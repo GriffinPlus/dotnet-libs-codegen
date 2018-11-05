@@ -36,7 +36,7 @@ configuration:
   - Release
 
 before_build:
-  - nuget restore
+  - msbuild /t:restore src\CodeGeneration.sln
 
 build:
   project: src\CodeGeneration.sln
