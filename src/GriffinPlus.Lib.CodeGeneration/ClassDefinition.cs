@@ -137,7 +137,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public void AddConstructorDefinition(ConstructorDefinition definition)
 		{
 			if (definition == null) throw new ArgumentNullException(nameof(definition));
-			if (mConstructors.Contains(definition))
+			if (mConstructors.Contains(definition, ConstructorDefinition.SignatureEquality))
 			{
 				throw new CodeGenException("A constructor with the same signature is already part of the definition.");
 			}

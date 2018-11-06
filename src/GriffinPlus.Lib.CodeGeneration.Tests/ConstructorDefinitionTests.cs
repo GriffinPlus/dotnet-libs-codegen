@@ -11,11 +11,13 @@
 // the specific language governing permissions and limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using GriffinPlus.Lib.CodeGeneration;
 using System;
+using System.Collections;
 using System.Linq;
 using Xunit;
 
-namespace GriffinPlus.Lib.CodeGeneration.Tests
+namespace UnitTests
 {
 	/// <summary>
 	/// Tests around the <see cref="ConstructorDefinition"/> class.
@@ -84,6 +86,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#region Equals / GetHashCode
 
+		/// <summary>
+		/// Checks two constructor definitions for equality and compares their hash codes using the objects own equality comparer.
+		/// </summary>
 		[Theory]
 		// fully equivalent constructor definitions
 		[InlineData(Visibility.Public,            new Type[] { typeof(object) },                 Visibility.Public,            new Type[] { typeof(object) },                 true)]
@@ -96,7 +101,55 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, true)]
 		[InlineData(Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, true)]
 		[InlineData(Visibility.Private,           new Type[] { typeof(object), typeof(string) }, Visibility.Private,           new Type[] { typeof(object), typeof(string) }, true)]
-		// different visibilities do NOT influence the equality check
+		// different visibilities
+		[InlineData(Visibility.Public,            new Type[] { typeof(object) },                 Visibility.Protected,         new Type[] { typeof(object) },                 false)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object) },                 Visibility.ProtectedInternal, new Type[] { typeof(object) },                 false)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object) },                 Visibility.Internal,          new Type[] { typeof(object) },                 false)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object) },                 Visibility.Private,           new Type[] { typeof(object) },                 false)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object) },                 Visibility.Public,            new Type[] { typeof(object) },                 false)]
+		[InlineData(Visibility.Public,            new Type[] { typeof(object), typeof(string) }, Visibility.Protected,         new Type[] { typeof(object), typeof(string) }, false)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object), typeof(string) }, Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, false)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, false)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, Visibility.Private,           new Type[] { typeof(object), typeof(string) }, false)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object), typeof(string) }, Visibility.Public,            new Type[] { typeof(object), typeof(string) }, false)]
+		// different parameters
+		[InlineData(Visibility.Public,            new Type[] { typeof(object) },                 Visibility.Public,            new Type[] { typeof(int) },                    false)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object) },                 Visibility.Protected,         new Type[] { typeof(int) },                    false)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object) },                 Visibility.ProtectedInternal, new Type[] { typeof(int) },                    false)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object) },                 Visibility.Internal,          new Type[] { typeof(int) },                    false)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object) },                 Visibility.Private,           new Type[] { typeof(int) },                    false)]
+		[InlineData(Visibility.Public,            new Type[] { typeof(object), typeof(string) }, Visibility.Public,            new Type[] { typeof(int), typeof(string) },    false)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object), typeof(string) }, Visibility.Protected,         new Type[] { typeof(int), typeof(string) },    false)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, Visibility.ProtectedInternal, new Type[] { typeof(int), typeof(string) },    false)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, Visibility.Internal,          new Type[] { typeof(int), typeof(string) },    false)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object), typeof(string) }, Visibility.Private,           new Type[] { typeof(int), typeof(string) },    false)]
+		public void EqualityAndHashCode_Default(Visibility visibility1, Type[] parameters1, Visibility visibility2, Type[] parameters2, bool equal)
+		{
+			ConstructorDefinition definition1 = new ConstructorDefinition(visibility1, parameters1, null);
+			ConstructorDefinition definition2 = new ConstructorDefinition(visibility2, parameters2, null);
+			Assert.Equal(equal, definition1.Equals(definition2)); // IEquatable<T>.Equals()
+			Assert.Equal(equal, definition2.Equals(definition1)); // IEquatable<T>.Equals()
+			Assert.Equal(equal, (definition1 as object).Equals(definition2)); // object.Equals()
+			Assert.Equal(equal, (definition2 as object).Equals(definition1)); // object.Equals()
+			Assert.Equal(equal, definition1.GetHashCode() == definition2.GetHashCode()); // different definitions CAN have the same hash code, but it is unlikely...
+		}
+
+		/// <summary>
+		/// Checks whether two constructor definitions for equality and compares their hash codes using the <see cref="ConstructorDefinition.SignatureEquality"/> comparer.
+		/// </summary>
+		[Theory]
+		// fully equivalent constructor definitions
+		[InlineData(Visibility.Public,            new Type[] { typeof(object) },                 Visibility.Public,            new Type[] { typeof(object) },                 true)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object) },                 Visibility.Protected,         new Type[] { typeof(object) },                 true)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object) },                 Visibility.ProtectedInternal, new Type[] { typeof(object) },                 true)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object) },                 Visibility.Internal,          new Type[] { typeof(object) },                 true)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object) },                 Visibility.Private,           new Type[] { typeof(object) },                 true)]
+		[InlineData(Visibility.Public,            new Type[] { typeof(object), typeof(string) }, Visibility.Public,            new Type[] { typeof(object), typeof(string) }, true)]
+		[InlineData(Visibility.Protected,         new Type[] { typeof(object), typeof(string) }, Visibility.Protected,         new Type[] { typeof(object), typeof(string) }, true)]
+		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, true)]
+		[InlineData(Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, true)]
+		[InlineData(Visibility.Private,           new Type[] { typeof(object), typeof(string) }, Visibility.Private,           new Type[] { typeof(object), typeof(string) }, true)]
+		// different visibilities
 		[InlineData(Visibility.Public,            new Type[] { typeof(object) },                 Visibility.Protected,         new Type[] { typeof(object) },                 true)]
 		[InlineData(Visibility.Protected,         new Type[] { typeof(object) },                 Visibility.ProtectedInternal, new Type[] { typeof(object) },                 true)]
 		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object) },                 Visibility.Internal,          new Type[] { typeof(object) },                 true)]
@@ -118,16 +171,18 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		[InlineData(Visibility.ProtectedInternal, new Type[] { typeof(object), typeof(string) }, Visibility.ProtectedInternal, new Type[] { typeof(int), typeof(string) },    false)]
 		[InlineData(Visibility.Internal,          new Type[] { typeof(object), typeof(string) }, Visibility.Internal,          new Type[] { typeof(int), typeof(string) },    false)]
 		[InlineData(Visibility.Private,           new Type[] { typeof(object), typeof(string) }, Visibility.Private,           new Type[] { typeof(int), typeof(string) },    false)]
-
-		public void EqualityAndHashCode(Visibility visibility1, Type[] parameters1, Visibility visibility2, Type[] parameters2, bool equal)
+		public void EqualityAndHashCode_UsingSignatureEqualityComparer(Visibility visibility1, Type[] parameters1, Visibility visibility2, Type[] parameters2, bool equal)
 		{
 			ConstructorDefinition definition1 = new ConstructorDefinition(visibility1, parameters1, null);
 			ConstructorDefinition definition2 = new ConstructorDefinition(visibility2, parameters2, null);
-			Assert.Equal(equal, definition1.Equals(definition2)); // IEquatable<T>.Equals()
-			Assert.Equal(equal, definition2.Equals(definition1)); // IEquatable<T>.Equals()
-			Assert.Equal(equal, (definition1 as object).Equals(definition2)); // object.Equals()
-			Assert.Equal(equal, (definition2 as object).Equals(definition1)); // object.Equals()
-			Assert.Equal(equal, definition1.GetHashCode() == definition2.GetHashCode()); // different definitions CAN have the same hash code, but it is unlikely...
+			var comparer = ConstructorDefinition.SignatureEquality as IEqualityComparer;
+			var icomparer = ConstructorDefinition.SignatureEquality as IEqualityComparer;
+			Assert.Equal(equal, comparer.Equals(definition1, definition2));
+			Assert.Equal(equal, comparer.Equals(definition2, definition1));
+			Assert.Equal(equal, icomparer.Equals(definition1, definition2));
+			Assert.Equal(equal, icomparer.Equals(definition2, definition1));
+			Assert.Equal(equal, comparer.GetHashCode(definition1) == comparer.GetHashCode(definition2)); // different definitions CAN have the same hash code, but it is unlikely...
+			Assert.Equal(equal, icomparer.GetHashCode(definition1) == icomparer.GetHashCode(definition2)); // different definitions CAN have the same hash code, but it is unlikely...
 		}
 
 		#endregion

@@ -47,6 +47,7 @@
     <Compile Include="CodeGenException.cs" />
     <Compile Include="CodeGenHelpers.cs" />
     <Compile Include="CodeGenModule.cs" />
+    <Compile Include="ConstructorDefinition+SignatureEqualityComparer.cs" />
     <Compile Include="ConstructorDefinition.cs" />
     <Compile Include="EventImplementations.cs" />
     <Compile Include="EventImplementation_Standard.cs" />

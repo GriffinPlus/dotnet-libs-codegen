@@ -29,9 +29,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// <summary>
 	/// Information about a constructor to create.
 	/// </summary>
-	public class ConstructorDefinition : IEquatable<ConstructorDefinition>
+	public partial class ConstructorDefinition : IEquatable<ConstructorDefinition>
 	{
 		private readonly static ConstructorDefinition sDefaultConstructor = new ConstructorDefinition(Visibility.Public, Type.EmptyTypes, null);
+		private readonly static SignatureEqualityComparer sSignatureEqualityComparer = new SignatureEqualityComparer();
 		private readonly Visibility mAccessModifier;
 		private readonly List<Type> mParameterTypes;
 		private readonly int mHashCode;
@@ -56,7 +57,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			
 			// calculate the hash code of the constructor definition
 			// => use the hash codes of the constructor parameter types as these types identify the constructor uniquely
-			mHashCode = 0;
+			mHashCode = mAccessModifier.GetHashCode();
 			foreach (var type in mParameterTypes)
 			{
 				mHashCode ^= type.GetHashCode();
@@ -71,6 +72,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public static ConstructorDefinition Default
 		{
 			get { return sDefaultConstructor; }
+		}
+
+		/// <summary>
+		/// Gets an equality comparer that compares the parameters of the constructor only.
+		/// It does not take the visibility or the implementation callback into account.
+		/// </summary>
+		public static EqualityComparer<ConstructorDefinition> SignatureEquality
+		{
+			get { return sSignatureEqualityComparer; }
 		}
 
 		/// <summary>
@@ -100,8 +110,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Checks whether the current object equals the specified one.
-		/// Two constructor definitions are equal, if both share the same parameter types.
-		/// The visibility of the constructor and the implementation callback is _not_ significant.
+		/// Two constructor definitions are equal, if both have the same visibility and share the same parameter types
+		/// The implementation callback is _not_ significant.
 		/// </summary>
 		/// <param name="other">Object to compare with.</param>
 		/// <returns>true, if the current object and the specified object are equal; otherwise false.</returns>
@@ -109,13 +119,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			// two constructors are equal, if their signature is the same
 			if (other == null) return false;
-			return mParameterTypes.SequenceEqual(other.mParameterTypes);
+			return mAccessModifier == other.mAccessModifier && mParameterTypes.SequenceEqual(other.mParameterTypes);
 		}
 
 		/// <summary>
 		/// Checks whether the current object equals the specified one
-		/// Two constructor definitions are equal, if both share the same parameter types.
-		/// The visibility of the constructor and the implementation callback is _not_ significant.
+		/// Two constructor definitions are equal, if both have the same visibility and share the same parameter types
+		/// The implementation callback is _not_ significant.
 		/// </summary>
 		/// <param name="obj">Object to compare with.</param>
 		/// <returns>true, if the current object and the specified object are equal; otherwise false.</returns>

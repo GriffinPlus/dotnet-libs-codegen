@@ -11,11 +11,12 @@
 // the specific language governing permissions and limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using GriffinPlus.Lib.CodeGeneration;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace GriffinPlus.Lib.CodeGeneration.Tests
+namespace UnitTests
 {
 	/// <summary>
 	/// Tests around the <see cref="ClassDefinition"/> class.
