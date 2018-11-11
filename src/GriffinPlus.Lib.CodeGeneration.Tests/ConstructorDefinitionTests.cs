@@ -14,7 +14,6 @@
 using GriffinPlus.Lib.CodeGeneration;
 using System;
 using System.Collections;
-using System.Linq;
 using Xunit;
 
 namespace UnitTests
