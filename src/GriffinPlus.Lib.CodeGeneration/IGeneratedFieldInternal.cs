@@ -11,39 +11,24 @@
 // the specific language governing permissions and limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Reflection;
+using System.Reflection.Emit;
 
 namespace GriffinPlus.Lib.CodeGeneration
 {
 	/// <summary>
-	/// Interface for inherited and generated fields.
+	/// Internal interface of a generated field.
 	/// </summary>
-	public interface IField : IMember
+	internal interface IGeneratedFieldInternal : IGeneratedField
 	{
 		/// <summary>
-		/// Gets the name of the field.
+		/// Adds the method to the type builder.
 		/// </summary>
-		string Name { get; }
+		void AddToTypeBuilder();
 
 		/// <summary>
-		/// Gets the type of the field.
+		/// Adds code to initialize the field with the specified default value (if any).
 		/// </summary>
-		Type Type { get; }
-
-		/// <summary>
-		/// Gets a value indicating whether the field is class variable (true) or a member variable (false).
-		/// </summary>
-		bool IsStatic { get; }
-
-		/// <summary>
-		/// Gets the access modifier of the field.
-		/// </summary>
-		Visibility Visibility { get; }
-
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.FieldInfo"/> associated with the field.
-		/// </summary>
-		FieldInfo FieldInfo { get; }
+		/// <param name="msil">IL Generator attached to a constructor.</param>
+		void ImplementFieldInitialization(ILGenerator msil);
 	}
 }

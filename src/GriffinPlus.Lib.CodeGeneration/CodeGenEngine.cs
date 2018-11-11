@@ -50,7 +50,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		private Phase mPhase = Phase.Idle;
 		private TypeBuilder mTypeBuilder;
 		private readonly List<InheritedField> mInheritedFields = new List<InheritedField>();
-		private readonly List<GeneratedField> mGeneratedFields = new List<GeneratedField>();
+		private readonly List<IGeneratedFieldInternal> mGeneratedFields = new List<IGeneratedFieldInternal>();
 		private readonly List<InheritedEvent> mInheritedEvents = new List<InheritedEvent>();
 		private readonly List<GeneratedEvent> mGeneratedEvents = new List<GeneratedEvent>();
 		private readonly List<InheritedProperty> mInheritedProperties = new List<InheritedProperty>();
@@ -58,6 +58,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		private readonly List<GeneratedDependencyProperty> mGeneratedDependencyProperties = new List<GeneratedDependencyProperty>();
 		private readonly List<InheritedMethod> mInheritedMethods = new List<InheritedMethod>();
 		private readonly List<GeneratedMethod> mGeneratedMethods = new List<GeneratedMethod>();
+		private readonly List<object> mExternalObjects = new List<object>();
 
 		#endregion
 
@@ -202,7 +203,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Gets the collection of generated fields.
 		/// </summary>
-		public IEnumerable<GeneratedField> GeneratedFields
+		public IEnumerable<IGeneratedField> GeneratedFields
 		{
 			get { return mGeneratedFields; }
 		}
@@ -263,6 +264,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 			get { return mGeneratedMethods; }
 		}
 
+		/// <summary>
+		/// Gets the collection of external objects that is added to the created type.
+		/// </summary>
+		internal List<object> ExternalObjects
+		{
+			get { return mExternalObjects; }
+		}
+
 		#endregion
 
 		#region Implementating a Class
@@ -290,7 +299,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				}
 
 				// freeze the declared members
-				foreach (GeneratedField field in mGeneratedFields) field.Freeze();
+				foreach (IGeneratedFieldInternal field in mGeneratedFields) field.Freeze();
 				foreach (GeneratedEvent evnt in mGeneratedEvents) evnt.Freeze();
 				foreach (GeneratedProperty property in mGeneratedProperties) property.Freeze();
 				foreach (GeneratedMethod method in mGeneratedMethods) method.Freeze();
@@ -340,7 +349,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				mTypeBuilder = typeBuilders.Peek();
 
 				// add fields, events, properties and methods to the type builder
-				foreach (GeneratedField field in mGeneratedFields) field.AddToTypeBuilder();
+				foreach (IGeneratedFieldInternal field in mGeneratedFields) field.AddToTypeBuilder();
 				foreach (GeneratedEvent evnt in mGeneratedEvents) evnt.AddToTypeBuilder();
 				foreach (GeneratedProperty property in mGeneratedProperties) property.AddToTypeBuilder();
 				foreach (GeneratedMethod method in mGeneratedMethods) method.AddToTypeBuilder();
@@ -394,7 +403,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			ILGenerator msil = constructorBuilder.GetILGenerator();
 
 			// add field initialization code
-			foreach (GeneratedField field in mGeneratedFields.Where(x => x.IsStatic))
+			foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => x.IsStatic))
 			{
 				field.ImplementFieldInitialization(msil);
 			}
@@ -494,7 +503,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				}
 
 				// add field initialization code
-				foreach (GeneratedField field in mGeneratedFields.Where(x => !x.IsStatic))
+				foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => !x.IsStatic))
 				{
 					field.ImplementFieldInitialization(msil);
 				}
@@ -546,7 +555,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public static Type CreateClass(ClassDefinition definition)
 		{
 			CodeGenEngine engine = new CodeGenEngine(definition);
-			return engine.GenerateClass();
+			Type generatedType = engine.GenerateClass();
+			CodeGenExternalStorage.Add(generatedType, engine.ExternalObjects.ToArray());
+			return generatedType;
 		}
 
 		#endregion
@@ -592,11 +603,19 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <remarks>
 		/// This method must be called in the 'declaration' phase only.
 		/// </remarks>
-		public GeneratedField AddField<T>(string name = null, Visibility visibility = Visibility.Private)
+		public IGeneratedField AddField<T>(string name = null, Visibility visibility = Visibility.Private)
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, false, typeof(T), name, visibility);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility>(
+				generatedFieldType,
+				this,
+				false,
+				name,
+				visibility);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -612,11 +631,52 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <remarks>
 		/// This method must be called in the 'declaration' phase only.
 		/// </remarks>
-		public GeneratedField AddField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
+		public IGeneratedField AddField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, false, typeof(T), name, visibility, defaultValue);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, T>(
+				generatedFieldType,
+				this,
+				false,
+				name,
+				visibility,
+				defaultValue);
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new member field to the type in creation (with factory callback).
+		/// </summary>
+		/// <typeparam name="T">Type of the field to add.</typeparam>
+		/// <param name="name">Name of the field to add (null to create a name dynamically to avoid name clashes with other modules).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="factory">Factory method that creates the object to assign to the field when the type is instanciated.</param>
+		/// <returns>The added field.</returns>
+		/// <remarks>
+		/// This method must be called in the 'declaration' phase only.
+		/// </remarks>
+		public IGeneratedField AddField<T>(string name, Visibility visibility, Func<T> factory)
+		{
+			if (factory == null) throw new ArgumentNullException(nameof(factory));
+			EnsurePhase(Phase.Declaring);
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			Type factoryType = typeof(Func<>).MakeGenericType(typeof(T));
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstanceDynamically(
+				generatedFieldType,
+				new[] { typeof(CodeGenEngine), typeof(bool), typeof(string), typeof(Visibility), factoryType },
+				this,
+				false,
+				name,
+				visibility,
+				factory);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -633,11 +693,20 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// This method must be called in the 'declaration' phase only.
 		/// The specified initializer method is executed in the 'implementation' phase, where all modules have declared their data.
 		/// </remarks>
-		public GeneratedField AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
+		public IGeneratedField AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, false, typeof(T), name, visibility, initializer);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, FieldInitializer>(
+				generatedFieldType,
+				this,
+				false,
+				name,
+				visibility,
+				initializer);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -652,11 +721,19 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <remarks>
 		/// This method must be called in the 'declaration' phase only.
 		/// </remarks>
-		public GeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private)
+		public IGeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private)
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, true, typeof(T), name, visibility);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility>(
+				generatedFieldType,
+				this,
+				true,
+				name,
+				visibility);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -672,11 +749,52 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <remarks>
 		/// This method must be called in the 'declaration' phase only.
 		/// </remarks>
-		public GeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
+		public IGeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, true, typeof(T), name, visibility, defaultValue);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, T>(
+				generatedFieldType,
+				this,
+				true,
+				name,
+				visibility,
+				defaultValue);
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new static field to the type in creation (with factory callback).
+		/// </summary>
+		/// <typeparam name="T">Type of the field to add.</typeparam>
+		/// <param name="name">Name of the field to add (null to create a name dynamically to avoid name clashes with other modules).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="factory">Factory method that creates the object to assign to the field when the type is initialized.</param>
+		/// <returns>The added field.</returns>
+		/// <remarks>
+		/// This method must be called in the 'declaration' phase only.
+		/// </remarks>
+		public IGeneratedField AddStaticField<T>(string name, Visibility visibility, Func<T> factory)
+		{
+			if (factory == null) throw new ArgumentNullException(nameof(factory));
+			EnsurePhase(Phase.Declaring);
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			Type factoryType = typeof(Func<>).MakeGenericType(typeof(T));
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstanceDynamically(
+				generatedFieldType,
+				new[] { typeof(CodeGenEngine), typeof(bool), typeof(string), typeof(Visibility), factoryType },
+				this,
+				true,
+				name,
+				visibility,
+				factory);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -693,11 +811,20 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// This method must be called in the 'declaration' phase only.
 		/// The specified initializer method is executed in the 'implementation' phase, where all modules have declared their data.
 		/// </remarks>
-		public GeneratedField AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
+		public IGeneratedField AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField field = new GeneratedField(this, true, typeof(T), name, visibility, initializer);
+
+			Type generatedFieldType = typeof(GeneratedField<T>);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, FieldInitializer>(
+				generatedFieldType,
+				this,
+				true,
+				name,
+				visibility,
+				initializer);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -715,12 +842,21 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// This method must be called in the 'declaration' phase only.
 		/// The specified initializer method is executed in the 'implementation' phase, where all modules have declared their data.
 		/// </remarks>
-		public GeneratedField AddField(Type type, string name = null, bool isStatic = false, Visibility visibility = Visibility.Private, FieldInitializer initializer = null)
+		public IGeneratedField AddField(Type type, string name = null, bool isStatic = false, Visibility visibility = Visibility.Private, FieldInitializer initializer = null)
 		{
 			EnsurePhase(Phase.Declaring);
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			if (type == null) throw new ArgumentNullException("type");
-			GeneratedField field = new GeneratedField(this, isStatic, type, name, visibility, initializer);
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			Type generatedFieldType = typeof(GeneratedField<>).MakeGenericType(type);
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, FieldInitializer>(
+				generatedFieldType,
+				this,
+				isStatic,
+				name,
+				visibility,
+				initializer);
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -736,7 +872,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <remarks>
 		/// This method must be called in the 'declaration' phase only.
 		/// </remarks>
-		public bool RemoveField(GeneratedField field)
+		public bool RemoveField(IGeneratedField field)
 		{
 			EnsurePhase(Phase.Declaring);
 			int index = mGeneratedFields.FindIndex(x => object.ReferenceEquals(field, x));
@@ -1188,7 +1324,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			if (identifier == null) return; // null means that a unique name is choosen => no conflict...
 
-			foreach (GeneratedField field in mGeneratedFields)
+			foreach (IGeneratedFieldInternal field in mGeneratedFields)
 			{
 				if (field.Name == identifier)
 				{

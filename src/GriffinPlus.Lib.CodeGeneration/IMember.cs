@@ -12,38 +12,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Reflection;
 
 namespace GriffinPlus.Lib.CodeGeneration
 {
 	/// <summary>
-	/// Interface for inherited and generated fields.
+	/// Interface of the base class for fields, events, properties and methods in the code generation engine.
 	/// </summary>
-	public interface IField : IMember
+	public interface IMember
 	{
 		/// <summary>
-		/// Gets the name of the field.
+		/// Gets a value indicating whether the member is frozen.
 		/// </summary>
-		string Name { get; }
+		bool IsFrozen
+		{
+			get;
+		}
 
 		/// <summary>
-		/// Gets the type of the field.
+		/// Freezes the member, so it cannot be modified lateron.
 		/// </summary>
-		Type Type { get; }
+		void Freeze();
 
-		/// <summary>
-		/// Gets a value indicating whether the field is class variable (true) or a member variable (false).
-		/// </summary>
-		bool IsStatic { get; }
-
-		/// <summary>
-		/// Gets the access modifier of the field.
-		/// </summary>
-		Visibility Visibility { get; }
-
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.FieldInfo"/> associated with the field.
-		/// </summary>
-		FieldInfo FieldInfo { get; }
 	}
 }

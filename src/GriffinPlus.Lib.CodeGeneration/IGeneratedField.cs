@@ -11,39 +11,34 @@
 // the specific language governing permissions and limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Reflection;
+using System.Reflection.Emit;
 
 namespace GriffinPlus.Lib.CodeGeneration
 {
 	/// <summary>
-	/// Interface for inherited and generated fields.
+	/// A generated field.
 	/// </summary>
-	public interface IField : IMember
+	public interface IGeneratedField : IField
 	{
-		/// <summary>
-		/// Gets the name of the field.
-		/// </summary>
-		string Name { get; }
+		#region Properties
 
 		/// <summary>
-		/// Gets the type of the field.
+		/// Gets a default value of the field (if any).
 		/// </summary>
-		Type Type { get; }
+		object DefaultValue
+		{
+			get;
+		}
 
 		/// <summary>
-		/// Gets a value indicating whether the field is class variable (true) or a member variable (false).
+		/// Gets the <see cref="System.Reflection.Emit.FieldBuilder"/> associated with the field.
 		/// </summary>
-		bool IsStatic { get; }
+		FieldBuilder FieldBuilder
+		{
+			get;
+		}
 
-		/// <summary>
-		/// Gets the access modifier of the field.
-		/// </summary>
-		Visibility Visibility { get; }
+		#endregion
 
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.FieldInfo"/> associated with the field.
-		/// </summary>
-		FieldInfo FieldInfo { get; }
 	}
 }

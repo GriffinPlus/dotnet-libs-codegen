@@ -34,7 +34,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// </remarks>
 	public class EventImplementation_Standard : IEventImplementation
 	{
-		private GeneratedField mBackingField;
+		private IGeneratedField mBackingField;
 
 		/// <summary>
 		/// Reviews the default declaration of the event and adds additional type declarations, if necessary.
@@ -65,7 +65,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="isAdd">true to create an 'add' method; false to create a 'remove' method.</param>
 		/// <param name="evnt">Event to implement.</param>
 		/// <param name="backingField">Multicast delegate field backing the event.</param>
-		private static void ImplementAccessor(bool isAdd, GeneratedEvent evnt, GeneratedField backingField)
+		private static void ImplementAccessor(bool isAdd, GeneratedEvent evnt, IGeneratedField backingField)
 		{
 			Type backingFieldType = backingField.FieldBuilder.FieldType;
 
@@ -137,7 +137,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="evnt">Event to implement.</param>
 		/// <param name="backingField">Multicast delegate field backing the event.</param>
-		private static void ImplementEventRaiser(GeneratedEvent evnt, GeneratedField backingField)
+		private static void ImplementEventRaiser(GeneratedEvent evnt, IGeneratedField backingField)
 		{
 			ILGenerator msil = evnt.Raiser.MethodBuilder.GetILGenerator();
 

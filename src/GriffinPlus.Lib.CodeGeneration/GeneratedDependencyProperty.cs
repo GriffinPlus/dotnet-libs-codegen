@@ -36,7 +36,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		private readonly string mName;
 		private readonly bool mIsReadOnly;
-		private readonly GeneratedField mDependencyPropertyField;
+		private readonly IGeneratedFieldInternal mDependencyPropertyField;
 		private readonly GeneratedProperty mAccessorProperty;
 		private readonly IPropertyImplementation mImplementation;
 
@@ -70,7 +70,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			// add the dependency property
 			if (mIsReadOnly)
 			{
-				mDependencyPropertyField = engine.AddStaticField<System.Windows.DependencyPropertyKey>(
+				mDependencyPropertyField = (IGeneratedFieldInternal)engine.AddStaticField<System.Windows.DependencyPropertyKey>(
 					name + "Property",
 					Visibility.Public,
 					(msil, field) =>
@@ -98,7 +98,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 			else
 			{
-				mDependencyPropertyField = engine.AddStaticField<System.Windows.DependencyProperty>(
+				mDependencyPropertyField = (IGeneratedFieldInternal)engine.AddStaticField<System.Windows.DependencyProperty>(
 					name + "Property",
 					Visibility.Public,
 					(msil, field) =>
@@ -184,7 +184,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Gets the static field storing the registered dependency property.
 		/// </summary>
-		public GeneratedField DependencyPropertyField
+		public IGeneratedField DependencyPropertyField
 		{
 			get { return mDependencyPropertyField; }
 		}

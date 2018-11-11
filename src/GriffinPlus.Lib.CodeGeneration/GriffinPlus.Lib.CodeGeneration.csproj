@@ -46,6 +46,7 @@
     <Compile Include="ClassDefinition.cs" />
     <Compile Include="CodeGenEngine.cs" />
     <Compile Include="CodeGenException.cs" />
+    <Compile Include="CodeGenExternalStorage.cs" />
     <Compile Include="CodeGenHelpers.cs" />
     <Compile Include="CodeGenModule.cs" />
     <Compile Include="ConstructorDefinition+SignatureEqualityComparer.cs" />
@@ -55,7 +56,10 @@
     <Compile Include="EventKind.cs" />
     <Compile Include="GeneratedDependencyProperty.cs" />
     <Compile Include="GeneratedEvent.cs" />
-    <Compile Include="GeneratedField.cs" />
+    <Compile Include="FieldInitializers.cs" />
+    <Compile Include="IGeneratedFieldInternal.cs" />
+    <Compile Include="IGeneratedField.cs" />
+    <Compile Include="GeneratedField{T}.cs" />
     <Compile Include="GeneratedMethod.cs" />
     <Compile Include="GeneratedProperty.cs" />
     <Compile Include="ICodeGenModule.cs" />
@@ -71,6 +75,7 @@
     <Compile Include="InheritedProperty.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="IPropertyImplementation.cs" />
+    <Compile Include="IMember.cs" />
     <Compile Include="Member.cs" />
     <Compile Include="MethodKind.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,6 +87,9 @@
     <Compile Include="Visibility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="GriffinPlus.Lib.FastActivator">
+      <Version>1.0.6</Version>
+    </PackageReference>
     <PackageReference Include="GriffinPlus.Lib.Logging">
       <Version>1.1.4</Version>
     </PackageReference>

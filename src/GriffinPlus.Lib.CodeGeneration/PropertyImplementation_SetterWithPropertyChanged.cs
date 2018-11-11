@@ -26,7 +26,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 	public class PropertyImplementation_SetterWithPropertyChanged : IPropertyImplementation
 	{
 		private static LogWriter sLog = Log.GetWriter(typeof(PropertyImplementation_SetterWithPropertyChanged));
-		private GeneratedField mBackingField;
+		private IGeneratedField mBackingField;
 
 		/// <summary>
 		/// Reviews the declaration of the property and adds additional type declarations, if necessary.

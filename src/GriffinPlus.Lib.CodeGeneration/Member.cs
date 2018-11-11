@@ -18,7 +18,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// <summary>
 	/// Base class for fields, events, properties and methods in the code generation engine.
 	/// </summary>
-	public class Member
+	public class Member : IMember
 	{
 		private readonly CodeGenEngine mEngine;
 		private bool mIsFrozen;
@@ -51,7 +51,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Freezes the member, so it cannot be modified lateron.
 		/// </summary>
-		protected internal virtual void Freeze()
+		public virtual void Freeze()
 		{
 			mIsFrozen = true;
 		}

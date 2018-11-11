@@ -20,7 +20,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// </summary>
 	public class PropertyImplementation_Simple : IPropertyImplementation
 	{
-		private GeneratedField mBackingField;
+		private IGeneratedField mBackingField;
 
 		/// <summary>
 		/// Reviews the declaration of the property and adds additional type declarations, if necessary.
