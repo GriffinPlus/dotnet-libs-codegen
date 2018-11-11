@@ -667,10 +667,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 			Type generatedFieldType = typeof(GeneratedField<T>);
-			Type factoryType = typeof(Func<>).MakeGenericType(typeof(T));
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstanceDynamically(
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, Func<T>>(
 				generatedFieldType,
-				new[] { typeof(CodeGenEngine), typeof(bool), typeof(string), typeof(Visibility), factoryType },
 				this,
 				false,
 				name,
@@ -785,10 +783,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 			Type generatedFieldType = typeof(GeneratedField<T>);
-			Type factoryType = typeof(Func<>).MakeGenericType(typeof(T));
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstanceDynamically(
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)FastActivator.CreateInstance<CodeGenEngine, bool, string, Visibility, Func<T>>(
 				generatedFieldType,
-				new[] { typeof(CodeGenEngine), typeof(bool), typeof(string), typeof(Visibility), factoryType },
 				this,
 				true,
 				name,
