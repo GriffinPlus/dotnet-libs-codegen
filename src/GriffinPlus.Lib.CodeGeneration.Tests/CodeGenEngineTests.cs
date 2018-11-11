@@ -13,7 +13,10 @@
 
 using GriffinPlus.Lib.CodeGeneration;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using Xunit;
 
 namespace UnitTests
@@ -39,348 +42,610 @@ namespace UnitTests
 			}
 		}
 
-		[Fact]
-		public void GenerateEmptyClass()
+		[Theory]
+		[InlineData("MyClass")] // specific class name
+		[InlineData(null)]      // random class name
+		public void GenerateEmptyClass(string className)
 		{
 			// create the type
-			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			ClassDefinition classDefinition = new ClassDefinition(className);
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(object), classType.BaseType);
-			Assert.Equal("MyClass", classType.Name);
+			if (className != null) Assert.Equal(className, classType.Name);
 
 			// instantiate the type
 			dynamic obj = Activator.CreateInstance(classType);
 			Assert.NotNull(obj);
 		}
 
-		[Fact]
-		public void GenerateEmptyClass_DerivedFromClassWithParameterlessConstructor()
+		[Theory]
+		[InlineData("MyClass", false)] // specific class name, do not create pass-through constructors
+		[InlineData(null,      false)] // random class name, do not create pass-through constructors
+		[InlineData("MyClass", true)]  // specific class name, create pass-through constructors
+		[InlineData(null,      true)]  // random class name, create pass-through constructors
+		public void GenerateEmptyClass_DerivedFromClassWithParameterlessConstructor(string className, bool createPassThroughConstructors)
 		{
 			// create the type
 			ClassDefinition classDefinition = new ClassDefinition(typeof(ClassWithParameterlessConstructor), false, "MyClass");
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(ClassWithParameterlessConstructor), classType.BaseType);
-			Assert.Equal("MyClass", classType.Name);
+			if (className != null) Assert.Equal(className, classType.Name);
 
 			// instantiate the type
 			dynamic obj = Activator.CreateInstance(classType);
 			Assert.NotNull(obj);
 		}
 
-		[Fact]
-		public void GenerateEmptyClass_DerivedFromClassWithoutParameterlessConstructor()
+		[Theory]
+		[InlineData("MyClass")] // specific class name
+		[InlineData(null)] // random class name
+		public void GenerateEmptyClass_DerivedFromClassWithoutParameterlessConstructor(string className)
 		{
 			Assert.Throws<CodeGenException>(() =>
 			{
 				// should throw an exception, because the base class does not have a parameterless constructor
-				ClassDefinition classDefinition = new ClassDefinition(typeof(ClassWithoutParameterlessConstructor), false, "MyClass");
+				ClassDefinition classDefinition = new ClassDefinition(typeof(ClassWithoutParameterlessConstructor), false, className);
 				CodeGenEngine.CreateClass(classDefinition);
 			});
 		}
 
 		#endregion
 
-		#region AddField: Primitive Fields
+		#region AddField
 
-		public class TestModule_AddPrimitiveFields_WithoutDefaultValue : CodeGenModule
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddField<T>(string name = null, Visibility visibility = Visibility.Private)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithoutDefaultValue))]
+		public void AddField_WithoutDefaultValue(Visibility visibility, Type fieldType, object defaultValue)
 		{
-			protected override void OnDeclare()
+			// generate the field name
+			string fieldName = "m" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
 			{
-				Engine.AddField<SByte>  ("mSByte",  Visibility.Public);
-				Engine.AddField<Byte>   ("mByte",   Visibility.Public);
-				Engine.AddField<Int16>  ("mInt16",  Visibility.Public);
-				Engine.AddField<UInt16> ("mUInt16", Visibility.Public);
-				Engine.AddField<Int32>  ("mInt32",  Visibility.Public);
-				Engine.AddField<UInt32> ("mUInt32", Visibility.Public);
-				Engine.AddField<Int64>  ("mInt64",  Visibility.Public);
-				Engine.AddField<UInt64> ("mUInt64", Visibility.Public);
-				Engine.AddField<Single> ("mSingle", Visibility.Public);
-				Engine.AddField<Double> ("mDouble", Visibility.Public);
-			}
-		}
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility) }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility });
+			};
 
-		[Fact]
-		public void AddPrimitiveFields_WithoutDefaultValue()
-		{
 			// create the type
 			ClassDefinition classDefinition = new ClassDefinition("MyClass");
-			classDefinition.AddModule(new TestModule_AddPrimitiveFields_WithoutDefaultValue());
+			classDefinition.AddModule(module);
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(object), classType.BaseType);
 			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
 
 			// instantiate the type
 			dynamic obj = Activator.CreateInstance(classType);
 			Assert.NotNull(obj);
 
-			// check whether fields have a value of the expected type
-			Assert.IsType<SByte>(obj.mSByte);
-			Assert.IsType<Byte>(obj.mByte);
-			Assert.IsType<Int16>(obj.mInt16);
-			Assert.IsType<UInt16>(obj.mUInt16);
-			Assert.IsType<Int32>(obj.mInt32);
-			Assert.IsType<UInt32>(obj.mUInt32);
-			Assert.IsType<Int64>(obj.mInt64);
-			Assert.IsType<UInt64>(obj.mUInt64);
-			Assert.IsType<Single>(obj.mSingle);
-			Assert.IsType<Double>(obj.mDouble);
-
-			// check whether fields have the expected default value
-			Assert.Equal(default(SByte),  obj.mSByte);
-			Assert.Equal(default(Byte),   obj.mByte);
-			Assert.Equal(default(Int16),  obj.mInt16);
-			Assert.Equal(default(UInt16), obj.mUInt16);
-			Assert.Equal(default(Int32),  obj.mInt32);
-			Assert.Equal(default(UInt32), obj.mUInt32);
-			Assert.Equal(default(Int64),  obj.mInt64);
-			Assert.Equal(default(UInt64), obj.mUInt64);
-			Assert.Equal(default(Single), obj.mSingle);
-			Assert.Equal(default(Double), obj.mDouble);
-		}
-
-		public class TestModule_AddPrimitiveFields_WithDefaultValue : CodeGenModule
-		{
-			protected override void OnDeclare()
+			// check whether fields have a value of the expected type and default type
+			var fieldValue = GetFieldValue(obj, fieldName);
+			Assert.Equal(defaultValue, fieldValue);
+			if (defaultValue != null) 
 			{
-				Engine.AddField<SByte>  ("mMin_SByte",   Visibility.Public, SByte.MinValue);
-				Engine.AddField<SByte>  ("mMax_SByte",   Visibility.Public, SByte.MaxValue);
-				Engine.AddField<Byte>   ("mMin_Byte",    Visibility.Public, Byte.MinValue);
-				Engine.AddField<Byte>   ("mMax_Byte",    Visibility.Public, Byte.MaxValue);
-				Engine.AddField<Int16>  ("mMin_Int16",   Visibility.Public, Int16.MinValue);
-				Engine.AddField<Int16>  ("mMax_Int16",   Visibility.Public, Int16.MaxValue);
-				Engine.AddField<UInt16> ("mMin_UInt16",  Visibility.Public, UInt16.MinValue);
-				Engine.AddField<UInt16> ("mMax_UInt16",  Visibility.Public, UInt16.MaxValue);
-				Engine.AddField<Int32>  ("mMin_Int32",   Visibility.Public, Int32.MinValue);
-				Engine.AddField<Int32>  ("mMax_Int32",   Visibility.Public, Int32.MaxValue);
-				Engine.AddField<UInt32> ("mMin_UInt32",  Visibility.Public, UInt32.MinValue);
-				Engine.AddField<UInt32> ("mMax_UInt32",  Visibility.Public, UInt32.MaxValue);
-				Engine.AddField<Int64>  ("mMin_Int64",   Visibility.Public, Int64.MinValue);
-				Engine.AddField<Int64>  ("mMax_Int64",   Visibility.Public, Int64.MaxValue);
-				Engine.AddField<UInt64> ("mMin_UInt64",  Visibility.Public, UInt64.MinValue);
-				Engine.AddField<UInt64> ("mMax_UInt64",  Visibility.Public, UInt64.MaxValue);
-				Engine.AddField<Single> ("mMin_Single",  Visibility.Public, Single.MinValue);
-				Engine.AddField<Single> ("mMax_Single",  Visibility.Public, Single.MaxValue);
-				Engine.AddField<Double> ("mMin_Double",  Visibility.Public, Double.MinValue);
-				Engine.AddField<Double> ("mMax_Double",  Visibility.Public, Double.MaxValue);
+				// the type of the field must match the type of the default value
+				Assert.IsType(defaultValue.GetType(), fieldValue);
+
+				// if the field type is a reference type, the value must actually be the same...
+				if (!fieldType.IsValueType) Assert.Same(defaultValue, fieldValue);
 			}
 		}
 
-		[Fact]
-		public void AddPrimitiveFields_WithDefaultValue()
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithDefaultValue))]
+		public void AddField_WithDefaultValue(Visibility visibility, Type fieldType, object defaultValue)
 		{
-			// create the class
+			// generate the field name
+			string fieldName = "m" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), x.GetGenericArguments()[0] }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility, defaultValue });
+			};
+
+			// create the type
 			ClassDefinition classDefinition = new ClassDefinition("MyClass");
-			classDefinition.AddModule(new TestModule_AddPrimitiveFields_WithDefaultValue());
+			classDefinition.AddModule(module);
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(object), classType.BaseType);
 			Assert.Equal("MyClass", classType.Name);
 
-			// instantiate the class
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
 			dynamic obj = Activator.CreateInstance(classType);
 			Assert.NotNull(obj);
 
-			// check whether fields with default values contain a value of the expected type
-			Assert.IsType<SByte>(obj.mMin_SByte);
-			Assert.IsType<SByte>(obj.mMax_SByte);
-			Assert.IsType<Byte>(obj.mMin_Byte);
-			Assert.IsType<Byte>(obj.mMax_Byte);
-			Assert.IsType<Int16>(obj.mMin_Int16);
-			Assert.IsType<Int16>(obj.mMax_Int16);
-			Assert.IsType<UInt16>(obj.mMin_UInt16);
-			Assert.IsType<UInt16>(obj.mMax_UInt16);
-			Assert.IsType<Int32>(obj.mMin_Int32);
-			Assert.IsType<Int32>(obj.mMax_Int32);
-			Assert.IsType<UInt32>(obj.mMin_UInt32);
-			Assert.IsType<UInt32>(obj.mMax_UInt32);
-			Assert.IsType<Int64>(obj.mMin_Int64);
-			Assert.IsType<Int64>(obj.mMax_Int64);
-			Assert.IsType<UInt64>(obj.mMin_UInt64);
-			Assert.IsType<UInt64>(obj.mMax_UInt64);
-			Assert.IsType<Single>(obj.mMin_Single);
-			Assert.IsType<Single>(obj.mMax_Single);
-			Assert.IsType<Double>(obj.mMin_Double);
-			Assert.IsType<Double>(obj.mMax_Double);
+			// check whether fields have a value of the expected type and default type
+			var fieldValue = GetFieldValue(obj, fieldName);
+			Assert.Equal(defaultValue, fieldValue);
+			if (defaultValue != null) 
+			{
+				// the type of the field must match the type of the default value
+				Assert.IsType(defaultValue.GetType(), fieldValue);
 
-			// check whether fields with default values contain the expected value
-			Assert.Equal(SByte.MinValue,  obj.mMin_SByte);
-			Assert.Equal(SByte.MaxValue,  obj.mMax_SByte);
-			Assert.Equal(Byte.MinValue,   obj.mMin_Byte);
-			Assert.Equal(Byte.MaxValue,   obj.mMax_Byte);
-			Assert.Equal(Int16.MinValue,  obj.mMin_Int16);
-			Assert.Equal(Int16.MaxValue,  obj.mMax_Int16);
-			Assert.Equal(UInt16.MinValue, obj.mMin_UInt16);
-			Assert.Equal(UInt16.MaxValue, obj.mMax_UInt16);
-			Assert.Equal(Int32.MinValue,  obj.mMin_Int32);
-			Assert.Equal(Int32.MaxValue,  obj.mMax_Int32);
-			Assert.Equal(UInt32.MinValue, obj.mMin_UInt32);
-			Assert.Equal(UInt32.MaxValue, obj.mMax_UInt32);
-			Assert.Equal(Int64.MinValue,  obj.mMin_Int64);
-			Assert.Equal(Int64.MaxValue,  obj.mMax_Int64);
-			Assert.Equal(UInt64.MinValue, obj.mMin_UInt64);
-			Assert.Equal(UInt64.MaxValue, obj.mMax_UInt64);
-			Assert.Equal(Single.MinValue, obj.mMin_Single);
-			Assert.Equal(Single.MaxValue, obj.mMax_Single);
-			Assert.Equal(Double.MinValue, obj.mMin_Double);
-			Assert.Equal(Double.MaxValue, obj.mMax_Double);
+				// if the field type is a reference type, the value must actually be the same...
+				if (!fieldType.IsValueType) Assert.Same(defaultValue, fieldValue);
+			}
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddField&lt;T&gt;(string name = null, Visibility visibility = Visibility.Private, Func&lt;T&gt; factory)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[InlineData(Visibility.Public)]
+		[InlineData(Visibility.Protected)]
+		[InlineData(Visibility.ProtectedInternal)]
+		[InlineData(Visibility.Internal)]
+		[InlineData(Visibility.Private)]
+		public void AddField_WithFactoryMethod_Struct(Visibility visibility)
+		{
+			// generate the field name
+			string fieldName = "mField";
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				m.Engine.AddField<DemoStruct>(fieldName, visibility, () => new DemoStruct() { MyInt32 = 42, MyString = "Lorem Ipsum" });
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			Assert.NotNull(field);
+			Assert.Equal(typeof(DemoStruct), field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			object obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether the field has the expected value
+			var fieldValue = GetFieldValue(obj, fieldName);
+			Assert.NotNull(fieldValue);
+			Assert.IsType<DemoStruct>(fieldValue);
+			Assert.Equal(42, ((DemoStruct)fieldValue).MyInt32);
+			Assert.Equal("Lorem Ipsum", ((DemoStruct)fieldValue).MyString);
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddField&lt;T&gt;(string name = null, Visibility visibility = Visibility.Private, Func&lt;T&gt; factory)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[InlineData(Visibility.Public)]
+		[InlineData(Visibility.Protected)]
+		[InlineData(Visibility.ProtectedInternal)]
+		[InlineData(Visibility.Internal)]
+		[InlineData(Visibility.Private)]
+		public void AddField_WithFactoryMethod_Class(Visibility visibility)
+		{
+			// generate the field name
+			string fieldName = "mField";
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				m.Engine.AddField<DemoClass>(fieldName, visibility, () => new DemoClass() { MyInt32 = 42, MyString = "Lorem Ipsum" } );
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			Assert.NotNull(field);
+			Assert.Equal(typeof(DemoClass), field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			object obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether the field has the expected value
+			var fieldValue = GetFieldValue(obj, fieldName);
+			Assert.NotNull(fieldValue);
+			Assert.IsType<DemoClass>(fieldValue);
+			Assert.Equal(42, ((DemoClass)fieldValue).MyInt32);
+			Assert.Equal("Lorem Ipsum", ((DemoClass)fieldValue).MyString);
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="expectedValue">Expected value the field should have after creating the object dynamically.</param>
+		/// <param name="initializer">Delegate that emits code to initialize the field.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithInitializer))]
+		public void AddField_WithInitializer(Visibility visibility, Type fieldType, object expectedValue, FieldInitializer initializer)
+		{
+			// generate the field name
+			string fieldName = "m" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility, initializer });
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			dynamic obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether fields have a value of the expected type and default type
+			var fieldValue = GetFieldValue(obj, fieldName);
+			Assert.Equal(expectedValue, fieldValue);
+		}
+
+		private static object GetFieldValue(object obj, string name)
+		{
+			FieldInfo field = obj.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			object value = field.GetValue(obj);
+			return value;
 		}
 
 		#endregion
 
-		#region AddStaticField: Primitive Fields
+		#region AddStaticField
 
-		public class TestModule_AddStaticPrimitiveFields_WithoutDefaultValue : CodeGenModule
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithoutDefaultValue))]
+		public void AddStaticField_WithoutDefaultValue(Visibility visibility, Type fieldType, object defaultValue)
 		{
-			protected override void OnDeclare()
+			// generate the field name
+			string fieldName = "s" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
 			{
-				Engine.AddStaticField<SByte>  ("sSByte",  Visibility.Public);
-				Engine.AddStaticField<Byte>   ("sByte",   Visibility.Public);
-				Engine.AddStaticField<Int16>  ("sInt16",  Visibility.Public);
-				Engine.AddStaticField<UInt16> ("sUInt16", Visibility.Public);
-				Engine.AddStaticField<Int32>  ("sInt32",  Visibility.Public);
-				Engine.AddStaticField<UInt32> ("sUInt32", Visibility.Public);
-				Engine.AddStaticField<Int64>  ("sInt64",  Visibility.Public);
-				Engine.AddStaticField<UInt64> ("sUInt64", Visibility.Public);
-				Engine.AddStaticField<Single> ("sSingle", Visibility.Public);
-				Engine.AddStaticField<Double> ("sDouble", Visibility.Public);
-			}
-		}
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddStaticField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility) }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility });
+			};
 
-		private static object GetStaticFieldValue(Type type, string name)
-		{
-			FieldInfo field = type.GetField(name, BindingFlags.Public | BindingFlags.Static);
-			object obj = field.GetValue(null);
-			return obj;
-		}
-
-		[Fact]
-		public void AddStaticPrimitiveFields_WithoutDefaultValue()
-		{
 			// create the type
 			ClassDefinition classDefinition = new ClassDefinition("MyClass");
-			classDefinition.AddModule(new TestModule_AddStaticPrimitiveFields_WithoutDefaultValue());
+			classDefinition.AddModule(module);
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(object), classType.BaseType);
 			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			// (not really needed to access the static field, but nice to know whether the type can be instantiated)
+			dynamic obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether field has the expected value
+			var fieldValue = GetStaticFieldValue(classType, fieldName);
+			Assert.Equal(defaultValue, fieldValue);
+			if (defaultValue != null) 
+			{
+				Assert.IsType(defaultValue.GetType(), fieldValue); // the type of the field must match the type of the default value
+				if (!fieldType.IsValueType) Assert.Same(defaultValue, fieldValue); // if the field type is a reference type, the value must actually be the same...
+			}
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField AddStaticField<T>(string name = null, Visibility visibility = Visibility.Private, T defaultValue = default(T))
+		/// (works for primitive types only, more complex types require an initializer)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithDefaultValue))]
+		public void AddStaticField_WithDefaultValue(Visibility visibility, Type fieldType, object defaultValue)
+		{
+			// generate the field name
+			string fieldName = "s" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddStaticField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), x.GetGenericArguments()[0] }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility, defaultValue });
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the class
+			// (not really needed to access the static field, but nice to know whether the type can be instantiated)
+			dynamic obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether field has the expected value
+			var fieldValue = GetStaticFieldValue(classType, fieldName);
+			Assert.Equal(defaultValue, fieldValue);
+			if (defaultValue != null) 
+			{
+				Assert.IsType(defaultValue.GetType(), fieldValue); // the type of the field must match the type of the default value
+				if (!fieldType.IsValueType) Assert.Same(defaultValue, fieldValue); // if the field type is a reference type, the value must actually be the same...
+			}
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddStaticField&lt;T&gt;(string name = null, Visibility visibility = Visibility.Private, Func&lt;T&gt; factory)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[InlineData(Visibility.Public)]
+		[InlineData(Visibility.Protected)]
+		[InlineData(Visibility.ProtectedInternal)]
+		[InlineData(Visibility.Internal)]
+		[InlineData(Visibility.Private)]
+		public void AddStaticField_WithFactoryMethod_Struct(Visibility visibility)
+		{
+			// generate the field name
+			string fieldName = "sField";
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				m.Engine.AddStaticField<DemoStruct>(fieldName, visibility, () => new DemoStruct() { MyInt32 = 42, MyString = "Lorem Ipsum" });
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.NotNull(field);
+			Assert.Equal(typeof(DemoStruct), field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			object obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether the field has the expected value
+			var fieldValue = GetStaticFieldValue(classType, fieldName);
+			Assert.NotNull(fieldValue);
+			Assert.IsType<DemoStruct>(fieldValue);
+			Assert.Equal(42, ((DemoStruct)fieldValue).MyInt32);
+			Assert.Equal("Lorem Ipsum", ((DemoStruct)fieldValue).MyString);
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddStaticField&lt;T&gt;(string name = null, Visibility visibility = Visibility.Private, Func&lt;T&gt; factory)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="defaultValue">Expected value the field should have after creating the object dynamically.</param>
+		[Theory]
+		[InlineData(Visibility.Public)]
+		[InlineData(Visibility.Protected)]
+		[InlineData(Visibility.ProtectedInternal)]
+		[InlineData(Visibility.Internal)]
+		[InlineData(Visibility.Private)]
+		public void AddStaticField_WithFactoryMethod_Class(Visibility visibility)
+		{
+			// generate the field name
+			string fieldName = "sField";
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				m.Engine.AddStaticField<DemoClass>(fieldName, visibility, () => new DemoClass() { MyInt32 = 42, MyString = "Lorem Ipsum" } );
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.NotNull(field);
+			Assert.Equal(typeof(DemoClass), field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
+
+			// instantiate the type
+			object obj = Activator.CreateInstance(classType);
+			Assert.NotNull(obj);
+
+			// check whether the field has the expected value
+			var fieldValue = GetStaticFieldValue(classType, fieldName);
+			Assert.NotNull(fieldValue);
+			Assert.IsType<DemoClass>(fieldValue);
+			Assert.Equal(42, ((DemoClass)fieldValue).MyInt32);
+			Assert.Equal("Lorem Ipsum", ((DemoClass)fieldValue).MyString);
+		}
+
+		/// <summary>
+		/// Tests the following method:
+		/// public GeneratedField CodeGenEngine.AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
+		/// </summary>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="expectedValue">Expected value the field should have after creating the object dynamically.</param>
+		/// <param name="initializer">Delegate that emits code to initialize the field.</param>
+		[Theory]
+		[MemberData(nameof(TestDataGenerator_AddField_WithInitializer))]
+		public void AddStaticField_WithInitializer(Visibility visibility, Type fieldType, object expectedValue, FieldInitializer initializer)
+		{
+			// generate the field name
+			string fieldName = "s" + fieldType.Name;
+
+			// setup code generation module
+			CallbackCodeGenModule module = new CallbackCodeGenModule();
+			module.Declare = (m) =>
+			{
+				MethodInfo genericMethod = typeof(CodeGenEngine)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(x => x.Name == "AddStaticField" && x.IsGenericMethodDefinition && x.GetGenericArguments().Length == 1)
+					.Where(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }))
+					.Single();
+				MethodInfo method = genericMethod.MakeGenericMethod(fieldType);
+				method.Invoke(m.Engine, new object[] { fieldName, visibility, initializer });
+			};
+
+			// create the type
+			ClassDefinition classDefinition = new ClassDefinition("MyClass");
+			classDefinition.AddModule(module);
+			Type classType = CodeGenEngine.CreateClass(classDefinition);
+			Assert.NotNull(classType);
+			Assert.Equal(typeof(object), classType.BaseType);
+			Assert.Equal("MyClass", classType.Name);
+
+			// check whether the field was generated correctly
+			var field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.NotNull(field);
+			Assert.Equal(fieldType, field.FieldType);
+			Assert.Equal(visibility, field.ToVisibility());
 
 			// instantiate the type
 			dynamic obj = Activator.CreateInstance(classType);
 			Assert.NotNull(obj);
 
-			// check whether fields have a value of the expected type
-			Assert.IsType<SByte>(GetStaticFieldValue(classType, "sSByte"));
-			Assert.IsType<Byte>(GetStaticFieldValue(classType, "sByte"));
-			Assert.IsType<Int16>(GetStaticFieldValue(classType, "sInt16"));
-			Assert.IsType<UInt16>(GetStaticFieldValue(classType, "sUInt16"));
-			Assert.IsType<Int32>(GetStaticFieldValue(classType, "sInt32"));
-			Assert.IsType<UInt32>(GetStaticFieldValue(classType, "sUInt32"));
-			Assert.IsType<Int64>(GetStaticFieldValue(classType, "sInt64"));
-			Assert.IsType<UInt64>(GetStaticFieldValue(classType, "sUInt64"));
-			Assert.IsType<Single>(GetStaticFieldValue(classType, "sSingle"));
-			Assert.IsType<Double>(GetStaticFieldValue(classType, "sDouble"));
-
-			// check whether fields have the expected default value
-			Assert.Equal(default(SByte),  GetStaticFieldValue(classType, "sSByte"));
-			Assert.Equal(default(Byte),   GetStaticFieldValue(classType, "sByte"));
-			Assert.Equal(default(Int16),  GetStaticFieldValue(classType, "sInt16")); 
-			Assert.Equal(default(UInt16), GetStaticFieldValue(classType, "sUInt16"));
-			Assert.Equal(default(Int32),  GetStaticFieldValue(classType, "sInt32"));
-			Assert.Equal(default(UInt32), GetStaticFieldValue(classType, "sUInt32"));
-			Assert.Equal(default(Int64),  GetStaticFieldValue(classType, "sInt64"));
-			Assert.Equal(default(UInt64), GetStaticFieldValue(classType, "sUInt64"));
-			Assert.Equal(default(Single), GetStaticFieldValue(classType, "sSingle"));
-			Assert.Equal(default(Double), GetStaticFieldValue(classType, "sDouble"));
+			// check whether fields have a value of the expected type and default type
+			var fieldValue = GetStaticFieldValue(classType, fieldName);
+			Assert.Equal(expectedValue, fieldValue);
 		}
 
-		public class TestModule_AddStaticPrimitiveFields_WithDefaultValue : CodeGenModule
+		private static object GetStaticFieldValue(Type type, string name)
 		{
-			protected override void OnDeclare()
-			{
-				Engine.AddStaticField<SByte>  ("sMin_SByte",   Visibility.Public, SByte.MinValue);
-				Engine.AddStaticField<SByte>  ("sMax_SByte",   Visibility.Public, SByte.MaxValue);
-				Engine.AddStaticField<Byte>   ("sMin_Byte",    Visibility.Public, Byte.MinValue);
-				Engine.AddStaticField<Byte>   ("sMax_Byte",    Visibility.Public, Byte.MaxValue);
-				Engine.AddStaticField<Int16>  ("sMin_Int16",   Visibility.Public, Int16.MinValue);
-				Engine.AddStaticField<Int16>  ("sMax_Int16",   Visibility.Public, Int16.MaxValue);
-				Engine.AddStaticField<UInt16> ("sMin_UInt16",  Visibility.Public, UInt16.MinValue);
-				Engine.AddStaticField<UInt16> ("sMax_UInt16",  Visibility.Public, UInt16.MaxValue);
-				Engine.AddStaticField<Int32>  ("sMin_Int32",   Visibility.Public, Int32.MinValue);
-				Engine.AddStaticField<Int32>  ("sMax_Int32",   Visibility.Public, Int32.MaxValue);
-				Engine.AddStaticField<UInt32> ("sMin_UInt32",  Visibility.Public, UInt32.MinValue);
-				Engine.AddStaticField<UInt32> ("sMax_UInt32",  Visibility.Public, UInt32.MaxValue);
-				Engine.AddStaticField<Int64>  ("sMin_Int64",   Visibility.Public, Int64.MinValue);
-				Engine.AddStaticField<Int64>  ("sMax_Int64",   Visibility.Public, Int64.MaxValue);
-				Engine.AddStaticField<UInt64> ("sMin_UInt64",  Visibility.Public, UInt64.MinValue);
-				Engine.AddStaticField<UInt64> ("sMax_UInt64",  Visibility.Public, UInt64.MaxValue);
-				Engine.AddStaticField<Single> ("sMin_Single",  Visibility.Public, Single.MinValue);
-				Engine.AddStaticField<Single> ("sMax_Single",  Visibility.Public, Single.MaxValue);
-				Engine.AddStaticField<Double> ("sMin_Double",  Visibility.Public, Double.MinValue);
-				Engine.AddStaticField<Double> ("sMax_Double",  Visibility.Public, Double.MaxValue);
-			}
-		}
-
-		[Fact]
-		public void AddStaticPrimitiveFields_WithDefaultValue()
-		{
-			// create the class
-			ClassDefinition classDefinition = new ClassDefinition("MyClass");
-			classDefinition.AddModule(new TestModule_AddStaticPrimitiveFields_WithDefaultValue());
-			Type classType = CodeGenEngine.CreateClass(classDefinition);
-			Assert.NotNull(classType);
-			Assert.Equal(typeof(object), classType.BaseType);
-			Assert.Equal("MyClass", classType.Name);
-
-			// instantiate the class
-			dynamic obj = Activator.CreateInstance(classType);
-			Assert.NotNull(obj);
-
-			// check whether fields with default values contain a value of the expected type
-			Assert.IsType<SByte>(GetStaticFieldValue(classType, "sMin_SByte"));
-			Assert.IsType<SByte>(GetStaticFieldValue(classType, "sMax_SByte"));
-			Assert.IsType<Byte>(GetStaticFieldValue(classType, "sMin_Byte"));
-			Assert.IsType<Byte>(GetStaticFieldValue(classType, "sMax_Byte"));
-			Assert.IsType<Int16>(GetStaticFieldValue(classType, "sMin_Int16"));
-			Assert.IsType<Int16>(GetStaticFieldValue(classType, "sMax_Int16"));
-			Assert.IsType<UInt16>(GetStaticFieldValue(classType, "sMin_UInt16"));
-			Assert.IsType<UInt16>(GetStaticFieldValue(classType, "sMax_UInt16"));
-			Assert.IsType<Int32>(GetStaticFieldValue(classType, "sMin_Int32"));
-			Assert.IsType<Int32>(GetStaticFieldValue(classType, "sMax_Int32"));
-			Assert.IsType<UInt32>(GetStaticFieldValue(classType, "sMin_UInt32"));
-			Assert.IsType<UInt32>(GetStaticFieldValue(classType, "sMax_UInt32"));
-			Assert.IsType<Int64>(GetStaticFieldValue(classType, "sMin_Int64"));
-			Assert.IsType<Int64>(GetStaticFieldValue(classType, "sMax_Int64"));
-			Assert.IsType<UInt64>(GetStaticFieldValue(classType, "sMin_UInt64"));
-			Assert.IsType<UInt64>(GetStaticFieldValue(classType, "sMax_UInt64"));
-			Assert.IsType<Single>(GetStaticFieldValue(classType, "sMin_Single"));
-			Assert.IsType<Single>(GetStaticFieldValue(classType, "sMax_Single"));
-			Assert.IsType<Double>(GetStaticFieldValue(classType, "sMin_Double"));
-			Assert.IsType<Double>(GetStaticFieldValue(classType, "sMax_Double"));
-
-			// check whether fields with default values contain the expected value
-			Assert.Equal(SByte.MinValue,  GetStaticFieldValue(classType, "sMin_SByte"));
-			Assert.Equal(SByte.MaxValue,  GetStaticFieldValue(classType, "sMax_SByte"));
-			Assert.Equal(Byte.MinValue,   GetStaticFieldValue(classType, "sMin_Byte"));
-			Assert.Equal(Byte.MaxValue,   GetStaticFieldValue(classType, "sMax_Byte"));
-			Assert.Equal(Int16.MinValue,  GetStaticFieldValue(classType, "sMin_Int16"));
-			Assert.Equal(Int16.MaxValue,  GetStaticFieldValue(classType, "sMax_Int16"));
-			Assert.Equal(UInt16.MinValue, GetStaticFieldValue(classType, "sMin_UInt16"));
-			Assert.Equal(UInt16.MaxValue, GetStaticFieldValue(classType, "sMax_UInt16"));
-			Assert.Equal(Int32.MinValue,  GetStaticFieldValue(classType, "sMin_Int32"));
-			Assert.Equal(Int32.MaxValue,  GetStaticFieldValue(classType, "sMax_Int32"));
-			Assert.Equal(UInt32.MinValue, GetStaticFieldValue(classType, "sMin_UInt32"));
-			Assert.Equal(UInt32.MaxValue, GetStaticFieldValue(classType, "sMax_UInt32"));
-			Assert.Equal(Int64.MinValue,  GetStaticFieldValue(classType, "sMin_Int64"));
-			Assert.Equal(Int64.MaxValue,  GetStaticFieldValue(classType, "sMax_Int64"));
-			Assert.Equal(UInt64.MinValue, GetStaticFieldValue(classType, "sMin_UInt64"));
-			Assert.Equal(UInt64.MaxValue, GetStaticFieldValue(classType, "sMax_UInt64"));
-			Assert.Equal(Single.MinValue, GetStaticFieldValue(classType, "sMin_Single"));
-			Assert.Equal(Single.MaxValue, GetStaticFieldValue(classType, "sMax_Single"));
-			Assert.Equal(Double.MinValue, GetStaticFieldValue(classType, "sMin_Double"));
-			Assert.Equal(Double.MaxValue, GetStaticFieldValue(classType, "sMax_Double"));
+			FieldInfo field = type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			object value = field.GetValue(null);
+			return value;
 		}
 
 		#endregion
@@ -600,6 +865,120 @@ namespace UnitTests
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(GetAbstractPropertiesClassC), classType.BaseType);
 			Assert.Equal("MyClass", classType.Name);
+		}
+
+		#endregion
+
+		#region Test Data
+
+		// The method works for all types.
+		// The default value of a field of type T should be default(T)
+		public static IEnumerable<object[]> TestDataGenerator_AddField_WithoutDefaultValue
+		{
+			get
+			{
+				foreach (Visibility visibility in TestData.Visibilities)
+				{
+					foreach (Type fieldType in TestData.BasicTypes)
+					{
+						var defaultValue = fieldType.IsValueType ? Activator.CreateInstance(fieldType) : null;
+						yield return new [] { visibility, fieldType, defaultValue };
+					}
+				}
+			}
+		}
+
+		// The method works for primitive types only.
+		// Other types require an initializer.
+		public static IEnumerable<object[]> TestDataGenerator_AddField_WithDefaultValue
+		{
+			get
+			{
+				foreach (Visibility visibility in TestData.Visibilities)
+				{
+					foreach (TestDataRecord data in TestData.MixedTestData.Where(x => x.Type.IsPrimitive))
+					{
+						yield return new [] { visibility, data.Type, data.Value };
+					}
+				}
+			}
+		}
+
+		public static IEnumerable<object[]> TestDataGenerator_AddField_WithInitializer
+		{
+			get
+			{
+				foreach (Visibility visibility in TestData.Visibilities)
+				{
+					// a string
+					var demoString = "Lorem Ipsum";
+					yield return new object[] {
+						visibility,
+						typeof(string),
+						demoString,
+						new FieldInitializer((msil, field) =>
+						{
+							msil.Emit(OpCodes.Ldstr, demoString);
+						})
+					};
+
+					// a custom struct
+					var demoStruct = new DemoStruct() { MyInt32 = 42, MyString = "Lorem Ipsum" };
+					yield return new object[] {
+						visibility,
+						typeof(DemoStruct),
+						demoStruct,
+						new FieldInitializer((msil, field) =>
+						{
+							// create new object
+							var local = msil.DeclareLocal(typeof(DemoStruct));
+							msil.Emit(OpCodes.Ldloca, local);
+							msil.Emit(OpCodes.Initobj, typeof(DemoStruct));
+
+							// set MyInt32
+							msil.Emit(OpCodes.Ldloca, local);
+							msil.Emit(OpCodes.Ldc_I4, demoStruct.MyInt32);
+							msil.Emit(OpCodes.Stfld, typeof(DemoStruct).GetField("MyInt32"));
+
+							// set MyString
+							msil.Emit(OpCodes.Ldloca, local);
+							msil.Emit(OpCodes.Ldstr, demoStruct.MyString);
+							msil.Emit(OpCodes.Stfld, typeof(DemoStruct).GetField("MyString"));
+
+							// push object onto the evaluation stack to let the code generation engine push it into the field
+							msil.Emit(OpCodes.Ldloc, local);
+						})
+					};
+
+					// a custom class
+					var demoClass = new DemoClass() { MyInt32 = 42, MyString = "Lorem Ipsum" };
+					yield return new object[] {
+						visibility,
+						typeof(DemoClass),
+						demoClass,
+						new FieldInitializer((msil, field) =>
+						{
+							// create new object
+							var local = msil.DeclareLocal(typeof(DemoClass));
+							msil.Emit(OpCodes.Newobj, typeof(DemoClass).GetConstructor(Type.EmptyTypes));
+							msil.Emit(OpCodes.Stloc, local);
+
+							// set MyInt32
+							msil.Emit(OpCodes.Ldloc, local);
+							msil.Emit(OpCodes.Ldc_I4, demoClass.MyInt32);
+							msil.Emit(OpCodes.Stfld, typeof(DemoClass).GetField("MyInt32"));
+
+							// set MyString
+							msil.Emit(OpCodes.Ldloc, local);
+							msil.Emit(OpCodes.Ldstr, demoClass.MyString);
+							msil.Emit(OpCodes.Stfld, typeof(DemoClass).GetField("MyString"));
+
+							// push object onto the evaluation stack to let the code generation engine push it into the field
+							msil.Emit(OpCodes.Ldloc, local);
+						})
+					};
+				}
+			}
 		}
 
 		#endregion
