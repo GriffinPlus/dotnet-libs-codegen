@@ -265,6 +265,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// emit code to call the factory callback when the type is constructed.
 				msil.Emit(OpCodes.Ldtoken, Engine.TypeBuilder);
+				msil.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new[] { typeof(RuntimeTypeHandle) }));
 				msil.Emit(OpCodes.Call, typeof(CodeGenExternalStorage).GetMethod("Get"));
 				msil.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				msil.Emit(OpCodes.Ldelem, typeof(Func<T>));
