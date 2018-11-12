@@ -24,5 +24,10 @@ namespace UnitTests
 			DemoClass other = (DemoClass)obj;
 			return other != null && MyInt32 == other.MyInt32 && MyString == other.MyString;
 		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }

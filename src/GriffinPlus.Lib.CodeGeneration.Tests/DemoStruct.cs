@@ -25,5 +25,10 @@ namespace UnitTests
 			return MyInt32 == other.MyInt32 && MyString == other.MyString;
 		}
 
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
 	}
 }

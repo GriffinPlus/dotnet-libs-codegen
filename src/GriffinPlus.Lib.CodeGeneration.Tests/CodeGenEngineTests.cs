@@ -67,7 +67,7 @@ namespace UnitTests
 		public void GenerateEmptyClass_DerivedFromClassWithParameterlessConstructor(string className, bool createPassThroughConstructors)
 		{
 			// create the type
-			ClassDefinition classDefinition = new ClassDefinition(typeof(ClassWithParameterlessConstructor), false, "MyClass");
+			ClassDefinition classDefinition = new ClassDefinition(typeof(ClassWithParameterlessConstructor), createPassThroughConstructors, "MyClass");
 			Type classType = CodeGenEngine.CreateClass(classDefinition);
 			Assert.NotNull(classType);
 			Assert.Equal(typeof(ClassWithParameterlessConstructor), classType.BaseType);
