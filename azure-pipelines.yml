@@ -166,7 +166,16 @@ stages:
         nobuild: true
         arguments: '--framework netcoreapp3.1 --verbosity normal'
     - task: DotNetCoreCLI@2
-      displayName: 'Test .NET 5.0'
+      displayName: 'Test .NET 5.0 (Windows)'
+      condition: eq(variables['agent.os'], 'Windows_NT')
+      inputs:
+        command: 'test'
+        projects: '**/*Tests/*.csproj'
+        nobuild: true
+        arguments: '--framework net5.0-windows7.0 --verbosity normal'
+    - task: DotNetCoreCLI@2
+      displayName: 'Test .NET 5.0 (Linux)'
+      condition: eq(variables['agent.os'], 'Linux')
       inputs:
         command: 'test'
         projects: '**/*Tests/*.csproj'
