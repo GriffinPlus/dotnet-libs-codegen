@@ -1,0 +1,12 @@
+﻿.\GriffinPlus.Lib.CodeGeneration.dll
+.\GriffinPlus.Lib.CodeGeneration.pdb
+.\GriffinPlus.Lib.CodeGeneration.Tests.dll
+.\GriffinPlus.Lib.CodeGeneration.Tests.pdb
+.\GriffinPlus.Lib.CodeGeneration.xml
+.\xunit.abstractions.dll
+.\xunit.assert.dll
+.\xunit.core.dll
+.\xunit.execution.desktop.dll
+.\xunit.runner.reporters.net452.dll
+.\xunit.runner.utility.net452.dll
+.\xunit.runner.visualstudio.testadapter.dll

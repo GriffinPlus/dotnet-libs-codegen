@@ -1,0 +1,16 @@
+﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-codegen)
+// The source code is licensed under the MIT license.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using System;
+
+namespace GriffinPlus.Lib.CodeGeneration.Tests
+{
+
+	/// <summary>
+	/// A dummy exception for testing purposes only.
+	/// </summary>
+	public class TestException : Exception { }
+
+}

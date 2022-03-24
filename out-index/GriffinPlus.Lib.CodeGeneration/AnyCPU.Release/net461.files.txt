@@ -1,0 +1,3 @@
+﻿.\GriffinPlus.Lib.CodeGeneration.dll
+.\GriffinPlus.Lib.CodeGeneration.pdb
+.\GriffinPlus.Lib.CodeGeneration.xml

@@ -54,7 +54,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-pipelines", "azure-pi
 		build.vs\azure-pipelines\ci-csharp-netstandard20-with-deployment-on-tag.yml = build.vs\azure-pipelines\ci-csharp-netstandard20-with-deployment-on-tag.yml
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GriffinPlus.Lib.CodeGeneration", "src\GriffinPlus.Lib.CodeGeneration\GriffinPlus.Lib.CodeGeneration.csproj", "{55AAA4D6-B606-42DF-9A8C-7E3E55079DA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GriffinPlus.Lib.CodeGeneration.Tests", "src\GriffinPlus.Lib.CodeGeneration.Tests\GriffinPlus.Lib.CodeGeneration.Tests.csproj", "{D437D4C8-419C-4056-A276-3E6A08960A98}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55AAA4D6-B606-42DF-9A8C-7E3E55079DA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AAA4D6-B606-42DF-9A8C-7E3E55079DA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55AAA4D6-B606-42DF-9A8C-7E3E55079DA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55AAA4D6-B606-42DF-9A8C-7E3E55079DA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D437D4C8-419C-4056-A276-3E6A08960A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D437D4C8-419C-4056-A276-3E6A08960A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D437D4C8-419C-4056-A276-3E6A08960A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D437D4C8-419C-4056-A276-3E6A08960A98}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

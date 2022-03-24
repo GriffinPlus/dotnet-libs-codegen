@@ -1,0 +1,11 @@
+﻿.\GriffinPlus.Lib.CodeGeneration.dll
+.\GriffinPlus.Lib.CodeGeneration.pdb
+.\GriffinPlus.Lib.CodeGeneration.Tests.deps.json
+.\GriffinPlus.Lib.CodeGeneration.Tests.dll
+.\GriffinPlus.Lib.CodeGeneration.Tests.pdb
+.\GriffinPlus.Lib.CodeGeneration.Tests.runtimeconfig.dev.json
+.\GriffinPlus.Lib.CodeGeneration.Tests.runtimeconfig.json
+.\GriffinPlus.Lib.CodeGeneration.xml
+.\xunit.runner.reporters.netcoreapp10.dll
+.\xunit.runner.utility.netcoreapp10.dll
+.\xunit.runner.visualstudio.dotnetcore.testadapter.dll
