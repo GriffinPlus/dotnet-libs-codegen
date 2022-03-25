@@ -22,7 +22,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Gets the type of the field.
 		/// </summary>
-		Type Type { get; }
+		Type FieldType { get; }
 
 		/// <summary>
 		/// Gets a value indicating whether the field is class variable (<c>true</c>) or an instance variable (<c>false</c>).

@@ -36,7 +36,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Gets the type of the field.
 		/// </summary>
-		public Type Type => FieldInfo.FieldType;
+		public Type FieldType => FieldInfo.FieldType;
 
 		/// <summary>
 		/// Gets a value indicating whether the field is class variable (<c>true</c>) or a member variable (<c>false</c>).
