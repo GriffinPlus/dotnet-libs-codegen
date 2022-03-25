@@ -1719,12 +1719,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		#region Helpers
 
 		/// <summary>
-		/// Gets inherited properties that have not been implemented/overridden, yet.
+		/// Gets inherited abstract properties that have not been implemented/overridden, yet.
 		/// </summary>
-		/// <returns>Properties that still need to be overridden to allow the type to be created.</returns>
-		public IProperty[] GetAbstractProperties()
+		/// <returns>Inherited abstract properties that still need to be overridden to allow the type to be created.</returns>
+		public IInheritedProperty[] GetAbstractPropertiesWithoutOverride()
 		{
-			List<IProperty> abstractProperties = new List<IProperty>();
+			List<IInheritedProperty> abstractProperties = new List<IInheritedProperty>();
 			foreach (var property in InheritedProperties.Where(x => x.Kind == PropertyKind.Abstract))
 			{
 				var overrider = mGeneratedProperties.Find(x => x.Kind == PropertyKind.Override && x.Name == property.Name);
