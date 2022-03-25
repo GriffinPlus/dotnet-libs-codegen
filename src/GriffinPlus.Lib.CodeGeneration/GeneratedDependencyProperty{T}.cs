@@ -269,7 +269,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="field">Field backing the dependency property.</param>
 		/// <param name="msilGenerator">MSIL generator to use.</param>
-		private void ImplementReadWrite(IGeneratedField<DependencyProperty> field, ILGenerator msilGenerator)
+		private void ImplementReadWrite(IGeneratedField field, ILGenerator msilGenerator)
 		{
 			// push parameters for DependencyProperty.Register() onto the evaluation stack
 			msilGenerator.Emit(OpCodes.Ldstr, Name);
@@ -345,7 +345,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="field">Field backing the dependency property.</param>
 		/// <param name="msilGenerator">MSIL generator to use.</param>
-		private void ImplementReadOnly(IGeneratedField<DependencyPropertyKey> field, ILGenerator msilGenerator)
+		private void ImplementReadOnly(IGeneratedField field, ILGenerator msilGenerator)
 		{
 			// push parameters for DependencyProperty.RegisterReadOnly() onto the evaluation stack
 			msilGenerator.Emit(OpCodes.Ldstr, Name);

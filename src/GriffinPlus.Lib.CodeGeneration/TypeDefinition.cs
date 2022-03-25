@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -544,6 +545,34 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new instance field to the type definition (without an initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
+		public IGeneratedField AddField(Type type, string name, Visibility visibility)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility });
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
 		/// Adds a new instance field to the type definition (with initial value).
 		/// </summary>
 		/// <typeparam name="T">Type of the field to add.</typeparam>
@@ -560,6 +589,50 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new instance field to the type definition (with initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="initialValue">Initial value of the field (must be of the specified <paramref name="type"/>).</param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException">
+		/// The initial value is not assignable to a field of the specified type
+		/// -or-
+		/// The field to add is a value type, initial value <c>null</c> is not allowed.
+		/// </exception>
+		public IGeneratedField AddField(
+			Type       type,
+			string     name,
+			Visibility visibility,
+			object     initialValue)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			if (initialValue != null && !type.IsInstanceOfType(initialValue))
+				throw new ArgumentException("The initial value is not assignable to a field of the specified type.", nameof(initialValue));
+
+			if (initialValue == null && type.IsValueType)
+				throw new ArgumentException("The field to add is a value type, initial value <null> is not allowed.", nameof(initialValue));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, false, name, visibility, initialValue });
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
 		/// Adds a new instance field to the type definition (with custom initializer).
 		/// </summary>
 		/// <typeparam name="T">Type of the field to add.</typeparam>
@@ -571,10 +644,48 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added field.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-		public IGeneratedField<T> AddField<T>(string name, Visibility visibility, FieldInitializer<T> initializer)
+		public IGeneratedField<T> AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedField<T> field = new GeneratedField<T>(this, false, name, visibility, initializer);
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new instance field to the type definition (with custom initializer).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="initializer">
+		/// A callback that provides an implementation pushing an object onto the evaluation stack to use as the initial
+		/// value for the generated field.
+		/// </param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// The specified <paramref name="type"/> or <paramref name="initializer"/> is <c>null</c>.
+		/// </exception>
+		public IGeneratedField AddField(
+			Type             type,
+			string           name,
+			Visibility       visibility,
+			FieldInitializer initializer)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, initializer });
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -597,6 +708,41 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new instance field to the type definition (with factory callback for an initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// The specified <paramref name="type"/> or <paramref name="provideInitialValueCallback"/> is <c>null</c>.
+		/// </exception>
+		public IGeneratedField AddField(
+			Type                 type,
+			string               name,
+			Visibility           visibility,
+			ProvideValueCallback provideInitialValueCallback)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, provideInitialValueCallback });
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
 		/// Adds a new static field to the type definition (without an initial value).
 		/// </summary>
 		/// <typeparam name="T">Type of the field to add.</typeparam>
@@ -607,6 +753,33 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility);
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new static field to the type definition (without an initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <returns>The added field.</returns>
+		public IGeneratedField AddStaticField(Type type, string name, Visibility visibility)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility });
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -628,6 +801,50 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new static field to the type definition (with initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="initialValue">Initial value of the field.</param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException">
+		/// The initial value is not assignable to a field of the specified type
+		/// -or-
+		/// The field to add is a value type, initial value <c>null</c> is not allowed.
+		/// </exception>
+		public IGeneratedField AddStaticField(
+			Type       type,
+			string     name,
+			Visibility visibility,
+			object     initialValue)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			if (initialValue != null && !type.IsInstanceOfType(initialValue))
+				throw new ArgumentException("The initial value is not assignable to a field of the specified type.", nameof(initialValue));
+
+			if (initialValue == null && type.IsValueType)
+				throw new ArgumentException("The field to add is a value type, initial value <null> is not allowed.", nameof(initialValue));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, true, name, visibility, initialValue });
+
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
 		/// Adds a new static field to the type definition (with custom initializer).
 		/// </summary>
 		/// <typeparam name="T">Type of the field to add.</typeparam>
@@ -639,10 +856,48 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added field.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, FieldInitializer<T> initializer)
+		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility, initializer);
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new static field to the type definition (with custom initializer).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="initializer">
+		/// A callback that provides an implementation pushing an object onto the evaluation stack to use as the initial
+		/// value for the generated field.
+		/// </param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// The specified <paramref name="type"/> or <paramref name="initializer"/> is <c>null</c>.
+		/// </exception>
+		public IGeneratedField AddStaticField(
+			Type             type,
+			string           name,
+			Visibility       visibility,
+			FieldInitializer initializer)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, initializer });
+
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -660,6 +915,39 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility, provideInitialValueCallback);
+			mGeneratedFields.Add(field);
+			return field;
+		}
+
+		/// <summary>
+		/// Adds a new static field to the type definition (with factory callback for an initial value).
+		/// </summary>
+		/// <param name="type">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
+		/// <returns>The added field.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// The specified <paramref name="type"/> or <paramref name="provideInitialValueCallback"/> is <c>null</c>.
+		/// </exception>
+		public IGeneratedField AddStaticField(
+			Type                 type,
+			string               name,
+			Visibility           visibility,
+			ProvideValueCallback provideInitialValueCallback)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			var constructor = typeof(GeneratedField<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, provideInitialValueCallback });
+
 			mGeneratedFields.Add(field);
 			return field;
 		}

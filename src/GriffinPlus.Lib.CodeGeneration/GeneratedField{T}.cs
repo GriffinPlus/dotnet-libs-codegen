@@ -16,9 +16,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// </summary>
 	class GeneratedField<T> : Member, IGeneratedField<T>, IGeneratedFieldInternal
 	{
-		private readonly FieldInitializer<T>     mInitializer;
+		private readonly FieldInitializer        mInitializer;
 		private readonly InitialValueInitializer mInitialValueInitializer;
-		private readonly ProvideValueCallback<T> mProvideInitialValueCallback;
+		private readonly ProvideValueCallback    mUntypedProvideInitialValueCallback;
+		private readonly ProvideValueCallback<T> mTypedProvideInitialValueCallback;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (without initial value).
@@ -61,7 +62,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			HasInitialValue = true;
 			InitialValue = initialValue;
 			if (InitialValueInitializers.TryGetInitializer(typeof(T), out var initializer)) mInitialValueInitializer = initializer;
-			else mProvideInitialValueCallback = () => initialValue;
+			else mTypedProvideInitialValueCallback = () => initialValue;
 
 			// initialize common parts
 			Initialize(isStatic, name, visibility);
@@ -81,11 +82,11 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> or <paramref name="initializer"/> is <c>null.</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
 		internal GeneratedField(
-			TypeDefinition      typeDefinition,
-			bool                isStatic,
-			string              name,
-			Visibility          visibility,
-			FieldInitializer<T> initializer) :
+			TypeDefinition   typeDefinition,
+			bool             isStatic,
+			string           name,
+			Visibility       visibility,
+			FieldInitializer initializer) :
 			base(typeDefinition)
 		{
 			mInitializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
@@ -111,7 +112,30 @@ namespace GriffinPlus.Lib.CodeGeneration
 			base(typeDefinition)
 		{
 			Visibility = visibility;
-			mProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
+			mTypedProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
+			Initialize(isStatic, name, visibility);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (with factory callback for an initial value).
+		/// </summary>
+		/// <param name="typeDefinition">The type definition the field belongs to.</param>
+		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
+		/// <param name="visibility">Visibility of the field.</param>
+		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> or <paramref name="provideInitialValueCallback"/> is <c>null.</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
+		internal GeneratedField(
+			TypeDefinition       typeDefinition,
+			bool                 isStatic,
+			string               name,
+			Visibility           visibility,
+			ProvideValueCallback provideInitialValueCallback) :
+			base(typeDefinition)
+		{
+			Visibility = visibility;
+			mUntypedProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
 			Initialize(isStatic, name, visibility);
 		}
 
@@ -149,7 +173,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Gets the type of the field.
 		/// </summary>
-		public Type Type => typeof(T);
+		public Type FieldType => typeof(T);
 
 		/// <summary>
 		/// Gets a value indicating whether the field is class variable (<c>true</c>) or an instance variable (<c>false</c>).
@@ -208,7 +232,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				// add storing the object on the evaluation stack to the field
 				msilGenerator.Emit(IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, FieldBuilder);
 			}
-			else if (mProvideInitialValueCallback != null)
+			else if (mTypedProvideInitialValueCallback != null || mUntypedProvideInitialValueCallback != null)
 			{
 				// the field has a factory method that provides the initial value
 
@@ -217,7 +241,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// put external factory callback into the collection of objects to pass along with the generated type
 				int externalObjectIndex = TypeDefinition.ExternalObjects.Count;
-				TypeDefinition.ExternalObjects.Add(mProvideInitialValueCallback);
+				if (mTypedProvideInitialValueCallback != null) TypeDefinition.ExternalObjects.Add(mTypedProvideInitialValueCallback);
+				else TypeDefinition.ExternalObjects.Add(mUntypedProvideInitialValueCallback);
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, createdType);
@@ -228,10 +253,21 @@ namespace GriffinPlus.Lib.CodeGeneration
 				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
 				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
-				msilGenerator.Emit(OpCodes.Ldelem, typeof(Func<T>));
-				var func_invoke = typeof(Func<T>).GetMethod("Invoke");
-				Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
-				msilGenerator.Emit(OpCodes.Call, func_invoke);
+				if (mTypedProvideInitialValueCallback != null)
+				{
+					msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
+					var func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+					Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
+					msilGenerator.Emit(OpCodes.Call, func_invoke);
+				}
+				else
+				{
+					msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback));
+					var func_invoke = typeof(ProvideValueCallback).GetMethod("Invoke");
+					Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
+					msilGenerator.Emit(OpCodes.Call, func_invoke);
+					if (FieldType != typeof(object)) msilGenerator.Emit(OpCodes.Unbox_Any, FieldType);
+				}
 
 				// add storing the object on the evaluation stack to the field
 				msilGenerator.Emit(IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, FieldBuilder);

@@ -12,9 +12,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// A method that provides an implementation pushing an object onto the evaluation stack to use as the initial value
 	/// for the generated field.
 	/// </summary>
-	/// <typeparam name="T">Type of the field to initialize.</typeparam>
 	/// <param name="field">The field to initialize.</param>
 	/// <param name="msilGenerator">MSIL generator to use.</param>
-	public delegate void FieldInitializer<in T>(IGeneratedField<T> field, ILGenerator msilGenerator);
+	public delegate void FieldInitializer(IGeneratedField field, ILGenerator msilGenerator);
 
 }

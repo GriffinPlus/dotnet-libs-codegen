@@ -310,10 +310,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region Test Data for Tests targeting AddField<T>(...) and AddStaticField<T>(...)
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility)"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility)"/>.
 		/// </summary>
-		public static IEnumerable<object[]> AddFieldTestData_NoInitialValue
+		public static IEnumerable<object[]> AddFieldTestData_WithDefaultValue
 		{
 			get
 			{
@@ -327,8 +330,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="bool"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="bool"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Boolean
 		{
@@ -345,8 +352,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="char"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="char"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Char
 		{
@@ -365,8 +376,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="sbyte"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="sbyte"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_SByte
 		{
@@ -386,8 +401,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="byte"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="byte"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Byte
 		{
@@ -406,8 +425,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="short"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="short"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int16
 		{
@@ -429,8 +452,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="ushort"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="ushort"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt16
 		{
@@ -449,8 +476,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="int"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="int"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int32
 		{
@@ -472,8 +503,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="uint"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="uint"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt32
 		{
@@ -492,8 +527,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="long"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="long"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int64
 		{
@@ -517,8 +556,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="ulong"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="ulong"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt64
 		{
@@ -538,9 +581,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumS8"/>,
-		/// an enumeration type backed by <see cref="sbyte"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumS8"/>, an enumeration type backed by <see cref="sbyte"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_SByte
 		{
@@ -560,9 +606,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumU8"/>,
-		/// an enumeration type backed by <see cref="byte"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumU8"/>, an enumeration type backed by <see cref="byte"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Byte
 		{
@@ -581,9 +630,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumS16"/>,
-		/// an enumeration type backed by <see cref="short"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumS16"/>, an enumeration type backed by <see cref="short"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int16
 		{
@@ -605,9 +657,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumU16"/>,
-		/// an enumeration type backed by <see cref="ushort"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumU16"/>, an enumeration type backed by <see cref="ushort"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt16
 		{
@@ -626,9 +681,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumS32"/>,
-		/// an enumeration type backed by <see cref="int"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumS32"/>, an enumeration type backed by <see cref="int"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int32
 		{
@@ -650,9 +708,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumU32"/>,
-		/// an enumeration type backed by <see cref="uint"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumU32"/>, an enumeration type backed by <see cref="uint"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt32
 		{
@@ -671,9 +732,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumS64"/>,
-		/// an enumeration type backed by <see cref="long"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumS64"/>, an enumeration type backed by <see cref="long"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int64
 		{
@@ -697,9 +761,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="TestEnumU64"/>,
-		/// an enumeration type backed by <see cref="ulong"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="TestEnumU64"/>, an enumeration type backed by <see cref="ulong"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt64
 		{
@@ -719,8 +786,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="float"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="float"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Single
 		{
@@ -736,9 +807,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="double"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="double"/>.
 		/// </summary>
+
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_Double
 		{
 			get
@@ -753,8 +829,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="string"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="string"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_String
 		{
@@ -771,8 +851,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> with field type <see cref="DateTime"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
+		/// with field type <see cref="DateTime"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_InitialValue_DateTime
 		{
@@ -789,8 +873,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,FieldInitializer{T})"/> and
-		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,FieldInitializer{T})"/>.
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,FieldInitializer)"/>,
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,FieldInitializer)"/>,
+		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,FieldInitializer)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,FieldInitializer)"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddFieldTestData_WithInitializer
 		{
@@ -805,7 +892,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						name,
 						visibility,
 						typeof(int),
-						new FieldInitializer<int>((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldc_I4, 100); }),
+						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldc_I4, 100); }),
 						100
 					};
 
@@ -815,18 +902,29 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						name,
 						visibility,
 						typeof(string),
-						new FieldInitializer<string>((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldstr, "just-a-string"); }),
+						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldstr, "just-a-string"); }),
 						"just-a-string"
+					};
+
+					// reference type (null)
+					yield return new object[]
+					{
+						name,
+						visibility,
+						typeof(string),
+						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldnull); }),
+						null
 					};
 				}
 			}
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddField{T}(string,Visibility,ProvideValueCallback{T})"/> and
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField{T}(string,Visibility,ProvideValueCallback{T})"/> and
 		/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,ProvideValueCallback{T})"/>.
 		/// </summary>
-		public static IEnumerable<object[]> AddFieldTestData_WithInitialValueCallback
+		public static IEnumerable<object[]> AddFieldTestData_WithTypedInitialValueCallback
 		{
 			get
 			{
@@ -852,6 +950,61 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback<string>(() => "just-a-string"),
 						"just-a-string"
 					};
+
+					// reference type (null)
+					yield return new object[]
+					{
+						name,
+						visibility,
+						typeof(string),
+						new ProvideValueCallback<string>(() => null),
+						null
+					};
+				}
+			}
+		}
+
+		/// <summary>
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddField(Type,string,Visibility,ProvideValueCallback)"/> and
+		/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,ProvideValueCallback)"/>.
+		/// </summary>
+		public static IEnumerable<object[]> AddFieldTestData_WithUntypedInitialValueCallback
+		{
+			get
+			{
+				foreach (string name in new[] { "Field", null })
+				foreach (Visibility visibility in Visibilities)
+				{
+					// value type
+					yield return new object[]
+					{
+						name,
+						visibility,
+						typeof(int),
+						new ProvideValueCallback(() => 100),
+						100
+					};
+
+					// reference type
+					yield return new object[]
+					{
+						name,
+						visibility,
+						typeof(string),
+						new ProvideValueCallback(() => "just-a-string"),
+						"just-a-string"
+					};
+
+					// reference type (null)
+					yield return new object[]
+					{
+						name,
+						visibility,
+						typeof(string),
+						new ProvideValueCallback(() => null),
+						null
+					};
 				}
 			}
 		}
@@ -868,7 +1021,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="fieldType">Type of the field to add.</param>
 		/// <param name="expectedInitialValue">The expected initial value of the field.</param>
 		[Theory]
-		[MemberData(nameof(AddFieldTestData_NoInitialValue))]
+		[MemberData(nameof(AddFieldTestData_WithDefaultValue))]
 		public void AddFieldT_WithDefaultValue(
 			string     name,
 			Visibility visibility,
@@ -904,6 +1057,50 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion
 
+		#region AddField(Type type, string name, Visibility visibility)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddField(Type,string,Visibility)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="expectedInitialValue">The expected initial value of the field.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithDefaultValue))]
+		public void AddField_WithDefaultValue(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
 		#region AddStaticField<T>(string name, Visibility visibility)
 
 		/// <summary>
@@ -914,7 +1111,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="fieldType">Type of the field to add.</param>
 		/// <param name="expectedInitialValue">The expected initial value of the field.</param>
 		[Theory]
-		[MemberData(nameof(AddFieldTestData_NoInitialValue))]
+		[MemberData(nameof(AddFieldTestData_WithDefaultValue))]
 		public void AddStaticFieldT_WithDefaultValue(
 			string     name,
 			Visibility visibility,
@@ -934,6 +1131,52 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+			Assert.NotNull(instance);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(null);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
+		#region AddStaticField(Type type, string name, Visibility visibility)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="expectedInitialValue">The expected initial value of the field.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithDefaultValue))]
+		public void AddStaticField_WithDefaultValue(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility });
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -1080,6 +1323,137 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion
 
+		#region AddField(Type type, string name, Visibility visibility, object initialValue)
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
+		public void AddField_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue) => AddField_WithInitialValue(typeof(bool), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
+		public void AddField_WithInitialValue_Char(string name, Visibility visibility, char initialValue) => AddField_WithInitialValue(typeof(char), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
+		public void AddField_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue) => AddField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
+		public void AddField_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue) => AddField_WithInitialValue(typeof(byte), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
+		public void AddField_WithInitialValue_Int16(string name, Visibility visibility, short initialValue) => AddField_WithInitialValue(typeof(short), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
+		public void AddField_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue) => AddField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
+		public void AddField_WithInitialValue_Int32(string name, Visibility visibility, int initialValue) => AddField_WithInitialValue(typeof(int), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
+		public void AddField_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue) => AddField_WithInitialValue(typeof(uint), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
+		public void AddField_WithInitialValue_Int64(string name, Visibility visibility, long initialValue) => AddField_WithInitialValue(typeof(long), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
+		public void AddField_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue) => AddField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
+		public void AddField_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumS8 initialValue) => AddField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
+		public void AddField_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumU8 initialValue) => AddField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
+		public void AddField_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue) => AddField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
+		public void AddField_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue) => AddField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
+		public void AddField_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue) => AddField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
+		public void AddField_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue) => AddField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
+		public void AddField_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue) => AddField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
+		public void AddField_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue) => AddField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
+		public void AddField_WithInitialValue_Single(string name, Visibility visibility, float initialValue) => AddField_WithInitialValue(typeof(float), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
+		public void AddField_WithInitialValue_Double(string name, Visibility visibility, double initialValue) => AddField_WithInitialValue(typeof(double), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_String))]
+		public void AddField_WithInitialValue_String(string name, Visibility visibility, string initialValue) => AddField_WithInitialValue(typeof(string), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
+		public void AddField_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue) => AddField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/> method
+		/// (common part, type specific tests methods run the tests).
+		/// </summary>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="initialValue">The initial value of the field to set.</param>
+		private void AddField_WithInitialValue(
+			Type       fieldType,
+			string     name,
+			Visibility visibility,
+			object     initialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new[] { fieldType, name, visibility, initialValue });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(initialValue, fieldValue);
+		}
+
+		#endregion
+
 		#region AddStaticField<T>(string name, Visibility visibility, T initialValue)
 
 		[Theory]
@@ -1210,15 +1584,146 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion
 
-		#region AddField<T>(string name, Visibility visibility, FieldInitializer<T> initializer)
+		#region AddStaticField(Type type, string name, Visibility visibility, object initialValue)
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
+		public void AddStaticField_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue) => AddStaticField_WithInitialValue(typeof(bool), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
+		public void AddStaticField_WithInitialValue_Char(string name, Visibility visibility, char initialValue) => AddStaticField_WithInitialValue(typeof(char), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
+		public void AddStaticField_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue) => AddStaticField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
+		public void AddStaticField_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue) => AddStaticField_WithInitialValue(typeof(byte), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
+		public void AddStaticField_WithInitialValue_Int16(string name, Visibility visibility, short initialValue) => AddStaticField_WithInitialValue(typeof(short), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
+		public void AddStaticField_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue) => AddStaticField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
+		public void AddStaticField_WithInitialValue_Int32(string name, Visibility visibility, int initialValue) => AddStaticField_WithInitialValue(typeof(int), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
+		public void AddStaticField_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue) => AddStaticField_WithInitialValue(typeof(uint), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
+		public void AddStaticField_WithInitialValue_Int64(string name, Visibility visibility, long initialValue) => AddStaticField_WithInitialValue(typeof(long), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
+		public void AddStaticField_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue) => AddStaticField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
+		public void AddStaticField_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumS8 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
+		public void AddStaticField_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumU8 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
+		public void AddStaticField_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
+		public void AddStaticField_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
+		public void AddStaticField_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
+		public void AddStaticField_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
+		public void AddStaticField_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
+		public void AddStaticField_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue) => AddStaticField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
+		public void AddStaticField_WithInitialValue_Single(string name, Visibility visibility, float initialValue) => AddStaticField_WithInitialValue(typeof(float), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
+		public void AddStaticField_WithInitialValue_Double(string name, Visibility visibility, double initialValue) => AddStaticField_WithInitialValue(typeof(double), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_String))]
+		public void AddStaticField_WithInitialValue_String(string name, Visibility visibility, string initialValue) => AddStaticField_WithInitialValue(typeof(string), name, visibility, initialValue);
+
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
+		public void AddStaticField_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue) => AddStaticField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddField{T}(string,Visibility,FieldInitializer{T})"/> method.
+		/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/> method
+		/// (common part, type specific tests methods run the tests).
+		/// </summary>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="initialValue">The initial value of the field to set.</param>
+		private void AddStaticField_WithInitialValue(
+			Type       fieldType,
+			string     name,
+			Visibility visibility,
+			object     initialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new[] { fieldType, name, visibility, initialValue });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(initialValue, fieldValue);
+		}
+
+		#endregion
+
+		#region AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddField{T}(string,Visibility,FieldInitializer)"/> method.
 		/// </summary>
 		/// <param name="name">Name of the field to add.</param>
 		/// <param name="visibility">Visibility of the field to add.</param>
 		/// <param name="fieldType">Type of the field to add.</param>
-		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer{T}"/>).</param>
+		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer"/>).</param>
 		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
 		[Theory]
 		[MemberData(nameof(AddFieldTestData_WithInitializer))]
@@ -1240,8 +1745,54 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer<>).MakeGenericType(fieldType) }));
+						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initializer });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
+		#region AddField(Type type, string name, Visibility visibility, FieldInitializer initializer)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddField(Type,string,Visibility,FieldInitializer)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer"/>).</param>
+		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithInitializer))]
+		public void AddField_WithInitialValueInitializer(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			Delegate   initializer,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, initializer });
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1261,12 +1812,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddStaticField<T>(string name, Visibility visibility, FieldInitializer<T> initializer)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,FieldInitializer{T})"/> method.
+		/// Tests the <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,FieldInitializer)"/> method.
 		/// </summary>
 		/// <param name="name">Name of the field to add.</param>
 		/// <param name="visibility">Visibility of the field to add.</param>
 		/// <param name="fieldType">Type of the field to add.</param>
-		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer{T}"/>).</param>
+		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer"/>).</param>
 		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
 		[Theory]
 		[MemberData(nameof(AddFieldTestData_WithInitializer))]
@@ -1288,7 +1839,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer<>).MakeGenericType(fieldType) }));
+						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initializer });
 
 			// create the defined type, check the result against the definition and create an instance of that type
@@ -1308,6 +1859,52 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion
 
+		#region AddStaticField(Type type, string name, Visibility visibility, FieldInitializer initializer)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,FieldInitializer)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="initializer">Field initializer to use when initializing the field (must be of type <see cref="FieldInitializer"/>).</param>
+		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithInitializer))]
+		public void AddStaticField_WithInitialValueInitializer(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			Delegate   initializer,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, initializer });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
 		#region AddField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
 
 		/// <summary>
@@ -1322,7 +1919,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </param>
 		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
 		[Theory]
-		[MemberData(nameof(AddFieldTestData_WithInitialValueCallback))]
+		[MemberData(nameof(AddFieldTestData_WithTypedInitialValueCallback))]
 		public void AddFieldT_WithInitialValueCallback(
 			string     name,
 			Visibility visibility,
@@ -1359,6 +1956,54 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion
 
+		#region AddField(Type type, string name, Visibility visibility, ProvideValueCallback provideInitialValueCallback)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddField(Type,string,Visibility,ProvideValueCallback)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="provideInitialValueCallback">
+		/// Callback that provides the initial value of the field (must be of type <see cref="ProvideValueCallback"/>).
+		/// </param>
+		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithUntypedInitialValueCallback))]
+		public void AddField_WithInitialValueCallback(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			Delegate   provideInitialValueCallback,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, provideInitialValueCallback });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
 		#region AddStaticField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
 
 		/// <summary>
@@ -1373,7 +2018,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </param>
 		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
 		[Theory]
-		[MemberData(nameof(AddFieldTestData_WithInitialValueCallback))]
+		[MemberData(nameof(AddFieldTestData_WithTypedInitialValueCallback))]
 		public void AddStaticFieldT_WithInitialValueCallback(
 			string     name,
 			Visibility visibility,
@@ -1407,6 +2052,54 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			var field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
 			var fieldValue = field.GetValue(null);
+			Assert.Equal(expectedInitialValue, fieldValue);
+		}
+
+		#endregion
+
+		#region AddStaticField(Type type, string name, Visibility visibility, ProvideValueCallback provideInitialValueCallback)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,ProvideValueCallback)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the field to add.</param>
+		/// <param name="visibility">Visibility of the field to add.</param>
+		/// <param name="fieldType">Type of the field to add.</param>
+		/// <param name="provideInitialValueCallback">
+		/// Callback that provides the initial value of the field (must be of type <see cref="ProvideValueCallback"/>).
+		/// </param>
+		/// <param name="expectedInitialValue">The initial value of the field to set.</param>
+		[Theory]
+		[MemberData(nameof(AddFieldTestData_WithUntypedInitialValueCallback))]
+		public void AddStaticField_WithInitialValueCallback(
+			string     name,
+			Visibility visibility,
+			Type       fieldType,
+			Delegate   provideInitialValueCallback,
+			object     expectedInitialValue)
+		{
+			// create a new type definition and add the field
+			var definition = CreateTypeDefinition();
+			var addFieldMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
+			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, provideInitialValueCallback });
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type type = definition.CreateType();
+			CheckTypeAgainstDefinition(type, definition);
+			object instance = Activator.CreateInstance(type);
+
+			// check whether the field has the expected initial value
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var field = type.GetField(addedField.Name, bindingFlags);
+			Assert.NotNull(field);
+			var fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
