@@ -18,9 +18,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// </summary>
 	class GeneratedDependencyProperty<T> : Member, IGeneratedDependencyProperty<T>
 	{
-		private readonly DependencyPropertyInitializer<T> mInitializer;
-		private readonly InitialValueInitializer          mInitialValueInitializer;
-		private readonly ProvideValueCallback<T>          mProvideInitialValueCallback;
+		private readonly DependencyPropertyInitializer mInitializer;
+		private readonly InitialValueInitializer       mInitialValueInitializer;
+		private readonly ProvideValueCallback<T>       mProvideInitialValueCallback;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class (without initial value).
@@ -99,10 +99,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> or <paramref name="initializer"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
 		internal GeneratedDependencyProperty(
-			TypeDefinition                   typeDefinition,
-			string                           name,
-			bool                             isReadOnly,
-			DependencyPropertyInitializer<T> initializer) :
+			TypeDefinition                typeDefinition,
+			string                        name,
+			bool                          isReadOnly,
+			DependencyPropertyInitializer initializer) :
 			base(typeDefinition)
 		{
 			IsReadOnly = isReadOnly;
@@ -223,7 +223,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		public IGeneratedProperty<T> AddAccessorProperty(
-			string     name = null,
+			string     name                  = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public)
 		{

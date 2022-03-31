@@ -1486,7 +1486,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added dependency property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, DependencyPropertyInitializer<T> initializer)
+		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, DependencyPropertyInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedDependencyProperty<T> dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initializer);

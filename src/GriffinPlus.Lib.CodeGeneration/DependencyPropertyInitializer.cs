@@ -14,10 +14,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// A method that provides an implementation pushing an object onto the evaluation stack to use as the initial value
 	/// for the generated dependency property.
 	/// </summary>
-	/// <typeparam name="T">Type of the dependency property to initialize.</typeparam>
 	/// <param name="dependencyProperty">The dependency property to initialize.</param>
 	/// <param name="msilGenerator">MSIL generator to use.</param>
-	public delegate void DependencyPropertyInitializer<T>(IGeneratedDependencyProperty<T> dependencyProperty, ILGenerator msilGenerator);
+	public delegate void DependencyPropertyInitializer(IGeneratedDependencyProperty dependencyProperty, ILGenerator msilGenerator);
 
 }
 
