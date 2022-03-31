@@ -3,22 +3,19 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-
 namespace GriffinPlus.Lib.CodeGeneration
 {
 
 	/// <summary>
 	/// Collection of predefined event implementation strategies.
 	/// </summary>
-	/// <typeparam name="T">Type of the event handler delegate.</typeparam>
-	public static class EventImplementations<T> where T : Delegate
+	public static class EventImplementations
 	{
 		/// <summary>
 		/// Event implementation that simply backs the event with a field storing event handlers.
 		/// An event raiser method is not added.
 		/// </summary>
-		public static EventImplementation_Standard<T> Standard => new EventImplementation_Standard<T>();
+		public static EventImplementation_Standard Standard => new EventImplementation_Standard();
 
 		/// <summary>
 		/// Event implementation that simply backs the event with a field storing event handlers.
@@ -31,9 +28,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="name">Name of the event raiser method (<c>null</c> to use 'On' + the name of the event).</param>
 		/// <param name="visibility">Visibility of the event raiser method.</param>
-		public static EventImplementation_Standard<T> StandardWithEventRaiser(string name = null, Visibility visibility = Visibility.Protected)
+		public static EventImplementation_Standard StandardWithEventRaiser(string name = null, Visibility visibility = Visibility.Protected)
 		{
-			return new EventImplementation_Standard<T>(name, visibility);
+			return new EventImplementation_Standard(name, visibility);
 		}
 	}
 

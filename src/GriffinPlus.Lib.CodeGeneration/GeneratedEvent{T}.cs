@@ -38,11 +38,11 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedEvent(
-			TypeDefinition          typeDefinition,
-			EventKind               kind,
-			string                  name,
-			Visibility              visibility,
-			IEventImplementation<T> implementation) :
+			TypeDefinition       typeDefinition,
+			EventKind            kind,
+			string               name,
+			Visibility           visibility,
+			IEventImplementation implementation) :
 			base(typeDefinition)
 		{
 			if (kind == EventKind.Abstract && implementation != null) throw new ArgumentException($"Event kind is '{kind}', an implementation strategy must not be specified.");
@@ -118,12 +118,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedEvent(
-			TypeDefinition                         typeDefinition,
-			EventKind                              kind,
-			string                                 name,
-			Visibility                             visibility,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) :
+			TypeDefinition                      typeDefinition,
+			EventKind                           kind,
+			string                              name,
+			Visibility                          visibility,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) :
 			base(typeDefinition)
 		{
 			if (kind == EventKind.Abstract && (addAccessorImplementationCallback != null || removeAccessorImplementationCallback != null))
@@ -185,9 +185,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="typeDefinition"/>, <paramref name="inheritedEvent"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		internal GeneratedEvent(
-			TypeDefinition          typeDefinition,
-			IInheritedEvent<T>      inheritedEvent,
-			IEventImplementation<T> implementation) :
+			TypeDefinition       typeDefinition,
+			IInheritedEvent<T>   inheritedEvent,
+			IEventImplementation implementation) :
 			base(typeDefinition)
 		{
 			if (inheritedEvent == null) throw new ArgumentNullException(nameof(inheritedEvent));
@@ -224,10 +224,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		internal GeneratedEvent(
-			TypeDefinition                         typeDefinition,
-			IInheritedEvent<T>                     inheritedEvent,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) :
+			TypeDefinition                      typeDefinition,
+			IInheritedEvent<T>                  inheritedEvent,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) :
 			base(typeDefinition)
 		{
 			if (inheritedEvent == null) throw new ArgumentNullException(nameof(inheritedEvent));
@@ -274,13 +274,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets the implementation strategy used to implement the event
 		/// (may be <c>null</c> if implementation callbacks are used).
 		/// </summary>
-		public IEventImplementation<T> Implementation { get; }
-
-		/// <summary>
-		/// Gets the implementation strategy used to implement the event
-		/// (may be <c>null</c> if implementation callbacks are used).
-		/// </summary>
-		IEventImplementation IGeneratedEvent.Implementation => Implementation;
+		public IEventImplementation Implementation { get; }
 
 		/// <summary>
 		/// Gets the <see cref="System.Reflection.Emit.EventBuilder"/> associated with the event.

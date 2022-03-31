@@ -22,7 +22,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The generated event.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		IGeneratedEvent<T> Override(IEventImplementation<T> implementation);
+		new IGeneratedEvent<T> Override(IEventImplementation implementation);
 
 		/// <summary>
 		/// Adds an override for the event.
@@ -34,9 +34,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <returns>The generated event.</returns>
-		IGeneratedEvent<T> Override(
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback);
+		new IGeneratedEvent<T> Override(
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback);
 	}
 
 }

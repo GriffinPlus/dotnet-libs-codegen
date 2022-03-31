@@ -20,6 +20,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Gets the type of the event handler.
+		/// This is always a delegate type.
 		/// </summary>
 		Type EventHandlerType { get; }
 

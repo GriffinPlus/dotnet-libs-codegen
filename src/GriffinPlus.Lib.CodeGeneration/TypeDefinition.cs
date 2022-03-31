@@ -967,7 +967,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added event.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedEvent<T> AddEvent<T>(string name, Visibility visibility, IEventImplementation<T> implementation) where T : Delegate
+		public IGeneratedEvent<T> AddEvent<T>(string name, Visibility visibility, IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -993,10 +993,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedEvent<T> AddEvent<T>(
-			string                                 name,
-			Visibility                             visibility,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) where T : Delegate
+			string                              name,
+			Visibility                          visibility,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -1042,9 +1042,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added event.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedEvent<T> AddVirtualEvent<T>(
-			string                  eventName,
-			Visibility              visibility,
-			IEventImplementation<T> implementation) where T : Delegate
+			string               eventName,
+			Visibility           visibility,
+			IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventName);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -1070,10 +1070,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedEvent<T> AddVirtualEvent<T>(
-			string                                 name,
-			Visibility                             visibility,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) where T : Delegate
+			string                              name,
+			Visibility                          visibility,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -1099,9 +1099,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added event.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedEvent<T> AddStaticEvent<T>(
-			string                  eventName,
-			Visibility              visibility,
-			IEventImplementation<T> implementation) where T : Delegate
+			string               eventName,
+			Visibility           visibility,
+			IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventName);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -1127,10 +1127,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedEvent<T> AddStaticEvent<T>(
-			string                                 name,
-			Visibility                             visibility,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) where T : Delegate
+			string                              name,
+			Visibility                          visibility,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
@@ -1153,7 +1153,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added event overriding the specified inherited event.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedEvent<T> AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation<T> implementation) where T : Delegate
+		public IGeneratedEvent<T> AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventToOverride.Name);
 
@@ -1186,9 +1186,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedEvent<T> AddEventOverride<T>(
-			IInheritedEvent<T>                     eventToOverride,
-			EventAccessorImplementationCallback<T> addAccessorImplementationCallback,
-			EventAccessorImplementationCallback<T> removeAccessorImplementationCallback) where T : Delegate
+			IInheritedEvent<T>                  eventToOverride,
+			EventAccessorImplementationCallback addAccessorImplementationCallback,
+			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventToOverride.Name);
 

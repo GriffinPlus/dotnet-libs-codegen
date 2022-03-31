@@ -2189,10 +2189,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Test data for tests targeting <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation{T})"/>,
-		/// <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation{T})"/> and
-		/// <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation{T})"/> using
-		/// <see cref="EventImplementation_Standard{T}"/> to implement add/remove accessors and the event raiser method.
+		/// Test data for tests targeting <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/>,
+		/// <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> and
+		/// <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> using
+		/// <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 		/// </summary>
 		public static IEnumerable<object[]> AddEventTestData_WithImplementationStrategy_Standard
 		{
@@ -2361,8 +2361,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation{T})"/> method
-		/// using <see cref="EventImplementation_Standard{T}"/> to implement add/remove accessors and the event raiser method.
+		/// Tests the <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/> method
+		/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 		/// </summary>
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
@@ -2388,7 +2388,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			var definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard<>).MakeGenericType(eventHandlerType);
+			var implementationType = typeof(EventImplementation_Standard);
 			var implementation = addEventRaiserMethod
 				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
 				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
@@ -2403,7 +2403,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation<>).MakeGenericType(eventHandlerType) }));
+						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
 			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
@@ -2437,8 +2437,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddVirtualEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation{T})"/> method
-		/// using <see cref="EventImplementation_Standard{T}"/> to implement add/remove accessors and the event raiser method.
+		/// Tests the <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> method
+		/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 		/// </summary>
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
@@ -2464,7 +2464,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			var definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard<>).MakeGenericType(eventHandlerType);
+			var implementationType = typeof(EventImplementation_Standard);
 			var implementation = addEventRaiserMethod
 				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
 				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
@@ -2479,7 +2479,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation<>).MakeGenericType(eventHandlerType) }));
+						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
 			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
@@ -2513,8 +2513,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation{T} implementation) --- TODO!
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation{T})"/> method
-		/// using <see cref="EventImplementation_Standard{T}"/> to implement add/remove accessors and the event raiser method.
+		/// Tests the <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
+		/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 		/// </summary>
 		public void AddEventOverride_WithImplementationStrategy_Standard()
 		{
@@ -2526,8 +2526,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddStaticEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation{T})"/> method
-		/// using <see cref="EventImplementation_Standard{T}"/> to implement add/remove accessors and the event raiser method.
+		/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation)"/> method
+		/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 		/// </summary>
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
@@ -2553,7 +2553,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			var definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard<>).MakeGenericType(eventHandlerType);
+			var implementationType = typeof(EventImplementation_Standard);
 			var implementation = addEventRaiserMethod
 				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
 				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
@@ -2568,7 +2568,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation<>).MakeGenericType(eventHandlerType) }));
+						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
 			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
@@ -2602,7 +2602,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region Common Event Test Code
 
 		/// <summary>
-		/// Tests an event that has been implemented using the <see cref="EventImplementation_Standard{T}"/> implementation strategy.
+		/// Tests an event that has been implemented using the <see cref="EventImplementation_Standard"/> implementation strategy.
 		/// </summary>
 		/// <param name="definition">Type definition the event to test belongs to.</param>
 		/// <param name="instance">Instance of the dynamically created type that contains the event.</param>

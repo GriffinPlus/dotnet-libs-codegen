@@ -12,13 +12,6 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// Typed interface of a generated event.
 	/// </summary>
 	/// <typeparam name="T">Type of the event handler delegate.</typeparam>
-	public interface IGeneratedEvent<T> : IGeneratedEvent where T : Delegate
-	{
-		/// <summary>
-		/// Gets the implementation strategy used to implement the event
-		/// (may be <c>null</c> if implementation callbacks are used).
-		/// </summary>
-		new IEventImplementation<T> Implementation { get; }
-	}
+	public interface IGeneratedEvent<T> : IGeneratedEvent where T : Delegate { }
 
 }

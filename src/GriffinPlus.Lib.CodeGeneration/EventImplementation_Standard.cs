@@ -18,23 +18,22 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// registered event handlers, adding and removing handlers is implemented thread-safe in a lockless way using interlocked
 	/// operations). Optionally an event raiser method can be added that takes care of firing the event.
 	/// </summary>
-	/// <typeparam name="T">Type of the event handler delegate.</typeparam>
-	public class EventImplementation_Standard<T> : EventImplementation<T> where T : Delegate
+	public class EventImplementation_Standard : EventImplementation
 	{
-		private          IGeneratedField<T> mBackingField;
-		private          IGeneratedMethod   mEventRaiserMethod;
-		private readonly bool               mAddEventRaiserMethod;
-		private readonly string             mEventRaiserMethodName;
-		private readonly Visibility         mEventRaiserMethodVisibility;
+		private          IGeneratedField  mBackingField;
+		private          IGeneratedMethod mEventRaiserMethod;
+		private readonly bool             mAddEventRaiserMethod;
+		private readonly string           mEventRaiserMethodName;
+		private readonly Visibility       mEventRaiserMethodVisibility;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="EventImplementation_Standard{T}"/> class.
+		/// Initializes a new instance of the <see cref="EventImplementation_Standard"/> class.
 		/// An event raiser method is not added.
 		/// </summary>
 		public EventImplementation_Standard() { }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="EventImplementation_Standard{T}"/> class.
+		/// Initializes a new instance of the <see cref="EventImplementation_Standard"/> class.
 		/// An event raiser method is added and implemented depending on the event type.
 		/// If the event type is <see cref="System.EventHandler"/> or <see cref="System.EventHandler{TEventArgs}"/> with
 		/// <c>TEventArgs</c> being <see cref="System.EventArgs"/> the event raiser method will have the signature <c>void OnEvent()</c>.
@@ -63,13 +62,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="typeDefinition">Definition of the type in creation.</param>
 		/// <param name="eventToImplement">Event to implement.</param>
-		public override void Declare(TypeDefinition typeDefinition, IGeneratedEvent<T> eventToImplement)
+		public override void Declare(TypeDefinition typeDefinition, IGeneratedEvent eventToImplement)
 		{
 			// declare the backing field storing event handlers
-			Debug.Assert(eventToImplement.EventHandlerType == typeof(T));
 			mBackingField = eventToImplement.Kind == EventKind.Static
-				                ? typeDefinition.AddStaticField<T>(null, eventToImplement.Visibility)
-				                : typeDefinition.AddField<T>(null, eventToImplement.Visibility);
+				                ? typeDefinition.AddStaticField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility)
+				                : typeDefinition.AddField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility);
 
 			// declare the event raiser method, if requested
 			if (mAddEventRaiserMethod)
@@ -122,9 +120,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="eventToImplement">The event the add accessor method to implement belongs to.</param>
 		/// <param name="msilGenerator">MSIL generator attached to the add accessor method to implement.</param>
 		public override void ImplementAddAccessorMethod(
-			TypeDefinition     typeDefinition,
-			IGeneratedEvent<T> eventToImplement,
-			ILGenerator        msilGenerator)
+			TypeDefinition  typeDefinition,
+			IGeneratedEvent eventToImplement,
+			ILGenerator     msilGenerator)
 		{
 			ImplementAccessor(true, eventToImplement);
 		}
@@ -136,9 +134,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="eventToImplement">The event the remove accessor method to implement belongs to.</param>
 		/// <param name="msilGenerator">MSIL generator attached to the remove accessor method to implement.</param>
 		public override void ImplementRemoveAccessorMethod(
-			TypeDefinition     typeDefinition,
-			IGeneratedEvent<T> eventToImplement,
-			ILGenerator        msilGenerator)
+			TypeDefinition  typeDefinition,
+			IGeneratedEvent eventToImplement,
+			ILGenerator     msilGenerator)
 		{
 			ImplementAccessor(false, eventToImplement);
 		}
@@ -151,7 +149,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <c>false</c> to implement the 'remove' accessor method.
 		/// </param>
 		/// <param name="eventToImplement">Event to implement.</param>
-		private void ImplementAccessor(bool isAdd, IGeneratedEvent<T> eventToImplement)
+		private void ImplementAccessor(bool isAdd, IGeneratedEvent eventToImplement)
 		{
 			Type backingFieldType = mBackingField.FieldBuilder.FieldType;
 
@@ -224,9 +222,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="eventToImplement">The event the raiser method to implement belongs to.</param>
 		/// <param name="msilGenerator">MSIL generator attached to the event raiser method to implement.</param>
 		public override void ImplementRaiserMethod(
-			TypeDefinition     typeDefinition,
-			IGeneratedEvent<T> eventToImplement,
-			ILGenerator        msilGenerator)
+			TypeDefinition  typeDefinition,
+			IGeneratedEvent eventToImplement,
+			ILGenerator     msilGenerator)
 		{
 			// handle events of type System.EventHandler and System.EventHandler<EventArgs>
 			// (the event raiser will have the signature: void OnEvent())
