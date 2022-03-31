@@ -1216,8 +1216,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Adds a new instance property to the type definition. The property does not have accessor methods.
-		/// The desired accessor methods can be added using <see cref="IGeneratedProperty{T}.AddGetAccessor"/> and
-		/// <see cref="IGeneratedProperty{T}.AddSetAccessor"/>).
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <returns>The added property.</returns>
@@ -1231,14 +1231,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Adds a new instance property to the type definition. The property does not have accessor methods.
-		/// The desired accessor methods can be added using <see cref="IGeneratedProperty{T}.AddGetAccessor"/> and
-		/// <see cref="IGeneratedProperty{T}.AddSetAccessor"/>).
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedProperty<T> AddProperty<T>(string name, IPropertyImplementation<T> implementation)
+		public IGeneratedProperty<T> AddProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Normal, name, implementation);
@@ -1261,8 +1261,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Adds a new virtual instance property to the type definition. The property does not have accessor methods.
-		/// The desired accessor methods can be added using <see cref="IGeneratedProperty{T}.AddGetAccessor"/> and
-		/// <see cref="IGeneratedProperty{T}.AddSetAccessor"/>).
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <returns>The added property.</returns>
@@ -1281,7 +1281,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedProperty<T> AddVirtualProperty<T>(string name, IPropertyImplementation<T> implementation)
+		public IGeneratedProperty<T> AddVirtualProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name, implementation);
@@ -1291,8 +1291,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Adds a new static property to the type definition. The property does not have accessor methods.
-		/// The desired accessor methods can be added using <see cref="IGeneratedProperty{T}.AddGetAccessor"/> and
-		/// <see cref="IGeneratedProperty{T}.AddSetAccessor"/>).
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <returns>The added property.</returns>
@@ -1311,7 +1311,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedProperty<T> AddStaticProperty<T>(string name, IPropertyImplementation<T> implementation)
+		public IGeneratedProperty<T> AddStaticProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
@@ -1327,12 +1327,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added property override.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty<T> AddPropertyOverride<T>(
-			IInheritedProperty<T>      property,
-			IPropertyImplementation<T> implementation)
+			IInheritedProperty<T>   property,
+			IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
 
-			// ensure that the property is abstract, virtual or an overrider
+			// ensure that the property is abstract, virtual or overriding an abstract/virtual property
 			switch (property.Kind)
 			{
 				case PropertyKind.Abstract:
@@ -1346,6 +1346,42 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			// add the property
 			GeneratedProperty<T> overrider = new GeneratedProperty<T>(this, property, implementation);
+			mGeneratedProperties.Add(overrider);
+			return overrider;
+		}
+
+		/// <summary>
+		/// Adds an override for the specified inherited property.
+		/// </summary>
+		/// <param name="property">Property to add an override for.</param>
+		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <returns>The added property override.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+		public IGeneratedProperty AddPropertyOverride(
+			IInheritedProperty      property,
+			IPropertyImplementation implementation)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
+
+			// ensure that the property is abstract, virtual or overriding an abstract/virtual property
+			switch (property.Kind)
+			{
+				case PropertyKind.Abstract:
+				case PropertyKind.Virtual:
+				case PropertyKind.Override:
+					break;
+
+				default:
+					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
+			}
+
+			// add the property
+			IGeneratedProperty overrider = (IGeneratedProperty)Activator.CreateInstance(
+				typeof(GeneratedProperty<>).MakeGenericType(property.PropertyType),
+				BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+				Type.DefaultBinder,
+				new object[] { this, property, implementation },
+				CultureInfo.InvariantCulture);
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1369,9 +1405,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="property"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
 		/// </exception>
 		public IGeneratedProperty<T> AddPropertyOverride<T>(
-			IInheritedProperty<T>                     property,
-			PropertyAccessorImplementationCallback<T> getAccessorImplementationCallback,
-			PropertyAccessorImplementationCallback<T> setAccessorImplementationCallback)
+			IInheritedProperty<T>                  property,
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
 
@@ -1479,7 +1515,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 #elif NETSTANDARD2_0 || NETSTANDARD2_1
-// Dependency properties are not supported on .NET Standard...
+		// Dependency properties are not supported on .NET Standard...
 #else
 #error Unhandled Target Framework.
 #endif

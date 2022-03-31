@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || NET5_0 && WINDOWS
-
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -224,7 +223,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		public IGeneratedProperty<T> AddAccessorProperty(
-			string     name                  = null,
+			string     name = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public)
 		{
@@ -242,7 +241,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			if (name != null) EnsureNameIsValidLanguageIndependentIdentifier(name);
 
 			// add the accessor property with get/set accessor
-			AccessorProperty = TypeDefinition.AddProperty(name, new PropertyImplementation_DependencyProperty<T>(this));
+			AccessorProperty = TypeDefinition.AddProperty<T>(name, new PropertyImplementation_DependencyProperty(this));
 			AccessorProperty.AddGetAccessor(getAccessorVisibility);
 			AccessorProperty.AddSetAccessor(setAccessorVisibility);
 

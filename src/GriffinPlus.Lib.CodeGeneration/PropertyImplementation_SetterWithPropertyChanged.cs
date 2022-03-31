@@ -15,22 +15,21 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// property value changes. The 'OnPropertyChanged' method must be public, protected or protected internal and have
 	/// the following signature: <c>void OnPropertyChanged(string name)</c>.
 	/// </summary>
-	/// <typeparam name="T">Type of the property.</typeparam>
-	public class PropertyImplementation_SetterWithPropertyChanged<T> : PropertyImplementation<T>
+	public class PropertyImplementation_SetterWithPropertyChanged : PropertyImplementation
 	{
-		private IGeneratedField<T> mBackingField;
+		private IGeneratedField mBackingField;
 
 		/// <summary>
 		/// Adds additional fields, events, properties and methods to the type definition.
 		/// </summary>
 		/// <param name="typeDefinition">The type definition.</param>
 		/// <param name="property">The property to implement.</param>
-		public override void Declare(TypeDefinition typeDefinition, IGeneratedProperty<T> property)
+		public override void Declare(TypeDefinition typeDefinition, IGeneratedProperty property)
 		{
 			// add an anonymous field
 			mBackingField = property.Kind == PropertyKind.Static
-				                ? typeDefinition.AddStaticField<T>(null, Visibility.Private, null)
-				                : typeDefinition.AddField<T>(null, Visibility.Private, null);
+				                ? typeDefinition.AddStaticField(property.PropertyType, null, Visibility.Private, null)
+				                : typeDefinition.AddField(property.PropertyType, null, Visibility.Private, null);
 		}
 
 		/// <summary>
@@ -40,9 +39,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="property">The property the get accessor method to implement belongs to.</param>
 		/// <param name="msilGenerator">MSIL generator attached to the get accessor method to implement.</param>
 		public override void ImplementGetAccessorMethod(
-			TypeDefinition        typeDefinition,
-			IGeneratedProperty<T> property,
-			ILGenerator           msilGenerator)
+			TypeDefinition     typeDefinition,
+			IGeneratedProperty property,
+			ILGenerator        msilGenerator)
 		{
 			if (property.Kind == PropertyKind.Static)
 			{
@@ -64,9 +63,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="property">The property the set accessor method to implement belongs to.</param>
 		/// <param name="msilGenerator">MSIL generator attached to the set accessor method to implement.</param>
 		public override void ImplementSetAccessorMethod(
-			TypeDefinition        typeDefinition,
-			IGeneratedProperty<T> property,
-			ILGenerator           msilGenerator)
+			TypeDefinition     typeDefinition,
+			IGeneratedProperty property,
+			ILGenerator        msilGenerator)
 		{
 			MethodInfo equalsMethod = typeof(object).GetMethod("Equals", new[] { typeof(object), typeof(object) });
 			Debug.Assert(equalsMethod != null, nameof(equalsMethod) + " != null");

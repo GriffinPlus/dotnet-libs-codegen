@@ -9,7 +9,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 {
 
 	/// <summary>
-	/// Untyped interface of property implementation strategies that implement the get/set accessor methods.
+	/// Interface of property implementation strategies that implement the get/set accessor methods.
 	/// </summary>
 	public interface IPropertyImplementation
 	{

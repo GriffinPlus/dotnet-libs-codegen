@@ -38,10 +38,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedProperty(
-			TypeDefinition             typeDefinition,
-			PropertyKind               kind,
-			string                     name,
-			IPropertyImplementation<T> implementation) :
+			TypeDefinition          typeDefinition,
+			PropertyKind            kind,
+			string                  name,
+			IPropertyImplementation implementation) :
 			base(typeDefinition)
 		{
 			if (kind == PropertyKind.Abstract && implementation != null) throw new ArgumentException($"Property kind is '{kind}', an implementation strategy must not be specified.");
@@ -113,9 +113,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="typeDefinition"/>, <paramref name="inheritedProperty"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		internal GeneratedProperty(
-			TypeDefinition             typeDefinition,
-			IInheritedProperty<T>      inheritedProperty,
-			IPropertyImplementation<T> implementation) :
+			TypeDefinition          typeDefinition,
+			IInheritedProperty<T>   inheritedProperty,
+			IPropertyImplementation implementation) :
 			base(typeDefinition)
 		{
 			// check parameters
@@ -172,10 +172,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="inheritedProperty"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
 		/// </exception>
 		internal GeneratedProperty(
-			TypeDefinition                            typeDefinition,
-			IInheritedProperty<T>                     inheritedProperty,
-			PropertyAccessorImplementationCallback<T> getAccessorImplementationCallback,
-			PropertyAccessorImplementationCallback<T> setAccessorImplementationCallback) :
+			TypeDefinition                         typeDefinition,
+			IInheritedProperty<T>                  inheritedProperty,
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback) :
 			base(typeDefinition)
 		{
 			// check parameters
@@ -259,13 +259,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets the implementation strategy used to implement the property
 		/// (may be <c>null</c> if implementation callbacks are used).
 		/// </summary>
-		public IPropertyImplementation<T> Implementation { get; }
-
-		/// <summary>
-		/// Gets the implementation strategy used to implement the property
-		/// (may be <c>null</c> if implementation callbacks are used).
-		/// </summary>
-		IPropertyImplementation IGeneratedProperty.Implementation => Implementation;
+		public IPropertyImplementation Implementation { get; }
 
 		/// <summary>
 		/// Adds a get accessor method to the property.
@@ -281,8 +275,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </exception>
 		/// <exception cref="InvalidOperationException">The get accessor method was already added to the property.</exception>
 		public IGeneratedMethod AddGetAccessor(
-			Visibility                                visibility                        = Visibility.Public,
-			PropertyAccessorImplementationCallback<T> getAccessorImplementationCallback = null)
+			Visibility                             visibility                        = Visibility.Public,
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback = null)
 		{
 			if (getAccessorImplementationCallback == null && Implementation == null)
 			{
@@ -349,8 +343,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </exception>
 		/// <exception cref="InvalidOperationException">The set accessor method was already added to the property.</exception>
 		public IGeneratedMethod AddSetAccessor(
-			Visibility                                visibility                        = Visibility.Public,
-			PropertyAccessorImplementationCallback<T> setAccessorImplementationCallback = null)
+			Visibility                             visibility                        = Visibility.Public,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback = null)
 		{
 			if (setAccessorImplementationCallback == null && Implementation == null)
 			{

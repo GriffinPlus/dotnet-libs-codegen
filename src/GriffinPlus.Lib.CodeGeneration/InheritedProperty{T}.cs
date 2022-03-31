@@ -86,7 +86,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="implementation">Implementation strategy that implements the get/set accessor methods of the property.</param>
 		/// <returns>The generated property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		public IGeneratedProperty<T> Override(IPropertyImplementation<T> implementation)
+		public IGeneratedProperty<T> Override(IPropertyImplementation implementation)
+		{
+			return TypeDefinition.AddPropertyOverride(this, implementation);
+		}
+
+		/// <summary>
+		/// Adds an override for the current property.
+		/// </summary>
+		/// <param name="implementation">Implementation strategy that implements the get/set accessor methods of the property.</param>
+		/// <returns>The generated property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+		IGeneratedProperty IInheritedProperty.Override(IPropertyImplementation implementation)
 		{
 			return TypeDefinition.AddPropertyOverride(this, implementation);
 		}
@@ -103,8 +114,29 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// The property has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
 		/// </exception>
 		public IGeneratedProperty<T> Override(
-			PropertyAccessorImplementationCallback<T> getAccessorImplementationCallback,
-			PropertyAccessorImplementationCallback<T> setAccessorImplementationCallback)
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback)
+		{
+			return TypeDefinition.AddPropertyOverride(
+				this,
+				getAccessorImplementationCallback,
+				setAccessorImplementationCallback);
+		}
+
+		/// <summary>
+		/// Adds an override for the current property.
+		/// </summary>
+		/// <param name="getAccessorImplementationCallback">A callback that implements the get accessor method of the property.</param>
+		/// <param name="setAccessorImplementationCallback">A callback that implements the set accessor method of the property.</param>
+		/// <returns>The generated property.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// The property has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
+		/// -or-
+		/// The property has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// </exception>
+		IGeneratedProperty IInheritedProperty.Override(
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback)
 		{
 			return TypeDefinition.AddPropertyOverride(
 				this,

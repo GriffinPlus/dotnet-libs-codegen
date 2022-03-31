@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || NET5_0 && WINDOWS
-
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -16,16 +15,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// <summary>
 	/// Property implementation for accessing a dependency property.
 	/// </summary>
-	/// <typeparam name="T">Type of the property.</typeparam>
-	public class PropertyImplementation_DependencyProperty<T> : PropertyImplementation<T>
+	public class PropertyImplementation_DependencyProperty : PropertyImplementation
 	{
-		private readonly IGeneratedDependencyProperty<T> mDependencyProperty;
+		private readonly IGeneratedDependencyProperty mDependencyProperty;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="PropertyImplementation_DependencyProperty{T}"/> class.
+		/// Initializes a new instance of the <see cref="PropertyImplementation_DependencyProperty"/> class.
 		/// </summary>
 		/// <param name="property">Dependency property to create the accessor property for.</param>
-		public PropertyImplementation_DependencyProperty(IGeneratedDependencyProperty<T> property)
+		public PropertyImplementation_DependencyProperty(IGeneratedDependencyProperty property)
 		{
 			mDependencyProperty = property;
 		}
@@ -38,7 +36,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="msilGenerator">MSIL generator attached to the get accessor method to implement.</param>
 		public override void ImplementGetAccessorMethod(
 			TypeDefinition        typeDefinition,
-			IGeneratedProperty<T> property,
+			IGeneratedProperty property,
 			ILGenerator           msilGenerator)
 		{
 			MethodInfo getValueMethod = typeof(DependencyObject)
@@ -78,7 +76,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="msilGenerator">MSIL generator attached to the set accessor method to implement.</param>
 		public override void ImplementSetAccessorMethod(
 			TypeDefinition        typeDefinition,
-			IGeneratedProperty<T> property,
+			IGeneratedProperty property,
 			ILGenerator           msilGenerator)
 		{
 			MethodInfo setValueMethod = typeof(DependencyObject)

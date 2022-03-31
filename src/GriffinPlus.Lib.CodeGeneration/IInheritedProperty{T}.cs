@@ -21,7 +21,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="implementation">Implementation strategy that implements the get/set accessor methods of the property.</param>
 		/// <returns>The generated property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-		IGeneratedProperty<T> Override(IPropertyImplementation<T> implementation);
+		new IGeneratedProperty<T> Override(IPropertyImplementation implementation);
 
 		/// <summary>
 		/// Adds an override for the current property. The <see cref="IProperty.Kind"/> property must be
@@ -35,9 +35,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// -or-
 		/// The property has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
 		/// </exception>
-		IGeneratedProperty<T> Override(
-			PropertyAccessorImplementationCallback<T> getAccessorImplementationCallback,
-			PropertyAccessorImplementationCallback<T> setAccessorImplementationCallback);
+		new IGeneratedProperty<T> Override(
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback);
 	}
 
 }
