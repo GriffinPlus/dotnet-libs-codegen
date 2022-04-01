@@ -392,7 +392,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 
 			// link the accessor method to the property
-			PropertyBuilder.SetSetMethod(GetAccessor.MethodBuilder);
+			PropertyBuilder.SetSetMethod(SetAccessor.MethodBuilder);
 
 			return SetAccessor;
 		}
