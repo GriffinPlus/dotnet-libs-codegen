@@ -1234,6 +1234,34 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
 		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <returns>The added property.</returns>
+		public IGeneratedProperty AddProperty(Type type, string name)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name });
+
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
+		/// Adds a new instance property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
 		/// <returns>The added property.</returns>
@@ -1247,6 +1275,36 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new instance property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <returns>The added property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+		public IGeneratedProperty AddProperty(Type type, string name, IPropertyImplementation implementation)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name, implementation });
+
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
 		/// Adds a new abstract instance property to the type definition.
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
@@ -1255,6 +1313,32 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Abstract, name, null);
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
+		/// Adds a new abstract instance property to the type definition.
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <returns>The added property.</returns>
+		public IGeneratedProperty AddAbstractProperty(Type type, string name)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Abstract, name });
+
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1275,7 +1359,37 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
-		/// Adds a new virtual instance property to the type definition.
+		/// Adds a new virtual instance property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <returns>The added property.</returns>
+		public IGeneratedProperty AddVirtualProperty(Type type, string name)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name });
+
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
+		/// Adds a new virtual instance property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
@@ -1290,6 +1404,36 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Adds a new virtual instance property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <returns>The added property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+		public IGeneratedProperty AddVirtualProperty(Type type, string name, IPropertyImplementation implementation)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name, implementation });
+
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
 		/// Adds a new static property to the type definition. The property does not have accessor methods.
 		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
 		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
@@ -1299,7 +1443,35 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedProperty<T> AddStaticProperty<T>(string name)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name);
+			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Static, name);
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
+		/// Adds a new static property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <returns>The added property.</returns>
+		public IGeneratedProperty AddStaticProperty(Type type, string name)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name });
+
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1315,6 +1487,36 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
+			mGeneratedProperties.Add(property);
+			return property;
+		}
+
+		/// <summary>
+		/// Adds a new static property to the type definition. The property does not have accessor methods.
+		/// The desired accessor methods can be added using <see cref="IGeneratedProperty.AddGetAccessor"/> and
+		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
+		/// </summary>
+		/// <param name="type">Type of the property to add.</param>
+		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
+		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <returns>The added property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+		public IGeneratedProperty AddStaticProperty(Type type, string name, IPropertyImplementation implementation)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name, implementation });
+
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1376,12 +1578,20 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 
 			// add the property
-			IGeneratedProperty overrider = (IGeneratedProperty)Activator.CreateInstance(
-				typeof(GeneratedProperty<>).MakeGenericType(property.PropertyType),
-				BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
-				Type.DefaultBinder,
-				new object[] { this, property, implementation },
-				CultureInfo.InvariantCulture);
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(property.PropertyType)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[]
+					{
+						typeof(TypeDefinition),
+						typeof(IInheritedProperty<>).MakeGenericType(property.PropertyType),
+						typeof(PropertyImplementation)
+					},
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, implementation });
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1425,6 +1635,63 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			// add the property
 			GeneratedProperty<T> overrider = new GeneratedProperty<T>(this, property, getAccessorImplementationCallback, setAccessorImplementationCallback);
+			mGeneratedProperties.Add(overrider);
+			return overrider;
+		}
+
+		/// <summary>
+		/// Adds an override for the specified inherited property.
+		/// </summary>
+		/// <param name="property">Property to add an override for.</param>
+		/// <param name="getAccessorImplementationCallback">
+		/// A callback that implements the get accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a get accessor method).
+		/// </param>
+		/// <param name="setAccessorImplementationCallback">
+		/// A callback that implements the set accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a set accessor method).
+		/// </param>
+		/// <returns>The added property override.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="property"/> has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
+		/// -or-
+		/// <paramref name="property"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// </exception>
+		public IGeneratedProperty AddPropertyOverride(
+			IInheritedProperty                     property,
+			PropertyAccessorImplementationCallback getAccessorImplementationCallback,
+			PropertyAccessorImplementationCallback setAccessorImplementationCallback)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
+
+			// ensure that the property is abstract, virtual or an overrider
+			switch (property.Kind)
+			{
+				case PropertyKind.Abstract:
+				case PropertyKind.Virtual:
+				case PropertyKind.Override:
+					break;
+
+				default:
+					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
+			}
+
+			// add the property
+			var constructor = typeof(GeneratedProperty<>)
+				.MakeGenericType(property.PropertyType)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[]
+					{
+						typeof(TypeDefinition),
+						typeof(IInheritedProperty<>).MakeGenericType(property.PropertyType),
+						typeof(PropertyAccessorImplementationCallback),
+						typeof(PropertyAccessorImplementationCallback)
+					},
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			IGeneratedProperty overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, getAccessorImplementationCallback, setAccessorImplementationCallback });
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}

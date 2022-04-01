@@ -13,6 +13,7 @@ using System.Reflection.Emit;
 using Xunit;
 
 // ReSharper disable ConvertToLocalFunction
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
 namespace GriffinPlus.Lib.CodeGeneration.Tests
@@ -2816,7 +2817,1080 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion // Adding Events
 
-		#region Adding Properties (TODO, all test cases missing)
+		#region Adding Properties (TODO, abstract and override test cases missing)
+
+		#region Test Data
+
+		/// <summary>
+		/// Names to test with when adding properties to the type definition.
+		/// </summary>
+		private static IEnumerable<string> PropertyNames
+		{
+			get
+			{
+				yield return "Property";
+				yield return null;
+			}
+		}
+
+		/// <summary>
+		/// Test data for tests targeting
+		/// <see cref="TypeDefinition.AddProperty{T}(string)"/>,
+		/// <see cref="TypeDefinition.AddProperty(Type,string)"/>,
+		/// <see cref="TypeDefinition.AddStaticProperty{T}(string)"/> and
+		/// <see cref="TypeDefinition.AddStaticProperty(Type,string)"/>.
+		/// </summary>
+		public static IEnumerable<object[]> AddPropertyTestData
+		{
+			get
+			{
+				foreach (string name in PropertyNames)
+				foreach (var visibility in Visibilities)
+				{
+					yield return new object[] { name, typeof(int), visibility, new object[] { 1, 2, 3 } };          // value type
+					yield return new object[] { name, typeof(string), visibility, new object[] { "A", "B", "C" } }; // reference type
+				}
+			}
+		}
+
+		#endregion
+
+		#region AddAbstractProperty<T>(string name) --- TODO!
+
+		#endregion
+
+		#region AddAbstractProperty(Type type, string name) --- TODO!
+
+		#endregion
+
+		#region AddProperty<T>(string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddProperty{T}(string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddPropertyT_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Normal,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddProperty(Type type, string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddProperty(Type,string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddProperty_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Normal,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddProperty<T>(string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddProperty{T}(string,IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddPropertyT_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getSet" : null,
+					implementation
+				});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getOnly" : null,
+					implementation
+				});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, 
+					new object[]
+					{
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_none" : null,
+					implementation
+				});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Normal,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddProperty(Type type, string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddProperty(Type,string,IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddProperty_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+
+					{
+						propertyType,
+						name != null ? name + "_none" : null,
+						implementation
+					});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Normal,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddVirtualProperty<T>(string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddVirtualProperty{T}(string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddVirtualPropertyT_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Virtual,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddVirtualProperty(Type type, string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddVirtualProperty(Type,string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddVirtualProperty_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Virtual,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddVirtualProperty<T>(string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddVirtualProperty{T}(string,IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddVirtualPropertyT_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getSet" : null,
+					implementation
+				});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getOnly" : null,
+					implementation
+				});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_setOnly" : null,
+					implementation
+				});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_none" : null,
+					implementation
+				});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Virtual,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddVirtualProperty(Type type, string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddVirtualProperty(Type,string,IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddVirtualProperty_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_getSet" : null,
+					implementation
+				});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_getOnly" : null,
+					implementation
+				});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_setOnly" : null,
+					implementation
+				});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_none" : null,
+					implementation
+				});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Virtual,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddPropertyOverride<T>(IInheritedProperty<T> property, IPropertyImplementation implementation) --- TODO!
+
+		#endregion
+
+		#region AddPropertyOverride(IInheritedProperty property, IPropertyImplementation implementation) --- TODO!
+
+		#endregion
+
+		#region AddPropertyOverride<T>(IInheritedProperty<T> property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
+
+		#endregion
+
+		#region AddPropertyOverride(IInheritedProperty property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
+
+		#endregion
+
+		#region AddStaticProperty<T>(string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticProperty{T}(string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddStaticPropertyT_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Static,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddStaticProperty(Type type, string name)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticProperty(Type,string)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddStaticProperty_WithoutImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getSet" : null });
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_getOnly" : null });
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_setOnly" : null });
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[] { propertyType, name != null ? name + "_none" : null });
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Static,
+					propertyType,
+					accessorVisibility,
+					null,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddStaticProperty<T>(string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticProperty{T}(string,IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddStaticPropertyT_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property (actually one property with get/set accessors,
+			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
+				.Where(method => method.GetGenericArguments().Length == 1)
+				.Select(method => method.MakeGenericMethod(propertyType))
+				.Single(
+					method => method
+						.GetParameters()
+						.Select(parameter => parameter.ParameterType)
+						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getSet" : null,
+					implementation
+				});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_getOnly" : null,
+					implementation
+				});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_setOnly" : null,
+					implementation
+				});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					name != null ? name + "_none" : null,
+					implementation
+				});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Static,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region AddStaticProperty(Type type, string name, IPropertyImplementation implementation)
+
+		/// <summary>
+		/// Tests the <see cref="TypeDefinition.AddStaticProperty(Type,string, IPropertyImplementation)"/> method.
+		/// </summary>
+		/// <param name="name">Name of the property to add.</param>
+		/// <param name="propertyType">Type of the property to add.</param>
+		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
+		[Theory]
+		[MemberData(nameof(AddPropertyTestData))]
+		public void AddStaticProperty_WithImplementationStrategy(
+			string     name,
+			Type       propertyType,
+			Visibility accessorVisibility,
+			object[]   testObjects)
+		{
+			// create a new type definition and add the property
+			var definition = CreateTypeDefinition();
+			var addPropertyMethod = typeof(TypeDefinition)
+				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
+				.Single(
+					method => !method.IsGenericMethod && method
+						          .GetParameters()
+						          .Select(parameter => parameter.ParameterType)
+						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+
+			using (TestDataStorage storage = new TestDataStorage())
+			{
+				int handle = storage.Add(testObjects[0]);
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_getSet" : null,
+					implementation
+				});
+
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_getOnly" : null,
+					implementation
+				});
+
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_setOnly" : null,
+					implementation
+				});
+
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
+				{
+					propertyType,
+					name != null ? name + "_none" : null,
+					implementation
+				});
+
+				// add accessor methods and test the property
+				AddProperty_CommonPart(
+					definition,
+					PropertyKind.Static,
+					propertyType,
+					accessorVisibility,
+					implementation,
+					handle,
+					testObjects,
+					addedProperty_getSet,
+					addedProperty_getOnly,
+					addedProperty_setOnly,
+					addedProperty_none);
+			}
+		}
+
+		#endregion
+
+		#region Common Test Code
+
+		/// <summary>
+		/// Checks whether the specified properties have the expected initial state, implements the accessor methods using the <see cref="TestDataStorage"/>
+		/// and tests whether the implementation works as expected.
+		/// </summary>
+		/// <param name="definition">The definition of the generated type containing the properties to test.</param>
+		/// <param name="expectedPropertyKind">The expected kind of the properties to test.</param>
+		/// <param name="expectedPropertyType">The expected type of the properties to test.</param>
+		/// <param name="accessorVisibility">Visibility of the accessor methods to implement.</param>
+		/// <param name="implementation">Implementation strategy the property should use to implement (may be <c>null</c> to implement using callbacks).</param>
+		/// <param name="handle">Handle of the test object in the <see cref="TestDataStorage"/> backing the property.</param>
+		/// <param name="testObjects">Test objects to use when playing with the get/set accessor methods.</param>
+		/// <param name="addedProperty_getSet">The added property to test (with get/set accessor).</param>
+		/// <param name="addedProperty_getOnly">The added property to test (with get accessor only).</param>
+		/// <param name="addedProperty_setOnly">The added property to test (with set accessor only).</param>
+		/// <param name="addedProperty_none">The added property to test (without get/set accessor).</param>
+		private static void AddProperty_CommonPart(
+			TDefinition  definition,
+			PropertyKind expectedPropertyKind,
+			Type         expectedPropertyType,
+			Visibility         accessorVisibility,
+			IPropertyImplementation implementation,
+			int handle,
+			object[]           testObjects,
+			IGeneratedProperty addedProperty_getSet,
+			IGeneratedProperty addedProperty_getOnly,
+			IGeneratedProperty addedProperty_setOnly,
+			IGeneratedProperty addedProperty_none)
+		{
+			// the added properties should not be null
+			Assert.NotNull(addedProperty_getSet);
+			Assert.NotNull(addedProperty_getOnly);
+			Assert.NotNull(addedProperty_setOnly);
+			Assert.NotNull(addedProperty_none);
+
+			// check whether the added properties are in the expected state
+			TestAddedProperty(addedProperty_getSet, expectedPropertyKind, expectedPropertyType, implementation);
+			TestAddedProperty(addedProperty_getOnly, expectedPropertyKind, expectedPropertyType, implementation);
+			TestAddedProperty(addedProperty_setOnly, expectedPropertyKind, expectedPropertyType, implementation);
+			TestAddedProperty(addedProperty_none, expectedPropertyKind, expectedPropertyType, implementation);
+
+			// implement get/set accessor methods
+			// (the actual data is stored in the test data storage, so it can be inspected more easily)
+			if (implementation != null)
+			{
+				addedProperty_getSet.AddGetAccessor(accessorVisibility);
+				addedProperty_getSet.AddSetAccessor(accessorVisibility);
+				addedProperty_getOnly.AddGetAccessor(accessorVisibility);
+				addedProperty_setOnly.AddSetAccessor(accessorVisibility);
+			}
+			else
+			{
+				addedProperty_getSet.AddGetAccessor(accessorVisibility, (p,  g) => EmitGetAccessorWithTestDataStorageCallback(p, handle, g));
+				addedProperty_getSet.AddSetAccessor(accessorVisibility, (p,  g) => EmitSetAccessorWithTestDataStorageCallback(p, handle, g));
+				addedProperty_getOnly.AddGetAccessor(accessorVisibility, (p, g) => EmitGetAccessorWithTestDataStorageCallback(p, handle, g));
+				addedProperty_setOnly.AddSetAccessor(accessorVisibility, (p, g) => EmitSetAccessorWithTestDataStorageCallback(p, handle, g));
+			}
+
+			// check whether the accessor methods in the generated property have been set accordingly
+			Assert.NotNull(addedProperty_getOnly.GetAccessor);
+			Assert.Null(addedProperty_getOnly.SetAccessor);
+			Assert.Null(addedProperty_setOnly.GetAccessor);
+			Assert.NotNull(addedProperty_setOnly.SetAccessor);
+			Assert.NotNull(addedProperty_getSet.GetAccessor);
+			Assert.NotNull(addedProperty_getSet.SetAccessor);
+
+			// create the defined type, check the result against the definition and create an instance of that type
+			Type generatedType = definition.CreateType();
+			CheckTypeAgainstDefinition(generatedType, definition);
+			object instance = Activator.CreateInstance(generatedType);
+
+			// test the property implementation
+			TestPropertyImplementation(addedProperty_getSet, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_getOnly, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_setOnly, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_none, instance, testObjects, handle);
+		}
+
+		/// <summary>
+		/// Emits MSIL code for a get accessor method that returns the value of a test data object from the <see cref="TestDataStorage"/>.
+		/// </summary>
+		/// <param name="property">Property to implement the accessor for.</param>
+		/// <param name="handle">Handle to the test data object.</param>
+		/// <param name="msilGenerator">MSIL generator to use when emitting code for the get accessor method.</param>
+		private static void EmitGetAccessorWithTestDataStorageCallback(IGeneratedProperty property, int handle, ILGenerator msilGenerator)
+		{
+			var testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
+			Debug.Assert(testDataStorage_get != null, nameof(testDataStorage_get) + " != null");
+			msilGenerator.Emit(OpCodes.Ldc_I4, handle);
+			msilGenerator.Emit(OpCodes.Call, testDataStorage_get);
+			msilGenerator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+
+		/// <summary>
+		/// Emits MSIL code for a set accessor method that changes the value of a test data object in the <see cref="TestDataStorage"/>.
+		/// </summary>
+		/// <param name="property">Property to implement the accessor for.</param>
+		/// <param name="handle">Handle to the test data object.</param>
+		/// <param name="msilGenerator">MSIL generator to use when emitting code for the set accessor method.</param>
+		private static void EmitSetAccessorWithTestDataStorageCallback(IGeneratedProperty property, int handle, ILGenerator msilGenerator)
+		{
+			msilGenerator.Emit(OpCodes.Ldc_I4, handle);
+			msilGenerator.Emit(property.Kind == PropertyKind.Static ? OpCodes.Ldarg_0 : OpCodes.Ldarg_1);
+			if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
+			var testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
+			Debug.Assert(testDataStorage_set != null, nameof(testDataStorage_set) + " != null");
+			msilGenerator.Emit(OpCodes.Call, testDataStorage_set);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+
+		/// <summary>
+		/// Tests the state of a newly added property.
+		/// </summary>
+		/// <param name="generatedProperty">The property to test.</param>
+		/// <param name="expectedPropertyKind">The expected property kind.</param>
+		/// <param name="expectedPropertyType">The expected property type.</param>
+		/// <param name="expectedImplementation">The expected property implementation (may be <c>null</c>).</param>
+		private static void TestAddedProperty(
+			IGeneratedProperty generatedProperty,
+			PropertyKind       expectedPropertyKind,
+			Type               expectedPropertyType,
+			IPropertyImplementation expectedImplementation)
+		{
+			// check whether the property is of the expected property kind
+			Assert.Equal(expectedPropertyKind, generatedProperty.Kind);
+
+			// check whether the property is of the expected type
+			Assert.Equal(expectedPropertyType, generatedProperty.PropertyType);
+
+			// check whether the property has an initialized property builder
+			Assert.NotNull(generatedProperty.PropertyBuilder);
+
+			// check whether the property has the expected implementation strategy
+			Assert.Same(expectedImplementation, generatedProperty.Implementation);
+
+			// newly added properties should not have accessor methods, yet
+			Assert.Null(generatedProperty.GetAccessor);
+			Assert.Null(generatedProperty.SetAccessor);
+
+		}
+
+		/// <summary>
+		/// Tests a property that has been implemented to use the <see cref="TestDataStorage"/> as backing storage.
+		/// </summary>
+		/// <param name="generatedProperty">The property to test.</param>
+		/// <param name="instance">Instance of the dynamically created type that contains the property.</param>
+		/// <param name="testObjects">Test objects to use when playing with the get/set accessors.</param>
+		/// <param name="testDataHandle">Handle of the test data field in the backing storage.</param>
+		private static void TestPropertyImplementation(
+			IGeneratedProperty generatedProperty,
+			object             instance,
+			object[]           testObjects,
+			int                testDataHandle)
+		{
+			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var generatedType = instance.GetType();
+			var property = generatedType.GetProperty(generatedProperty.Name, bindingFlags);
+			Assert.NotNull(property);
+
+			// reset instance if the property is static to make getting/setting them below work as expected
+			if (generatedProperty.Kind == PropertyKind.Static) instance = null;
+
+			// reset test data in the backing storage 
+			TestDataStorage.Set(testDataHandle, testObjects[0]);
+
+			// check whether the get accessor returns the expected initial value
+			if (property.CanRead)
+				Assert.Equal(testObjects[0], property.GetValue(instance));
+
+			// check whether the set accessor modifies the test data in the backing storage
+			if (property.CanWrite)
+			{
+				// property has a set accessor
+				// => use it to modify the data in the backing storage
+				property.SetValue(instance, testObjects[1]);
+				Assert.Equal(testObjects[1], TestDataStorage.Get(testDataHandle));
+			}
+			else
+			{
+				// property does not have a set accessor
+				// => directly change data in the backing storage
+				TestDataStorage.Set(testDataHandle, testObjects[1]);
+			}
+
+			// check whether the get accessor returns the changed value
+			if (property.CanRead)
+				Assert.Equal(testObjects[1], property.GetValue(instance));
+		}
+
+		#endregion
 
 		#endregion // Adding Properties
 
