@@ -357,7 +357,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		#endregion
 
 		#region Public Type Check
-		
+
 		/// <summary>
 		/// Checks whether the specified type is public and all nested types are public, too;
 		/// otherwise an exception is thrown as the created type in a dynamically generated assembly will not be able to access it.

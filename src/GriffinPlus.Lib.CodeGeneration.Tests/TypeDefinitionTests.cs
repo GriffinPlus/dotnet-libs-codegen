@@ -34,18 +34,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region Common Test Data
 
 		/// <summary>
-		/// Names to test with when adding fields to the type definition.
-		/// </summary>
-		private static IEnumerable<string> FieldNames
-		{
-			get
-			{
-				yield return "Field";
-				yield return null;
-			}
-		}
-
-		/// <summary>
 		/// All supported visibilities.
 		/// </summary>
 		private static IEnumerable<Visibility> Visibilities
@@ -308,7 +296,19 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#region Adding Fields
 
-		#region Test Data for Tests targeting AddField<T>(...) and AddStaticField<T>(...)
+		#region Test Data
+
+		/// <summary>
+		/// Names to test with when adding fields to the type definition.
+		/// </summary>
+		private static IEnumerable<string> FieldNames
+		{
+			get
+			{
+				yield return "Field";
+				yield return null;
+			}
+		}
 
 		/// <summary>
 		/// Test data for tests targeting
@@ -893,7 +893,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						name,
 						visibility,
 						typeof(int),
-						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldc_I4, 100); }),
+						new FieldInitializer((_, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldc_I4, 100); }),
 						100
 					};
 
@@ -903,7 +903,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						name,
 						visibility,
 						typeof(string),
-						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldstr, "just-a-string"); }),
+						new FieldInitializer((_, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldstr, "just-a-string"); }),
 						"just-a-string"
 					};
 
@@ -913,7 +913,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						name,
 						visibility,
 						typeof(string),
-						new FieldInitializer((field, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldnull); }),
+						new FieldInitializer((_, msilGenerator) => { msilGenerator.Emit(OpCodes.Ldnull); }),
 						null
 					};
 				}
@@ -1042,6 +1042,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1086,6 +1087,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1132,6 +1134,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -1178,6 +1181,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -1308,6 +1312,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
 				.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(TFieldType) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initialValue });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1439,6 +1444,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new[] { fieldType, name, visibility, initialValue });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1567,6 +1573,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
 				.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(TFieldType) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initialValue });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -1700,6 +1707,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new[] { fieldType, name, visibility, initialValue });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1748,6 +1756,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initializer });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1794,6 +1803,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, initializer });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1842,6 +1852,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, initializer });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -1890,6 +1901,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, initializer });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1941,6 +1953,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, provideInitialValueCallback });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -1989,6 +2002,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, provideInitialValueCallback });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -2040,6 +2054,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { name, visibility, provideInitialValueCallback });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			// (the instance is not required for accessing the static field, but tests whether the type can be created successfully)
@@ -2090,6 +2105,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
 			var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, new object[] { fieldType, name, visibility, provideInitialValueCallback });
+			Assert.NotNull(addedField);
 
 			// create the defined type, check the result against the definition and create an instance of that type
 			Type type = definition.CreateType();
@@ -2108,7 +2124,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion // Adding Fields
 
-		#region Adding Events (TODO, override test case missing)
+		#region Adding Events (TODO, abstract and override test cases missing)
 
 		#region Test Data
 
@@ -2407,9 +2423,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
-			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
-				definition,
-				new object[] { name, visibility, implementation });
+			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, new object[] { name, visibility, implementation });
+			Assert.NotNull(addedEvent);
 			Assert.Equal(EventKind.Normal, addedEvent.Kind);
 			Assert.Equal(visibility, addedEvent.Visibility);
 			Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
@@ -2483,9 +2498,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
-			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
-				definition,
-				new object[] { name, visibility, implementation });
+			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, new object[] { name, visibility, implementation });
+			Assert.NotNull(addedEvent);
 			Assert.Equal(EventKind.Virtual, addedEvent.Kind);
 			Assert.Equal(visibility, addedEvent.Visibility);
 			Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
@@ -2572,9 +2586,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
 
 			// invoke the method to add the event to the type definition
-			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
-				definition,
-				new object[] { name, visibility, implementation });
+			var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, new object[] { name, visibility, implementation });
+			Assert.NotNull(addedEvent);
 			Assert.Equal(EventKind.Static, addedEvent.Kind);
 			Assert.Equal(visibility, addedEvent.Visibility);
 			Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
@@ -3992,6 +4005,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					// (cannot be accessed by a derived type defined in another assembly)
 					MethodInfo addMethod = eventInfo.GetAddMethod(true);
 					MethodInfo removeMethod = eventInfo.GetRemoveMethod(true);
+					Debug.Assert(addMethod != null, nameof(addMethod) + " != null");
+					Debug.Assert(removeMethod != null, nameof(removeMethod) + " != null");
 					if (addMethod.IsPrivate || addMethod.IsAssembly) continue;
 					if (removeMethod.IsPrivate || removeMethod.IsAssembly) continue;
 

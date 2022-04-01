@@ -13,7 +13,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 	{
 		// TODO: Add tests for...
 		// AddPassThroughConstructors()
-
 	}
 
 }

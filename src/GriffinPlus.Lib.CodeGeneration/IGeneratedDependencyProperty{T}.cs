@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || NET5_0 && WINDOWS
-
 namespace GriffinPlus.Lib.CodeGeneration
 {
 
@@ -34,7 +33,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		new IGeneratedProperty<T> AddAccessorProperty(
-			string     name                  = null,
+			string     name = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public);
 	}
