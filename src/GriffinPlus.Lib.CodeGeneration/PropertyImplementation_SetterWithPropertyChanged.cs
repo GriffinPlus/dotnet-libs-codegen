@@ -28,8 +28,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			// add an anonymous field
 			mBackingField = property.Kind == PropertyKind.Static
-				                ? typeDefinition.AddStaticField(property.PropertyType, null, Visibility.Private, null)
-				                : typeDefinition.AddField(property.PropertyType, null, Visibility.Private, null);
+				                ? typeDefinition.AddStaticField(property.PropertyType, null, Visibility.Private)
+				                : typeDefinition.AddField(property.PropertyType, null, Visibility.Private);
 		}
 
 		/// <summary>
