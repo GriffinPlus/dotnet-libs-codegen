@@ -3,7 +3,6 @@
 .\GriffinPlus.Lib.CodeGeneration.Tests.dll
 .\GriffinPlus.Lib.CodeGeneration.Tests.pdb
 .\GriffinPlus.Lib.CodeGeneration.xml
-.\Microsoft.VisualStudio.CodeCoverage.Shim.dll
 .\xunit.abstractions.dll
 .\xunit.assert.dll
 .\xunit.core.dll
