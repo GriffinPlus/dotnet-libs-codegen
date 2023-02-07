@@ -1,0 +1,12 @@
+﻿.\GriffinPlus.Lib.CodeGeneration.Demo.deps.json
+.\GriffinPlus.Lib.CodeGeneration.Demo.dll
+.\GriffinPlus.Lib.CodeGeneration.Demo.dll.config
+.\GriffinPlus.Lib.CodeGeneration.Demo.exe
+.\GriffinPlus.Lib.CodeGeneration.Demo.pdb
+.\GriffinPlus.Lib.CodeGeneration.Demo.runtimeconfig.dev.json
+.\GriffinPlus.Lib.CodeGeneration.Demo.runtimeconfig.json
+.\GriffinPlus.Lib.CodeGeneration.Demo.xml
+.\GriffinPlus.Lib.CodeGeneration.dll
+.\GriffinPlus.Lib.CodeGeneration.pdb
+.\GriffinPlus.Lib.CodeGeneration.xml
+.\System.CodeDom.dll
