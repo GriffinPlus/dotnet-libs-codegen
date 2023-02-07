@@ -118,7 +118,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Empty(definition.GeneratedFields);
 			Assert.Empty(definition.GeneratedMethods);
 			Assert.Empty(definition.GeneratedProperties);
-#if NET461 || NET5_0 && WINDOWS
+#if NET48 || NET5_0 && WINDOWS
 			Assert.Empty(definition.GeneratedDependencyProperties);
 #elif NETCOREAPP3_1_OR_GREATER
 			// Dependency properties are not supported on .NET Core
