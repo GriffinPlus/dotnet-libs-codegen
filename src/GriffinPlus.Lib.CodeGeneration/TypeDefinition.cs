@@ -419,9 +419,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		private readonly List<IGeneratedProperty>       mGeneratedProperties = new List<IGeneratedProperty>();
 		private readonly List<IGeneratedMethodInternal> mGeneratedMethods    = new List<IGeneratedMethodInternal>();
 
-#if NET461 || NET5_0 && WINDOWS
+#if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
 		private readonly List<IGeneratedDependencyProperty> mGeneratedDependencyProperties = new List<IGeneratedDependencyProperty>();
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 // Dependency properties are not supported on .NET Standard...
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+		// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
@@ -450,12 +451,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		public IEnumerable<IGeneratedMethod> GeneratedMethods => mGeneratedMethods.Where(x => !x.MethodInfo.IsSpecialName);
 
-#if NET461 || NET5_0 && WINDOWS
+#if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
 		/// <summary>
 		/// Gets the dependency properties that have already been generated on the type.
 		/// </summary>
 		public IEnumerable<IGeneratedDependencyProperty> GeneratedDependencyProperties => mGeneratedDependencyProperties;
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 // Dependency properties are not supported on .NET Standard...
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+		// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
@@ -1700,7 +1702,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		#region Adding Dependency Properties
 
-#if NET461 || NET5_0 && WINDOWS
+#if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
 		/// <summary>
 		/// Adds a new dependency property to the type definition (without initial value).
 		/// </summary>
@@ -1781,8 +1783,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 			return dependencyProperty;
 		}
 
-#elif NETSTANDARD2_0 || NETSTANDARD2_1
-		// Dependency properties are not supported on .NET Standard...
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+		// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif

@@ -1,0 +1,4 @@
+﻿.\GriffinPlus.Lib.CodeGeneration.deps.json
+.\GriffinPlus.Lib.CodeGeneration.dll
+.\GriffinPlus.Lib.CodeGeneration.pdb
+.\GriffinPlus.Lib.CodeGeneration.xml

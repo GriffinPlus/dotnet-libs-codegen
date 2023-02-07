@@ -3,7 +3,7 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if NET461 || NET5_0 && WINDOWS
+#if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -417,8 +417,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 }
 
-#elif NETSTANDARD2_0 || NETSTANDARD2_1
-// Dependency properties are not supported on .NET Standard...
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
