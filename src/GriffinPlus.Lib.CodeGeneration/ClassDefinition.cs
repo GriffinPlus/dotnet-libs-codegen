@@ -57,9 +57,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added constructors.</returns>
 		public IGeneratedConstructor[] AddPassThroughConstructors()
 		{
-			List<IGeneratedConstructor> constructors = new List<IGeneratedConstructor>();
+			var constructors = new List<IGeneratedConstructor>();
 
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 			Debug.Assert(TypeBuilder.BaseType != null, "TypeBuilder.BaseType != null");
 			ConstructorInfo[] constructorInfos = TypeBuilder.BaseType.GetConstructors(flags);
 			foreach (ConstructorInfo constructorInfo in constructorInfos)
@@ -88,7 +88,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				}
 
 				// add pass-through constructor
-				var constructor = AddConstructor(Visibility.Public, parameterTypes, ImplementPassThroughConstructorBaseCall);
+				IGeneratedConstructor constructor = AddConstructor(Visibility.Public, parameterTypes, ImplementPassThroughConstructorBaseCall);
 				constructors.Add(constructor);
 			}
 
@@ -104,7 +104,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			// find base class constructor
 			Type[] parameterTypes = generatedConstructor.ParameterTypes.ToArray();
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 			Debug.Assert(TypeBuilder.BaseType != null, "TypeBuilder.BaseType != null");
 			ConstructorInfo baseClassConstructor = TypeBuilder.BaseType.GetConstructor(flags, Type.DefaultBinder, parameterTypes, null);
 			Debug.Assert(baseClassConstructor != null, nameof(baseClassConstructor) + " != null");

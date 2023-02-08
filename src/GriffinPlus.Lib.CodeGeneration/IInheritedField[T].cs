@@ -7,9 +7,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 {
 
 	/// <summary>
-	/// Typed interface of a generated property.
+	/// Typed interface of an inherited field.
 	/// </summary>
-	/// <typeparam name="T">Type of the property.</typeparam>
-	public interface IGeneratedProperty<T> : IGeneratedProperty { }
+	/// <typeparam name="T">Type of the field.</typeparam>
+	// ReSharper disable once UnusedTypeParameter
+	public interface IInheritedField<T> : IInheritedField { }
 
 }

@@ -25,7 +25,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (without initial value).
 		/// </summary>
 		/// <param name="typeDefinition">The code generation engine.</param>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> is <c>null</c>.</exception>
@@ -44,7 +47,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (with initial value).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the field belongs to.</param>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <param name="initialValue">Initial value of the field.</param>
@@ -61,7 +67,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			// set up an initializer or factory callback pushing the initial value into the dependency property on initialization
 			HasInitialValue = true;
 			InitialValue = initialValue;
-			if (InitialValueInitializers.TryGetInitializer(typeof(T), out var initializer)) mInitialValueInitializer = initializer;
+			if (InitialValueInitializers.TryGetInitializer(typeof(T), out InitialValueInitializer initializer)) mInitialValueInitializer = initializer;
 			else mTypedProvideInitialValueCallback = () => initialValue;
 
 			// initialize common parts
@@ -72,7 +78,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (with factory callback for an initial value).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the field belongs to.</param>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <param name="initializer">
@@ -97,7 +106,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (with factory callback for an initial value).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the field belongs to.</param>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
@@ -120,7 +132,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Initializes a new instance of the <see cref="GeneratedField{T}"/> class (with factory callback for an initial value).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the field belongs to.</param>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
@@ -142,7 +157,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Performs common initializations during construction.
 		/// </summary>
-		/// <param name="isStatic"><c>true</c> to create a static field; <c>false</c> to create an instance field.</param>
+		/// <param name="isStatic">
+		/// <c>true</c> to create a static field;<br/>
+		/// <c>false</c> to create an instance field.
+		/// </param>
 		/// <param name="name">Name of the field (may be <c>null</c> to create a random name).</param>
 		/// <param name="visibility">Visibility of the field.</param>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
@@ -160,7 +178,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			CodeGenHelpers.EnsureTypeIsTotallyPublic(typeof(T));
 
 			// create the field builder
-			FieldAttributes flags = Visibility.ToFieldAttributes();
+			var flags = Visibility.ToFieldAttributes();
 			if (IsStatic) flags |= FieldAttributes.Static;
 			FieldBuilder = TypeDefinition.TypeBuilder.DefineField(Name, typeof(T), flags);
 		}
@@ -246,24 +264,24 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, createdType);
-				var type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+				MethodInfo type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
 				Debug.Assert(type_getTypeFromHandle != null, nameof(type_getTypeFromHandle) + " != null");
 				msilGenerator.Emit(OpCodes.Call, type_getTypeFromHandle);
-				var codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				MethodInfo codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
 				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
 				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				if (mTypedProvideInitialValueCallback != null)
 				{
 					msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
-					var func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+					MethodInfo func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
 					Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
 					msilGenerator.Emit(OpCodes.Call, func_invoke);
 				}
 				else
 				{
 					msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback));
-					var func_invoke = typeof(ProvideValueCallback).GetMethod("Invoke");
+					MethodInfo func_invoke = typeof(ProvideValueCallback).GetMethod("Invoke");
 					Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
 					msilGenerator.Emit(OpCodes.Call, func_invoke);
 					if (FieldType != typeof(object)) msilGenerator.Emit(OpCodes.Unbox_Any, FieldType);

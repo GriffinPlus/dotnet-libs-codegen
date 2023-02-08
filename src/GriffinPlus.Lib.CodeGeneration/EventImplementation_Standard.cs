@@ -145,7 +145,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Implements the add/remove accessor of the event.
 		/// </summary>
 		/// <param name="isAdd">
-		/// <c>true</c> to implement the 'add' accessor method;
+		/// <c>true</c> to implement the 'add' accessor method;<br/>
 		/// <c>false</c> to implement the 'remove' accessor method.
 		/// </param>
 		/// <param name="eventToImplement">Event to implement.</param>

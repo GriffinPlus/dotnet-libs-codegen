@@ -62,7 +62,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		public void Create(string name)
 		{
 			// create a new type definition
-			var definition = CreateTypeDefinition(name);
+			TDefinition definition = CreateTypeDefinition(name);
 
 			// check whether the type definition has been initialized correctly
 			CheckDefinitionAfterConstruction(
@@ -156,8 +156,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type                      baseType,
 			IEnumerable<IConstructor> constructors)
 		{
-			var baseClassConstructors = GetConstructorsAccessibleFromDerivedType(baseType);
-			foreach (var constructor in constructors)
+			HashSet<ConstructorInfo> baseClassConstructors = GetConstructorsAccessibleFromDerivedType(baseType);
+			foreach (IConstructor constructor in constructors)
 			{
 				// the constructor event should be in the set of expected constructors
 				Assert.Contains(constructor.ConstructorInfo, baseClassConstructors);
@@ -175,15 +175,18 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Checks whether the specified inherited events reflect the expected set of inherited events.
 		/// </summary>
 		/// <param name="baseType">The base type.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden events; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden events;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="eventsToCheck">Inherited events to check.</param>
 		private static void CheckInheritedEvents(
 			Type                         baseType,
 			bool                         includeHidden,
 			IEnumerable<IInheritedEvent> eventsToCheck)
 		{
-			var inheritedEvents = GetEventsAccessibleFromDerivedType(baseType, includeHidden);
-			foreach (var @event in eventsToCheck)
+			HashSet<EventInfo> inheritedEvents = GetEventsAccessibleFromDerivedType(baseType, includeHidden);
+			foreach (IInheritedEvent @event in eventsToCheck)
 			{
 				// the event should be in the set of expected events
 				Assert.Contains(@event.EventInfo, inheritedEvents);
@@ -201,15 +204,18 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Checks whether the specified inherited fields reflect the expected set of inherited fields.
 		/// </summary>
 		/// <param name="baseType">The base type.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden fields; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden fields;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="fieldsToCheck">Inherited fields to check.</param>
 		private static void CheckInheritedFields(
 			Type                         baseType,
 			bool                         includeHidden,
 			IEnumerable<IInheritedField> fieldsToCheck)
 		{
-			var inheritedFields = GetFieldsAccessibleFromDerivedType(baseType, includeHidden);
-			foreach (var field in fieldsToCheck)
+			HashSet<FieldInfo> inheritedFields = GetFieldsAccessibleFromDerivedType(baseType, includeHidden);
+			foreach (IInheritedField field in fieldsToCheck)
 			{
 				// the field should be in the set of expected fields
 				Assert.Contains(field.FieldInfo, inheritedFields);
@@ -227,15 +233,18 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Checks whether the specified inherited methods reflect the expected set of inherited methods.
 		/// </summary>
 		/// <param name="baseType">The base type.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden methods; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden methods;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="methodsToCheck">Inherited methods to check.</param>
 		private static void CheckInheritedMethods(
 			Type                          baseType,
 			bool                          includeHidden,
 			IEnumerable<IInheritedMethod> methodsToCheck)
 		{
-			var inheritedMethods = GetMethodsAccessibleFromDerivedType(baseType, includeHidden);
-			foreach (var method in methodsToCheck)
+			HashSet<MethodInfo> inheritedMethods = GetMethodsAccessibleFromDerivedType(baseType, includeHidden);
+			foreach (IInheritedMethod method in methodsToCheck)
 			{
 				// the method should be in the set of expected methods
 				Assert.Contains(method.MethodInfo, inheritedMethods);
@@ -253,15 +262,18 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Checks whether the specified inherited properties reflect the expected set of inherited properties.
 		/// </summary>
 		/// <param name="baseType">The base type.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden properties; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden properties;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="propertiesToCheck">Inherited properties to check.</param>
 		private static void CheckInheritedProperties(
 			Type                            baseType,
 			bool                            includeHidden,
 			IEnumerable<IInheritedProperty> propertiesToCheck)
 		{
-			var inheritedProperties = GetPropertiesAccessibleFromDerivedType(baseType, includeHidden);
-			foreach (var property in propertiesToCheck)
+			HashSet<PropertyInfo> inheritedProperties = GetPropertiesAccessibleFromDerivedType(baseType, includeHidden);
+			foreach (IInheritedProperty property in propertiesToCheck)
 			{
 				// the property should be in the set of expected properties
 				Assert.Contains(property.PropertyInfo, inheritedProperties);
@@ -287,7 +299,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		[InlineData(null)]     // automatically generated name
 		public void CreateType(string name)
 		{
-			var definition = CreateTypeDefinition(name);
+			TDefinition definition = CreateTypeDefinition(name);
 			Type type = definition.CreateType();
 			CheckTypeAgainstDefinition(type, definition);
 		}
@@ -1030,8 +1042,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1051,9 +1063,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1077,8 +1089,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Single(
@@ -1096,9 +1108,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1122,8 +1134,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1145,9 +1157,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(null);
+			object fieldValue = field.GetValue(null);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1171,8 +1183,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Single(
@@ -1192,9 +1204,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(null);
+			object fieldValue = field.GetValue(null);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1304,8 +1316,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			TFieldType initialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1321,9 +1333,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(initialValue, fieldValue);
 		}
 
@@ -1434,8 +1446,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     initialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Single(
@@ -1453,9 +1465,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(initialValue, fieldValue);
 		}
 
@@ -1565,8 +1577,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			TFieldType initialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1584,9 +1596,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(null);
+			object fieldValue = field.GetValue(null);
 			Assert.Equal(initialValue, fieldValue);
 		}
 
@@ -1697,8 +1709,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     initialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Single(
@@ -1716,9 +1728,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(initialValue, fieldValue);
 		}
 
@@ -1744,8 +1756,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1765,9 +1777,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1793,8 +1805,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Single(
@@ -1812,9 +1824,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1840,8 +1852,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1863,9 +1875,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(null);
+			object fieldValue = field.GetValue(null);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1891,8 +1903,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Single(
@@ -1910,9 +1922,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1941,8 +1953,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -1962,9 +1974,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -1992,8 +2004,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddField))
 				.Single(
@@ -2011,9 +2023,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -2042,8 +2054,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -2065,9 +2077,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(null);
+			object fieldValue = field.GetValue(null);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -2095,8 +2107,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object     expectedInitialValue)
 		{
 			// create a new type definition and add the field
-			var definition = CreateTypeDefinition();
-			var addFieldMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addFieldMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 				.Single(
@@ -2114,9 +2126,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the field has the expected initial value
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var field = type.GetField(addedField.Name, bindingFlags);
+			FieldInfo field = type.GetField(addedField.Name, bindingFlags);
 			Assert.NotNull(field);
-			var fieldValue = field.GetValue(instance);
+			object fieldValue = field.GetValue(instance);
 			Assert.Equal(expectedInitialValue, fieldValue);
 		}
 
@@ -2221,9 +2233,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				{
 					// cycle through event raiser visibilities only if adding a raiser method,
 					// use public visibility only if not adding a raiser method (no effect)
-					var eventRaiserVisibilities = addRaiser ? Visibilities : new[] { Visibility.Public };
+					IEnumerable<Visibility> eventRaiserVisibilities = addRaiser ? Visibilities : new[] { Visibility.Public };
 
-					foreach (var eventRaiserVisibility in eventRaiserVisibilities)
+					foreach (Visibility eventRaiserVisibility in eventRaiserVisibilities)
 					{
 						// System.EventHandler
 						// (event raiser should be like: void OnEvent())
@@ -2384,7 +2396,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
 		/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-		/// <param name="addEventRaiserMethod"><c>true</c> to add the event raiser method; otherwise <c>false</c>.</param>
+		/// <param name="addEventRaiserMethod">
+		/// <c>true</c> to add the event raiser method;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
 		/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
 		/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
@@ -2402,16 +2417,16 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type[]     expectedEventRaiserParameterTypes)
 		{
 			// create a new type definition
-			var definition = CreateTypeDefinition();
+			TDefinition definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard);
-			var implementation = addEventRaiserMethod
-				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
+			Type implementationType = typeof(EventImplementation_Standard);
+			IEventImplementation implementation = addEventRaiserMethod
+				                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
+				                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
 
 			// get the AddEvent(...) method to test
-			var addEventMethod = typeof(TypeDefinition)
+			MethodInfo addEventMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -2459,7 +2474,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
 		/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-		/// <param name="addEventRaiserMethod"><c>true</c> to add the event raiser method; otherwise <c>false</c>.</param>
+		/// <param name="addEventRaiserMethod">
+		/// <c>true</c> to add the event raiser method;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
 		/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
 		/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
@@ -2477,16 +2495,16 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type[]     expectedEventRaiserParameterTypes)
 		{
 			// create a new type definition
-			var definition = CreateTypeDefinition();
+			TDefinition definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard);
-			var implementation = addEventRaiserMethod
-				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
+			Type implementationType = typeof(EventImplementation_Standard);
+			IEventImplementation implementation = addEventRaiserMethod
+				                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
+				                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
 
 			// get the AddEvent(...) method to test
-			var addEventMethod = typeof(TypeDefinition)
+			MethodInfo addEventMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualEvent))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -2547,7 +2565,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="name">Name of the event to add.</param>
 		/// <param name="visibility">Visibility of the event to add.</param>
 		/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-		/// <param name="addEventRaiserMethod"><c>true</c> to add the event raiser method; otherwise <c>false</c>.</param>
+		/// <param name="addEventRaiserMethod">
+		/// <c>true</c> to add the event raiser method;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
 		/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
 		/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
@@ -2565,16 +2586,16 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type[]     expectedEventRaiserParameterTypes)
 		{
 			// create a new type definition
-			var definition = CreateTypeDefinition();
+			TDefinition definition = CreateTypeDefinition();
 
 			// create an instance of the implementation strategy
-			var implementationType = typeof(EventImplementation_Standard);
-			var implementation = addEventRaiserMethod
-				                     ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-				                     : (IEventImplementation)Activator.CreateInstance(implementationType);
+			Type implementationType = typeof(EventImplementation_Standard);
+			IEventImplementation implementation = addEventRaiserMethod
+				                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
+				                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
 
 			// get the AddEvent(...) method to test
-			var addEventMethod = typeof(TypeDefinition)
+			MethodInfo addEventMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -2621,7 +2642,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="definition">Type definition the event to test belongs to.</param>
 		/// <param name="instance">Instance of the dynamically created type that contains the event.</param>
 		/// <param name="isStaticEvent">
-		/// <c>true</c> if the event to test is a static event;
+		/// <c>true</c> if the event to test is a static event;<br/>
 		/// <c>false</c> if the event to test is an instance event.
 		/// </param>
 		/// <param name="eventName">Name of the added event.</param>
@@ -2638,7 +2659,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// argument).
 		/// </param>
 		/// <param name="strategyAddsEventRaiserMethod">
-		/// <c>true</c> if the implementation strategy should have added an event raiser method;
+		/// <c>true</c> if the implementation strategy should have added an event raiser method;<br/>
 		/// otherwise <c>false</c>.
 		/// </param>
 		/// <param name="eventRaiserName">
@@ -2662,9 +2683,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type generatedType = instance.GetType();
 
 			// get generated event accessor methods
-			var bindingFlags = (isStaticEvent ? BindingFlags.Static : BindingFlags.Instance) | BindingFlags.Public | BindingFlags.NonPublic;
-			var addAccessorMethod = generatedType.GetMethod("add_" + eventName, bindingFlags);
-			var removeAccessorMethod = generatedType.GetMethod("remove_" + eventName, bindingFlags);
+			BindingFlags bindingFlags = (isStaticEvent ? BindingFlags.Static : BindingFlags.Instance) | BindingFlags.Public | BindingFlags.NonPublic;
+			MethodInfo addAccessorMethod = generatedType.GetMethod("add_" + eventName, bindingFlags);
+			MethodInfo removeAccessorMethod = generatedType.GetMethod("remove_" + eventName, bindingFlags);
 			Assert.NotNull(addAccessorMethod);
 			Assert.NotNull(removeAccessorMethod);
 
@@ -2682,13 +2703,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// check whether the implementation strategy has added the event raiser method to the type definition
 			Assert.Single(definition.GeneratedMethods);
-			var eventRaiserMethodDefinition = definition.GeneratedMethods.Single();
+			IGeneratedMethod eventRaiserMethodDefinition = definition.GeneratedMethods.Single();
 			Assert.Equal(expectedEventRaiserName, eventRaiserMethodDefinition.Name);
 			Assert.Equal(expectedEventRaiserReturnType, eventRaiserMethodDefinition.ReturnType);
 			Assert.Equal(expectedEventRaiserParameterTypes, eventRaiserMethodDefinition.ParameterTypes);
 
 			// get the event raiser method
-			var eventRaiserMethod = generatedType.GetMethods(bindingFlags).SingleOrDefault(x => x.Name == expectedEventRaiserName);
+			MethodInfo eventRaiserMethod = generatedType.GetMethods(bindingFlags).SingleOrDefault(x => x.Name == expectedEventRaiserName);
 			Assert.NotNull(eventRaiserMethod);
 
 			// prepare an event handler to register with the event
@@ -2858,7 +2879,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				foreach (string name in PropertyNames)
-				foreach (var visibility in Visibilities)
+				foreach (Visibility visibility in Visibilities)
 				{
 					yield return new object[] { name, typeof(int), visibility, new object[] { 1, 2, 3 } };          // value type
 					yield return new object[] { name, typeof(string), visibility, new object[] { "A", "B", "C" } }; // reference type
@@ -2883,7 +2904,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -2895,8 +2916,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -2907,7 +2928,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -2941,7 +2962,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -2952,8 +2973,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
 				.Single(
@@ -2962,7 +2983,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -2996,7 +3017,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3008,8 +3029,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -3020,35 +3041,42 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
 
-				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getSet" : null,
-					implementation
-				});
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
 
-				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getOnly" : null,
-					implementation
-				});
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
 
-				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, 
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
 					new object[]
 					{
 						name != null ? name + "_setOnly" : null,
 						implementation
 					});
 
-				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_none" : null,
-					implementation
-				});
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_none" : null,
+						implementation
+					});
 
 				// add accessor methods and test the property
 				AddProperty_CommonPart(
@@ -3075,7 +3103,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3086,8 +3114,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddProperty))
 				.Single(
@@ -3096,7 +3124,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
@@ -3163,7 +3191,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3175,8 +3203,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -3187,7 +3215,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -3221,7 +3249,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3232,8 +3260,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
 				.Single(
@@ -3242,7 +3270,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -3276,7 +3304,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3288,8 +3316,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -3300,34 +3328,42 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
 
-				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getSet" : null,
-					implementation
-				});
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
 
-				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getOnly" : null,
-					implementation
-				});
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
 
-				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_setOnly" : null,
-					implementation
-				});
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
 
-				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_none" : null,
-					implementation
-				});
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_none" : null,
+						implementation
+					});
 
 				// add accessor methods and test the property
 				AddProperty_CommonPart(
@@ -3354,7 +3390,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3365,8 +3401,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
 				.Single(
@@ -3375,38 +3411,46 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
 
-				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_getSet" : null,
-					implementation
-				});
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
 
-				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_getOnly" : null,
-					implementation
-				});
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
 
-				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_setOnly" : null,
-					implementation
-				});
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
 
-				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_none" : null,
-					implementation
-				});
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_none" : null,
+						implementation
+					});
 
 				// add accessor methods and test the property
 				AddProperty_CommonPart(
@@ -3449,7 +3493,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3461,8 +3505,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -3473,7 +3517,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -3507,7 +3551,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3518,8 +3562,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
 				.Single(
@@ -3528,7 +3572,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 
@@ -3562,7 +3606,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3574,8 +3618,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the property (actually one property with get/set accessors,
 			// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
@@ -3586,34 +3630,42 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
 
-				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getSet" : null,
-					implementation
-				});
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
 
-				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_getOnly" : null,
-					implementation
-				});
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
 
-				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_setOnly" : null,
-					implementation
-				});
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
 
-				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					name != null ? name + "_none" : null,
-					implementation
-				});
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						name != null ? name + "_none" : null,
+						implementation
+					});
 
 				// add accessor methods and test the property
 				AddProperty_CommonPart(
@@ -3640,7 +3692,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name">Name of the property to add.</param>
 		/// <param name="propertyType">Type of the property to add.</param>
-		/// <param name="accessorVisibility">Visibility the get/set accessor should have.</param>
+		/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
 		/// <param name="testObjects">Test values to use when when playing with accessor methods.</param>
 		[Theory]
 		[MemberData(nameof(AddPropertyTestData))]
@@ -3651,8 +3703,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			object[]   testObjects)
 		{
 			// create a new type definition and add the property
-			var definition = CreateTypeDefinition();
-			var addPropertyMethod = typeof(TypeDefinition)
+			TDefinition definition = CreateTypeDefinition();
+			MethodInfo addPropertyMethod = typeof(TypeDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.Where(method => method.Name == nameof(TypeDefinition.AddStaticProperty))
 				.Single(
@@ -3661,38 +3713,46 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						          .Select(parameter => parameter.ParameterType)
 						          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
 
-			using (TestDataStorage storage = new TestDataStorage())
+			using (var storage = new TestDataStorage())
 			{
 				int handle = storage.Add(testObjects[0]);
 				var implementation = new PropertyImplementation_TestDataStorage(handle);
 
-				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_getSet" : null,
-					implementation
-				});
+				var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getSet" : null,
+						implementation
+					});
 
-				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_getOnly" : null,
-					implementation
-				});
+				var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_getOnly" : null,
+						implementation
+					});
 
-				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_setOnly" : null,
-					implementation
-				});
+				var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_setOnly" : null,
+						implementation
+					});
 
-				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, new object[]
-				{
-					propertyType,
-					name != null ? name + "_none" : null,
-					implementation
-				});
+				var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
+					definition,
+					new object[]
+					{
+						propertyType,
+						name != null ? name + "_none" : null,
+						implementation
+					});
 
 				// add accessor methods and test the property
 				AddProperty_CommonPart(
@@ -3724,23 +3784,23 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="accessorVisibility">Visibility of the accessor methods to implement.</param>
 		/// <param name="implementation">Implementation strategy the property should use to implement (may be <c>null</c> to implement using callbacks).</param>
 		/// <param name="handle">Handle of the test object in the <see cref="TestDataStorage"/> backing the property.</param>
-		/// <param name="testObjects">Test objects to use when playing with the get/set accessor methods.</param>
-		/// <param name="addedProperty_getSet">The added property to test (with get/set accessor).</param>
-		/// <param name="addedProperty_getOnly">The added property to test (with get accessor only).</param>
-		/// <param name="addedProperty_setOnly">The added property to test (with set accessor only).</param>
-		/// <param name="addedProperty_none">The added property to test (without get/set accessor).</param>
+		/// <param name="testObjects">Test objects to use when playing with the 'get'/'set' accessor methods.</param>
+		/// <param name="addedProperty_getSet">The added property to test (with 'get'/'set' accessor).</param>
+		/// <param name="addedProperty_getOnly">The added property to test (with 'get' accessor only).</param>
+		/// <param name="addedProperty_setOnly">The added property to test (with 'set' accessor only).</param>
+		/// <param name="addedProperty_none">The added property to test (without 'get'/'set' accessor).</param>
 		private static void AddProperty_CommonPart(
-			TDefinition  definition,
-			PropertyKind expectedPropertyKind,
-			Type         expectedPropertyType,
-			Visibility         accessorVisibility,
+			TDefinition             definition,
+			PropertyKind            expectedPropertyKind,
+			Type                    expectedPropertyType,
+			Visibility              accessorVisibility,
 			IPropertyImplementation implementation,
-			int handle,
-			object[]           testObjects,
-			IGeneratedProperty addedProperty_getSet,
-			IGeneratedProperty addedProperty_getOnly,
-			IGeneratedProperty addedProperty_setOnly,
-			IGeneratedProperty addedProperty_none)
+			int                     handle,
+			IReadOnlyList<object>   testObjects,
+			IGeneratedProperty      addedProperty_getSet,
+			IGeneratedProperty      addedProperty_getOnly,
+			IGeneratedProperty      addedProperty_setOnly,
+			IGeneratedProperty      addedProperty_none)
 		{
 			// the added properties should not be null
 			Assert.NotNull(addedProperty_getSet);
@@ -3792,14 +3852,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Emits MSIL code for a get accessor method that returns the value of a test data object from the <see cref="TestDataStorage"/>.
+		/// Emits MSIL code for a 'get' accessor method that returns the value of a test data object from the <see cref="TestDataStorage"/>.
 		/// </summary>
 		/// <param name="property">Property to implement the accessor for.</param>
 		/// <param name="handle">Handle to the test data object.</param>
-		/// <param name="msilGenerator">MSIL generator to use when emitting code for the get accessor method.</param>
-		private static void EmitGetAccessorWithTestDataStorageCallback(IGeneratedProperty property, int handle, ILGenerator msilGenerator)
+		/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'get' accessor method.</param>
+		private static void EmitGetAccessorWithTestDataStorageCallback(IProperty property, int handle, ILGenerator msilGenerator)
 		{
-			var testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
+			MethodInfo testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
 			Debug.Assert(testDataStorage_get != null, nameof(testDataStorage_get) + " != null");
 			msilGenerator.Emit(OpCodes.Ldc_I4, handle);
 			msilGenerator.Emit(OpCodes.Call, testDataStorage_get);
@@ -3808,17 +3868,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Emits MSIL code for a set accessor method that changes the value of a test data object in the <see cref="TestDataStorage"/>.
+		/// Emits MSIL code for a 'set' accessor method that changes the value of a test data object in the <see cref="TestDataStorage"/>.
 		/// </summary>
 		/// <param name="property">Property to implement the accessor for.</param>
 		/// <param name="handle">Handle to the test data object.</param>
-		/// <param name="msilGenerator">MSIL generator to use when emitting code for the set accessor method.</param>
-		private static void EmitSetAccessorWithTestDataStorageCallback(IGeneratedProperty property, int handle, ILGenerator msilGenerator)
+		/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'set' accessor method.</param>
+		private static void EmitSetAccessorWithTestDataStorageCallback(IProperty property, int handle, ILGenerator msilGenerator)
 		{
 			msilGenerator.Emit(OpCodes.Ldc_I4, handle);
 			msilGenerator.Emit(property.Kind == PropertyKind.Static ? OpCodes.Ldarg_0 : OpCodes.Ldarg_1);
 			if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
-			var testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
+			MethodInfo testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
 			Debug.Assert(testDataStorage_set != null, nameof(testDataStorage_set) + " != null");
 			msilGenerator.Emit(OpCodes.Call, testDataStorage_set);
 			msilGenerator.Emit(OpCodes.Ret);
@@ -3832,9 +3892,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="expectedPropertyType">The expected property type.</param>
 		/// <param name="expectedImplementation">The expected property implementation (may be <c>null</c>).</param>
 		private static void TestAddedProperty(
-			IGeneratedProperty generatedProperty,
-			PropertyKind       expectedPropertyKind,
-			Type               expectedPropertyType,
+			IGeneratedProperty      generatedProperty,
+			PropertyKind            expectedPropertyKind,
+			Type                    expectedPropertyType,
 			IPropertyImplementation expectedImplementation)
 		{
 			// check whether the property is of the expected property kind
@@ -3852,7 +3912,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			// newly added properties should not have accessor methods, yet
 			Assert.Null(generatedProperty.GetAccessor);
 			Assert.Null(generatedProperty.SetAccessor);
-
 		}
 
 		/// <summary>
@@ -3860,17 +3919,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="generatedProperty">The property to test.</param>
 		/// <param name="instance">Instance of the dynamically created type that contains the property.</param>
-		/// <param name="testObjects">Test objects to use when playing with the get/set accessors.</param>
+		/// <param name="testObjects">Test objects to use when playing with the 'get'/'set' accessors.</param>
 		/// <param name="testDataHandle">Handle of the test data field in the backing storage.</param>
 		private static void TestPropertyImplementation(
-			IGeneratedProperty generatedProperty,
-			object             instance,
-			object[]           testObjects,
-			int                testDataHandle)
+			IProperty             generatedProperty,
+			object                instance,
+			IReadOnlyList<object> testObjects,
+			int                   testDataHandle)
 		{
 			const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			var generatedType = instance.GetType();
-			var property = generatedType.GetProperty(generatedProperty.Name, bindingFlags);
+			Type generatedType = instance.GetType();
+			PropertyInfo property = generatedType.GetProperty(generatedProperty.Name, bindingFlags);
 			Assert.NotNull(property);
 
 			// reset instance if the property is static to make getting/setting them below work as expected
@@ -3971,8 +4030,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <returns>The constructors of the specified type that can be accessed by a type deriving from that type.</returns>
 		protected static HashSet<ConstructorInfo> GetConstructorsAccessibleFromDerivedType(Type type)
 		{
-			HashSet<ConstructorInfo> constructorInfos = new HashSet<ConstructorInfo>();
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+			var constructorInfos = new HashSet<ConstructorInfo>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 			foreach (ConstructorInfo constructorInfo in type.GetConstructors(flags))
 			{
 				// skip constructor if it is private or internal
@@ -3990,12 +4049,15 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Gets the events that can be accessed by a type deriving from the specified type.
 		/// </summary>
 		/// <param name="type">Type to inspect.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden events; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden events;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <returns>The events that can be accessed by a type deriving from the specified type.</returns>
 		protected static HashSet<EventInfo> GetEventsAccessibleFromDerivedType(Type type, bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<EventInfo> eventInfos = new HashSet<EventInfo>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var eventInfos = new HashSet<EventInfo>();
 			Type typeToInspect = type;
 			while (typeToInspect != null)
 			{
@@ -4034,13 +4096,16 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Gets the fields that can be accessed by a type deriving from the specified type.
 		/// </summary>
 		/// <param name="type">Type to inspect.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden fields; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden fields;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <returns>The fields that can be accessed by a type deriving from the specified type.</returns>
 		protected static HashSet<FieldInfo> GetFieldsAccessibleFromDerivedType(Type type, bool includeHidden)
 		{
 			// all fields that are neither private nor internal are accessible to derived types
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<FieldInfo> fieldInfos = new HashSet<FieldInfo>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var fieldInfos = new HashSet<FieldInfo>();
 			Type typeToInspect = type;
 			while (typeToInspect != null)
 			{
@@ -4069,12 +4134,15 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Gets the methods that can be accessed by a type deriving from the specified type.
 		/// </summary>
 		/// <param name="type">Type to inspect.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden methods; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden methods;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <returns>The methods that can be accessed by a type deriving from the specified type.</returns>
 		protected static HashSet<MethodInfo> GetMethodsAccessibleFromDerivedType(Type type, bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<MethodInfo> methodInfos = new HashSet<MethodInfo>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var methodInfos = new HashSet<MethodInfo>();
 			Type typeToInspect = type;
 			while (typeToInspect != null)
 			{
@@ -4112,12 +4180,15 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Gets the properties that can be accessed by a type deriving from the specified type.
 		/// </summary>
 		/// <param name="type">Type to inspect.</param>
-		/// <param name="includeHidden"><c>true</c> to include hidden properties; otherwise <c>false</c>.</param>
+		/// <param name="includeHidden">
+		/// <c>true</c> to include hidden properties;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <returns>The properties that can be accessed by a type deriving from the specified type.</returns>
 		protected static HashSet<PropertyInfo> GetPropertiesAccessibleFromDerivedType(Type type, bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<PropertyInfo> propertyInfos = new HashSet<PropertyInfo>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var propertyInfos = new HashSet<PropertyInfo>();
 			Type typeToInspect = type;
 			while (typeToInspect != null)
 			{
@@ -4170,7 +4241,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">Field to compare.</param>
 		/// <param name="y">Field to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified fields have the same signature;
+		/// <c>true</c> if the specified fields have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(FieldInfo x, FieldInfo y)
@@ -4185,7 +4256,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">Event to compare.</param>
 		/// <param name="y">Event to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified events have the same signature;
+		/// <c>true</c> if the specified events have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(EventInfo x, EventInfo y)
@@ -4200,7 +4271,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">Property to compare.</param>
 		/// <param name="y">Property to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified properties have the same signature;
+		/// <c>true</c> if the specified properties have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(PropertyInfo x, PropertyInfo y)
@@ -4215,13 +4286,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">Method to compare.</param>
 		/// <param name="y">Method to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified methods have the same signature;
+		/// <c>true</c> if the specified methods have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
-		private static bool HasSameSignature(MethodInfo x, MethodInfo y)
+		private static bool HasSameSignature(MethodBase x, MethodBase y)
 		{
-			if (x.Name != y.Name) return false;
-			return x.GetParameters().Select(z => z.ParameterType).SequenceEqual(y.GetParameters().Select(z => z.ParameterType));
+			return x.Name == y.Name && x.GetParameters().Select(z => z.ParameterType).SequenceEqual(y.GetParameters().Select(z => z.ParameterType));
 		}
 
 		#endregion

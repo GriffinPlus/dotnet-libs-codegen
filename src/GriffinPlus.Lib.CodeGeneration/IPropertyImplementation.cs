@@ -9,7 +9,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 {
 
 	/// <summary>
-	/// Interface of property implementation strategies that implement the get/set accessor methods.
+	/// Interface of property implementation strategies that implement the 'get'/'set' accessor methods.
 	/// </summary>
 	public interface IPropertyImplementation
 	{
@@ -21,22 +21,22 @@ namespace GriffinPlus.Lib.CodeGeneration
 		void Declare(TypeDefinition typeDefinition, IGeneratedProperty property);
 
 		/// <summary>
-		/// Implements the get accessor method of the property.
+		/// Implements the 'get' accessor method of the property.
 		/// </summary>
 		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the get accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the get accessor method to implement.</param>
+		/// <param name="property">The property the 'get' accessor method to implement belongs to.</param>
+		/// <param name="msilGenerator">MSIL generator attached to the 'get' accessor method to implement.</param>
 		void ImplementGetAccessorMethod(
 			TypeDefinition     typeDefinition,
 			IGeneratedProperty property,
 			ILGenerator        msilGenerator);
 
 		/// <summary>
-		/// Implements the set accessor method of the property.
+		/// Implements the 'set' accessor method of the property.
 		/// </summary>
 		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the set accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the set accessor method to implement.</param>
+		/// <param name="property">The property the 'set' accessor method to implement belongs to.</param>
+		/// <param name="msilGenerator">MSIL generator attached to the 'set' accessor method to implement.</param>
 		void ImplementSetAccessorMethod(
 			TypeDefinition     typeDefinition,
 			IGeneratedProperty property,

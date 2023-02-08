@@ -24,17 +24,17 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="kind">Kind of property determining whether the property is static, abstract, virtual or an override.</param>
 		/// <param name="name">Name of the property (may be <c>null</c> to create a random name).</param>
 		/// <param name="implementation">
-		/// Implementation strategy that implements the get/set accessor methods of the property.
+		/// Implementation strategy that implements the 'get'/'set' accessor methods of the property.
 		/// Must be <c>null</c> if <paramref name="kind"/> is <see cref="PropertyKind.Abstract"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/> is <c>null</c>
-		/// -or-
+		/// <paramref name="typeDefinition"/> is <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="kind"/> is not <see cref="PropertyKind.Abstract"/> and <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is <see cref="PropertyKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>
-		/// -or-
+		/// <paramref name="kind"/> is <see cref="PropertyKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedProperty(
@@ -108,7 +108,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the property belongs to.</param>
 		/// <param name="inheritedProperty">Inherited property to override.</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessor methods of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessor methods of the property.</param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="typeDefinition"/>, <paramref name="inheritedProperty"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
@@ -157,19 +157,19 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the property belongs to.</param>
 		/// <param name="inheritedProperty">Inherited property to override.</param>
 		/// <param name="getAccessorImplementationCallback">
-		/// A callback that implements the get accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a get accessor method).
+		/// A callback that implements the 'get' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'get' accessor method).
 		/// </param>
 		/// <param name="setAccessorImplementationCallback">
-		/// A callback that implements the set accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a set accessor method).
+		/// A callback that implements the 'set' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'set' accessor method).
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/> or <paramref name="inheritedProperty"/> is <c>null</c>
-		/// -or-
-		/// <paramref name="inheritedProperty"/> has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
-		/// -or-
-		/// <paramref name="inheritedProperty"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// <paramref name="typeDefinition"/> or <paramref name="inheritedProperty"/> is <c>null</c>.<br/>
+		/// -or-<br/>
+		/// <paramref name="inheritedProperty"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
+		/// -or-<br/>
+		/// <paramref name="inheritedProperty"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		internal GeneratedProperty(
 			TypeDefinition                         typeDefinition,
@@ -262,18 +262,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IPropertyImplementation Implementation { get; }
 
 		/// <summary>
-		/// Adds a get accessor method to the property.
+		/// Adds a 'get' accessor method to the property.
 		/// </summary>
-		/// <param name="visibility">Visibility of the get accessor to add.</param>
+		/// <param name="visibility">Visibility of the 'get' accessor to add.</param>
 		/// <param name="getAccessorImplementationCallback">
-		/// A callback that implements the get accessor method of the property.
+		/// A callback that implements the 'get' accessor method of the property
 		/// (<c>null</c> to let the implementation strategy implement the method if specified when adding the property).
 		/// </param>
-		/// <returns>The added get accessor method.</returns>
+		/// <returns>The added 'get' accessor method.</returns>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="getAccessorImplementationCallback"/> is <c>null</c> and the property was created without an implementation strategy.
 		/// </exception>
-		/// <exception cref="InvalidOperationException">The get accessor method was already added to the property.</exception>
+		/// <exception cref="InvalidOperationException">The 'get' accessor method was already added to the property.</exception>
 		public IGeneratedMethod AddGetAccessor(
 			Visibility                             visibility                        = Visibility.Public,
 			PropertyAccessorImplementationCallback getAccessorImplementationCallback = null)
@@ -330,18 +330,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
-		/// Adds a set accessor method to the property.
+		/// Adds a 'set' accessor method to the property.
 		/// </summary>
-		/// <param name="visibility">Visibility of the set accessor to add.</param>
+		/// <param name="visibility">Visibility of the 'set' accessor to add.</param>
 		/// <param name="setAccessorImplementationCallback">
-		/// A callback that implements the set accessor method of the property.
+		/// A callback that implements the 'set' accessor method of the property
 		/// (<c>null</c> to let the implementation strategy implement the method if specified when adding the property).
 		/// </param>
-		/// <returns>The added set accessor method.</returns>
+		/// <returns>The added 'set' accessor method.</returns>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="setAccessorImplementationCallback"/> is <c>null</c> and the property was created without an implementation strategy.
 		/// </exception>
-		/// <exception cref="InvalidOperationException">The set accessor method was already added to the property.</exception>
+		/// <exception cref="InvalidOperationException">The 'set' accessor method was already added to the property.</exception>
 		public IGeneratedMethod AddSetAccessor(
 			Visibility                             visibility                        = Visibility.Public,
 			PropertyAccessorImplementationCallback setAccessorImplementationCallback = null)

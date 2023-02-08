@@ -25,7 +25,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		string Name { get; }
 
 		/// <summary>
-		/// Gets a value indicating whether the dependency property is read-only (true) or read-write (false).
+		/// Gets a value indicating whether the dependency property is read-only (<c>true</c>) or read-write (<c>false</c>).
 		/// </summary>
 		bool IsReadOnly { get; }
 	}

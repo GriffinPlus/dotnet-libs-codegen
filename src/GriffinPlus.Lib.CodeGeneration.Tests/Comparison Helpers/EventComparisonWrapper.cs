@@ -52,15 +52,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="other">Wrapper to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public bool Equals(EventComparisonWrapper other)
 		{
 			if (Name != other.Name) return false;
 			if (EventHandlerType != other.EventHandlerType) return false;
-			if (!AddAccessor.Equals(other.AddAccessor)) return false;
-			if (!RemoveAccessor.Equals(other.RemoveAccessor)) return false;
-			return true;
+			return AddAccessor.Equals(other.AddAccessor) && RemoveAccessor.Equals(other.RemoveAccessor);
 		}
 
 		/// <summary>
@@ -68,13 +67,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="obj">Object to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((EventComparisonWrapper)obj);
+			return obj.GetType() == GetType() && Equals((EventComparisonWrapper)obj);
 		}
 
 		/// <summary>

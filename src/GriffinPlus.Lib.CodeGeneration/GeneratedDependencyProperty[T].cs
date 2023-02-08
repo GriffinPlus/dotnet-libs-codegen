@@ -31,7 +31,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// (may be <c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> is <c>null</c>.</exception>
@@ -55,7 +55,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// (may be <c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="initialValue">Initial value of the field.</param>
@@ -73,7 +73,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			// set up an initializer or factory callback pushing the initial value into the dependency property on initialization
 			HasInitialValue = true;
 			InitialValue = initialValue;
-			if (InitialValueInitializers.TryGetInitializer(typeof(T), out var initializer)) mInitialValueInitializer = initializer;
+			if (InitialValueInitializers.TryGetInitializer(typeof(T), out InitialValueInitializer initializer)) mInitialValueInitializer = initializer;
 			else mProvideInitialValueCallback = () => InitialValue;
 
 			// initialize common parts
@@ -81,7 +81,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class (with initial value).
+		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class
+		/// (with initial value provided by a custom initializer).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
@@ -89,7 +90,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// (may be <c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="initializer">
@@ -111,7 +112,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class (with initial value).
+		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class
+		/// (with initial value provided by a factory callback).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
@@ -119,7 +121,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// (may be <c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
@@ -223,7 +225,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		public IGeneratedProperty<T> AddAccessorProperty(
-			string     name = null,
+			string     name                  = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public)
 		{
@@ -295,15 +297,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
-				var type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+				MethodInfo type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
 				Debug.Assert(type_getTypeFromHandle != null, nameof(type_getTypeFromHandle) + " != null");
 				msilGenerator.Emit(OpCodes.Call, type_getTypeFromHandle);
-				var codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				MethodInfo codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
 				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
 				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
-				var func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+				MethodInfo func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
 				Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
 				msilGenerator.Emit(OpCodes.Call, func_invoke);
 			}
@@ -371,15 +373,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
-				var type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+				MethodInfo type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
 				Debug.Assert(type_getTypeFromHandle != null, nameof(type_getTypeFromHandle) + " != null");
 				msilGenerator.Emit(OpCodes.Call, type_getTypeFromHandle);
-				var codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				MethodInfo codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
 				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
 				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
-				var func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+				MethodInfo func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
 				Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
 				msilGenerator.Emit(OpCodes.Call, func_invoke);
 			}

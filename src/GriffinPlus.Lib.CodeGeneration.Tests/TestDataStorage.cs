@@ -58,7 +58,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			lock (sStorageByHandle)
 			{
-				if (!sStorageByHandle.TryGetValue(handle, out var storage))
+				if (!sStorageByHandle.TryGetValue(handle, out TestDataStorage storage))
 					throw new ArgumentException($"No object with handle {handle} was found.");
 
 				return storage.mObjectByHandle[handle];
@@ -74,7 +74,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			lock (sStorageByHandle)
 			{
-				if (!sStorageByHandle.TryGetValue(handle, out var storage))
+				if (!sStorageByHandle.TryGetValue(handle, out TestDataStorage storage))
 					throw new ArgumentException($"No object with handle {handle} was found.");
 
 				storage.mObjectByHandle[handle] = value;

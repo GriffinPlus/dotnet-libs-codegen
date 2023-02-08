@@ -109,7 +109,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="other">Object to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the current object and the specified object are equal;
+		/// <c>true</c> if the current object and the specified object are equal;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		public bool Equals(GeneratedConstructor other)
@@ -126,7 +126,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="obj">Object to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the current object and the specified object are equal;
+		/// <c>true</c> if the current object and the specified object are equal;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
@@ -144,7 +144,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			unchecked
 			{
 				int hashCode = Visibility.GetHashCode();
-				foreach (var type in ParameterTypes) hashCode = (hashCode * 397) ^ type.GetHashCode();
+				foreach (Type type in ParameterTypes) hashCode = (hashCode * 397) ^ type.GetHashCode();
 				return hashCode;
 			}
 		}

@@ -67,6 +67,19 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case FieldAttributes.FamANDAssem:
 					throw new NotImplementedException($"The access modifier of the field ({field.Attributes & FieldAttributes.FieldAccessMask}) is not supported under C#.");
 
+				case FieldAttributes.FieldAccessMask:
+				case FieldAttributes.HasDefault:
+				case FieldAttributes.HasFieldMarshal:
+				case FieldAttributes.HasFieldRVA:
+				case FieldAttributes.InitOnly:
+				case FieldAttributes.Literal:
+				case FieldAttributes.NotSerialized:
+				case FieldAttributes.PinvokeImpl:
+				case FieldAttributes.PrivateScope:
+				case FieldAttributes.ReservedMask:
+				case FieldAttributes.RTSpecialName:
+				case FieldAttributes.SpecialName:
+				case FieldAttributes.Static:
 				default:
 					throw new NotImplementedException("The visibility of the field is not supported."); // should never occur
 			}
@@ -106,7 +119,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			// determine the event kind from the add/remove accessor method
 			// (both accessor methods should have the same attributes)
-			var accessor = @event.AddMethod ?? @event.RemoveMethod;
+			MethodInfo accessor = @event.AddMethod ?? @event.RemoveMethod;
 			if (accessor == null) throw new ArgumentException("The event has neither an add accessor method nor a remove accessor method.");
 			MethodAttributes attributes = accessor.Attributes;
 
@@ -130,6 +143,22 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case MethodAttributes.FamANDAssem:
 					throw new NotImplementedException($"The access modifier of the event accessor method ({attributes & MethodAttributes.MemberAccessMask}) is not supported under C#.");
 
+				case MethodAttributes.Abstract:
+				case MethodAttributes.CheckAccessOnOverride:
+				case MethodAttributes.Final:
+				case MethodAttributes.HasSecurity:
+				case MethodAttributes.HideBySig:
+				case MethodAttributes.MemberAccessMask:
+				case MethodAttributes.NewSlot:
+				case MethodAttributes.PinvokeImpl:
+				case MethodAttributes.PrivateScope:
+				case MethodAttributes.RequireSecObject:
+				case MethodAttributes.ReservedMask:
+				case MethodAttributes.RTSpecialName:
+				case MethodAttributes.SpecialName:
+				case MethodAttributes.Static:
+				case MethodAttributes.UnmanagedExport:
+				case MethodAttributes.Virtual:
 				default:
 					throw new NotImplementedException("The visibility of the event is not supported."); // should never occur
 			}
@@ -159,15 +188,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public static EventKind ToEventKind(this MethodInfo accessor)
 		{
 			// ensure the method is a add/remove accessor method
-			if (!accessor.IsSpecialName || !accessor.Name.StartsWith("add_") && !accessor.Name.StartsWith("remove_"))
+			if (!accessor.IsSpecialName || (!accessor.Name.StartsWith("add_") && !accessor.Name.StartsWith("remove_")))
 				throw new ArgumentException("The method is not a add/remove accessor method.");
 
 			MethodAttributes attributes = accessor.Attributes;
 			if ((attributes & MethodAttributes.Static) == MethodAttributes.Static) return EventKind.Static;
 			if ((attributes & MethodAttributes.Abstract) == MethodAttributes.Abstract) return EventKind.Abstract;
 			if ((attributes & (MethodAttributes.Virtual | MethodAttributes.NewSlot)) == MethodAttributes.Virtual) return EventKind.Override;
-			if ((attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual) return EventKind.Virtual;
-			return EventKind.Normal;
+			return (attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual ? EventKind.Virtual : EventKind.Normal;
 		}
 
 		#endregion
@@ -179,12 +207,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="property">The property to get the property kind from (must have at least one accessor method).</param>
 		/// <returns>The kind of property.</returns>
-		/// <exception cref="ArgumentException">The property has neither a get accessor method nor a set accessor method.</exception>
+		/// <exception cref="ArgumentException">The property has neither a 'get' accessor method nor a 'set' accessor method.</exception>
 		public static PropertyKind ToPropertyKind(this PropertyInfo property)
 		{
 			// determine the property kind from the get/set accessor method
 			// (both accessor methods should have the same attributes, but one of the accessor methods may not be implemented)
-			var accessor = property.GetMethod ?? property.SetMethod;
+			MethodInfo accessor = property.GetMethod ?? property.SetMethod;
 			if (accessor == null) throw new ArgumentException("The property has neither a get accessor method nor a set accessor method.");
 			return accessor.ToPropertyKind();
 		}
@@ -193,22 +221,21 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets the property kind of the method the property accessor method belongs to.
 		/// </summary>
 		/// <param name="accessor">
-		/// Property accessor method to get the property kind from (must be a get/set accessor method).
+		/// Property accessor method to get the property kind from (must be a 'get'/'set' accessor method).
 		/// </param>
 		/// <returns>The kind of property the specified accessor belongs to.</returns>
-		/// <exception cref="ArgumentException">The method is not a get/set accessor method.</exception>
+		/// <exception cref="ArgumentException">The method is not a 'get'/'set' accessor method.</exception>
 		public static PropertyKind ToPropertyKind(this MethodInfo accessor)
 		{
 			// ensure the method is a get/set accessor method
-			if (!accessor.IsSpecialName || !accessor.Name.StartsWith("get_") && !accessor.Name.StartsWith("set_"))
+			if (!accessor.IsSpecialName || (!accessor.Name.StartsWith("get_") && !accessor.Name.StartsWith("set_")))
 				throw new ArgumentException("The method is not a get/set accessor method.");
 
 			MethodAttributes attributes = accessor.Attributes;
 			if ((attributes & MethodAttributes.Static) == MethodAttributes.Static) return PropertyKind.Static;
 			if ((attributes & MethodAttributes.Abstract) == MethodAttributes.Abstract) return PropertyKind.Abstract;
 			if ((attributes & (MethodAttributes.Virtual | MethodAttributes.NewSlot)) == MethodAttributes.Virtual) return PropertyKind.Override;
-			if ((attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual) return PropertyKind.Virtual;
-			return PropertyKind.Normal;
+			return (attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual ? PropertyKind.Virtual : PropertyKind.Normal;
 		}
 
 		#endregion
@@ -262,6 +289,22 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case MethodAttributes.FamANDAssem:
 					throw new NotImplementedException($"The access modifier of the method ({method.Attributes & MethodAttributes.MemberAccessMask}) is not supported under C#.");
 
+				case MethodAttributes.Abstract:
+				case MethodAttributes.CheckAccessOnOverride:
+				case MethodAttributes.Final:
+				case MethodAttributes.HasSecurity:
+				case MethodAttributes.HideBySig:
+				case MethodAttributes.MemberAccessMask:
+				case MethodAttributes.NewSlot:
+				case MethodAttributes.PinvokeImpl:
+				case MethodAttributes.PrivateScope:
+				case MethodAttributes.RequireSecObject:
+				case MethodAttributes.ReservedMask:
+				case MethodAttributes.RTSpecialName:
+				case MethodAttributes.SpecialName:
+				case MethodAttributes.Static:
+				case MethodAttributes.UnmanagedExport:
+				case MethodAttributes.Virtual:
 				default:
 					throw new NotImplementedException("The visibility of the method is not supported."); // should never occur
 			}
@@ -298,8 +341,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			if ((attributes & MethodAttributes.Static) == MethodAttributes.Static) return MethodKind.Static;
 			if ((attributes & MethodAttributes.Abstract) == MethodAttributes.Abstract) return MethodKind.Abstract;
 			if ((attributes & (MethodAttributes.Virtual | MethodAttributes.NewSlot)) == MethodAttributes.Virtual) return MethodKind.Override;
-			if ((attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual) return MethodKind.Virtual;
-			return MethodKind.Normal;
+			return (attributes & MethodAttributes.Virtual) == MethodAttributes.Virtual ? MethodKind.Virtual : MethodKind.Normal;
 		}
 
 		/// <summary>
@@ -326,7 +368,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets the appropriate calling convention for the method kind.
 		/// </summary>
 		/// <param name="kind">Method kind to get the calling convention for.</param>
-		/// <param name="isVArgs"><c>true</c> for variable argument lists; otherwise <c>false</c>.</param>
+		/// <param name="isVArgs">
+		/// <c>true</c> for variable argument lists;<br/>
+		/// otherwise <c>false</c>.
+		/// </param>
 		/// <returns>The calling convention to use for the specified method kind.</returns>
 		public static CallingConventions ToCallingConvention(this MethodKind kind, bool isVArgs)
 		{
@@ -378,44 +423,51 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <exception cref="ArgumentException">The specified type itself or a type that is part of the specified type is not public.</exception>
 		private static void EnsureTypeIsTotallyPublic(Type typeToCheck, Type specifiedType)
 		{
-			// in the initial call, the root type is null
-			if (specifiedType == null) specifiedType = typeToCheck;
-
-			// ensure that the declaring type is public as well
-			if (typeToCheck.IsNested)
+			while (true)
 			{
-				EnsureTypeIsTotallyPublic(typeToCheck.DeclaringType, specifiedType);
-			}
+				// in the initial call, the root type is null
+				if (specifiedType == null)
+					specifiedType = typeToCheck;
 
-			// check whether the type is public
-			if (!typeToCheck.IsPublic && !typeToCheck.IsNestedPublic)
-			{
-				throw new ArgumentException(
-					typeToCheck == specifiedType
-						? $"The specified type ({specifiedType.FullName}) is not public."
-						: $"The specified type ({specifiedType.FullName}) depends on a type ({typeToCheck.FullName}) that is not public.");
-			}
-
-			if (typeof(Delegate).IsAssignableFrom(typeToCheck))
-			{
-				// a delegate
-				// => check return value type and parameter types
-				MethodInfo method = typeToCheck.GetMethod("Invoke");
-				Debug.Assert(method != null, nameof(method) + " != null");
-				EnsureTypeIsTotallyPublic(method.ReturnType, specifiedType);
-				foreach (ParameterInfo parameterInfo in method.GetParameters())
+				// ensure that the declaring type is public as well
+				if (typeToCheck.IsNested)
 				{
-					EnsureTypeIsTotallyPublic(parameterInfo.ParameterType, specifiedType);
+					EnsureTypeIsTotallyPublic(typeToCheck.DeclaringType, specifiedType);
 				}
 
-				// everything is fine...
-				return;
-			}
+				// check whether the type is public
+				if (!typeToCheck.IsPublic && !typeToCheck.IsNestedPublic)
+				{
+					throw new ArgumentException(
+						typeToCheck == specifiedType
+							? $"The specified type ({specifiedType.FullName}) is not public."
+							: $"The specified type ({specifiedType.FullName}) depends on a type ({typeToCheck.FullName}) that is not public.");
+				}
 
-			// check base type
-			if (typeToCheck.BaseType != null)
-			{
-				EnsureTypeIsTotallyPublic(typeToCheck.BaseType, specifiedType);
+				if (typeof(Delegate).IsAssignableFrom(typeToCheck))
+				{
+					// a delegate
+					// => check return value type and parameter types
+					MethodInfo method = typeToCheck.GetMethod("Invoke");
+					Debug.Assert(method != null, nameof(method) + " != null");
+					EnsureTypeIsTotallyPublic(method.ReturnType, specifiedType);
+					foreach (ParameterInfo parameterInfo in method.GetParameters())
+					{
+						EnsureTypeIsTotallyPublic(parameterInfo.ParameterType, specifiedType);
+					}
+
+					// everything is fine...
+					return;
+				}
+
+				// check base type
+				if (typeToCheck.BaseType != null)
+				{
+					typeToCheck = typeToCheck.BaseType;
+					continue;
+				}
+
+				break;
 			}
 		}
 
@@ -432,7 +484,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public static void EnsureNameIsValidTypeName(string name)
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name), "The type name must not be a null reference.");
-			var tokens = name.Split('.');
+			string[] tokens = name.Split('.');
 			if (tokens.Any(x => !CodeGenerator.IsValidLanguageIndependentIdentifier(x)))
 				throw new ArgumentException($"'{name}' is not a valid type name.");
 		}
@@ -752,7 +804,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="msilGenerator">IL generator to emit opcodes to.</param>
 		/// <param name="type">Type whose default value is to load.</param>
 		/// <param name="box">
-		/// <c>true</c> to box value types;
+		/// <c>true</c> to box value types;<br/>
 		/// <c>false</c> to keep value types.
 		/// </param>
 		public static void EmitLoadDefaultValue(ILGenerator msilGenerator, Type type, bool box)

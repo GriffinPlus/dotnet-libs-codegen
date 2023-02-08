@@ -28,13 +28,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Must be <c>null</c> if <paramref name="kind"/> is <see cref="EventKind.Abstract"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/> is <c>null</c>
-		/// -or-
+		/// <paramref name="typeDefinition"/> is <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="kind"/> is not <see cref="EventKind.Abstract"/> and <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is <see cref="EventKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>
-		/// -or-
+		/// <paramref name="kind"/> is <see cref="EventKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedEvent(
@@ -106,15 +106,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Must be <c>null</c> if <paramref name="kind"/> is <see cref="EventKind.Abstract"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/> is <c>null</c>
-		/// -or-
+		/// <paramref name="typeDefinition"/> is <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="kind"/> is not <see cref="EventKind.Abstract"/> and <paramref name="addAccessorImplementationCallback"/> or
 		/// <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="kind"/> is <see cref="EventKind.Abstract"/> and <paramref name="addAccessorImplementationCallback"/> or
-		/// <paramref name="removeAccessorImplementationCallback"/> is not <c>null</c>
-		/// -or-
+		/// <paramref name="removeAccessorImplementationCallback"/> is not <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="name"/> is not a valid language independent identifier.
 		/// </exception>
 		internal GeneratedEvent(

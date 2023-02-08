@@ -36,15 +36,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Must be <c>null</c> if <paramref name="kind"/> is <see cref="MethodKind.Abstract"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/>, <paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>
-		/// -or-
+		/// <paramref name="typeDefinition"/>, <paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>.<br/>
+		/// -or-<br/>
 		/// <paramref name="kind"/> is not <see cref="MethodKind.Abstract"/> and <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is <see cref="MethodKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>
-		/// -or-
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="kind"/> is <see cref="MethodKind.Abstract"/> and <paramref name="implementation"/> is not <c>null</c>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		internal GeneratedMethod(
@@ -79,15 +79,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Must be <c>null</c> if <paramref name="kind"/> is <see cref="MethodKind.Abstract"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="typeDefinition"/>, <paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>
-		/// -or-
+		/// <paramref name="typeDefinition"/>, <paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c><br/>
+		/// -or-<br/>
 		/// <paramref name="kind"/> is not <see cref="MethodKind.Abstract"/> and <paramref name="implementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is <see cref="MethodKind.Abstract"/> and <paramref name="implementationCallback"/> is not <c>null</c>
-		/// -or-
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="kind"/> is <see cref="MethodKind.Abstract"/> and <paramref name="implementationCallback"/> is not <c>null</c><br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> is not a valid language independent identifier<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		internal GeneratedMethod(
@@ -118,8 +118,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="additionalMethodAttributes">Additional method attributes to 'or' with other attributes.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		private void Initialize(

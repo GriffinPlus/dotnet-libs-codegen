@@ -3,6 +3,7 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +29,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">First constructor to compare.</param>
 		/// <param name="y">Seconds constructor to compare.</param>
 		/// <returns>
-		/// <c>true</c> if the specified constructors are equal;
+		/// <c>true</c> if the specified constructors are equal;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(ConstructorInfo x, ConstructorInfo y)
@@ -36,8 +37,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			if (x == null && y == null) return true;
 			if (x == null || y == null) return false;
 			if (x.Attributes != y.Attributes) return false;
-			var xParameters = x.GetParameters().Select(parameter => parameter.ParameterType);
-			var yParameters = y.GetParameters().Select(parameter => parameter.ParameterType);
+			IEnumerable<Type> xParameters = x.GetParameters().Select(parameter => parameter.ParameterType);
+			IEnumerable<Type> yParameters = y.GetParameters().Select(parameter => parameter.ParameterType);
 			return xParameters.SequenceEqual(yParameters);
 		}
 
@@ -61,7 +62,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			unchecked
 			{
 				int hashCode = constructor.Attributes.GetHashCode();
-				foreach (var type in constructor.GetParameters().Select(parameter => parameter.ParameterType))
+				foreach (Type type in constructor.GetParameters().Select(parameter => parameter.ParameterType))
 				{
 					hashCode = (hashCode * 397) ^ type.GetHashCode();
 				}

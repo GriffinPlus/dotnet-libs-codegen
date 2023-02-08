@@ -51,12 +51,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Demo
 
 		/// <summary>
 		/// Takes the specified view model class with abstract properties, derives a class from it and implements these properties.
-		/// The properties are backed by a member field. The set accessor calls the <see cref="ViewModelBase.OnPropertyChanged"/>
+		/// The properties are backed by a member field. The 'set' accessor calls the <see cref="ViewModelBase.OnPropertyChanged"/>
 		/// method to notify clients that the property has changed, if the value of the property has changed. The implementation
 		/// uses <see cref="object.Equals(object,object)"/> to determine whether the the value has changed.
 		/// </summary>
 		/// <typeparam name="TViewModel">The view model class to create.</typeparam>
-		/// <returns></returns>
+		/// <returns>The created view model.</returns>
 		public static TViewModel CreateViewModel<TViewModel>() where TViewModel : ViewModelBase
 		{
 			// create a new class definition deriving from the ViewModelBase class providing common functionality
@@ -69,7 +69,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Demo
 			// let the derived class implement all abstract properties using an implementation strategy that adds a backing
 			// field for the property value and implements the get/set accessor methods as declared by the abstract property
 			// in the abstract view model class
-			foreach (var property in definition.GetAbstractPropertiesWithoutOverride())
+			foreach (IInheritedProperty property in definition.GetAbstractPropertiesWithoutOverride())
 			{
 				property.Override(PropertyImplementations.SetterWithPropertyChanged);
 			}

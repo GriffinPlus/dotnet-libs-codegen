@@ -3,6 +3,7 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,7 +27,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="x">First constructor definition to compare.</param>
 		/// <param name="y">Seconds constructor definition to compare.</param>
-		/// <returns><c>true</c> if the specified constructor definitions are equal; otherwise <c>false</c>.</returns>
+		/// <returns>
+		/// <c>true</c> if the specified constructor definitions are equal;<br/>
+		/// otherwise <c>false</c>.
+		/// </returns>
 		public override bool Equals(IConstructor x, IConstructor y)
 		{
 			if (x == null && y == null) return true;
@@ -56,7 +60,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			unchecked
 			{
 				int hashCode = 0;
-				foreach (var type in generatedConstructor.ParameterTypes)
+				foreach (Type type in generatedConstructor.ParameterTypes)
 				{
 					hashCode = (hashCode * 397) ^ type.GetHashCode();
 				}

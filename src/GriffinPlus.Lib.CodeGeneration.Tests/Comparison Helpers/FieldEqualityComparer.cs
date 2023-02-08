@@ -26,7 +26,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// <param name="x">First field to compare.</param>
 		/// <param name="y">Seconds field to compare.</param>
 		/// <returns>
-		/// <c>true</c> if the specified fields are equal;
+		/// <c>true</c> if the specified fields are equal;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(FieldInfo x, FieldInfo y)
@@ -35,8 +35,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			if (x == null || y == null) return false;
 			if (x.Name != y.Name) return false;
 			if (x.FieldType != y.FieldType) return false;
-			if (x.Attributes != y.Attributes) return false;
-			return true;
+			return x.Attributes == y.Attributes;
 		}
 
 		/// <summary>

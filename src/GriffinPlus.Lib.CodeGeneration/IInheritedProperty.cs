@@ -28,7 +28,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Adds an override for the current property.
 		/// </summary>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessor methods of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessor methods of the property.</param>
 		/// <returns>The generated property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		IGeneratedProperty Override(IPropertyImplementation implementation);
@@ -37,13 +37,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Adds an override for the current property. The <see cref="IProperty.Kind"/> property must be
 		/// <see cref="PropertyKind.Abstract"/>, <see cref="PropertyKind.Virtual"/> or <see cref="PropertyKind.Override"/>.
 		/// </summary>
-		/// <param name="getAccessorImplementationCallback">A callback that implements the get accessor method of the property.</param>
-		/// <param name="setAccessorImplementationCallback">A callback that implements the set accessor method of the property.</param>
+		/// <param name="getAccessorImplementationCallback">A callback that implements the 'get' accessor method of the property.</param>
+		/// <param name="setAccessorImplementationCallback">A callback that implements the 'set' accessor method of the property.</param>
 		/// <returns>The generated property.</returns>
 		/// <exception cref="ArgumentNullException">
-		/// The property has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
-		/// -or-
-		/// The property has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// The property has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
+		/// -or-<br/>
+		/// The property has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		IGeneratedProperty Override(
 			PropertyAccessorImplementationCallback getAccessorImplementationCallback,

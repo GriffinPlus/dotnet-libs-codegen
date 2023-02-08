@@ -51,15 +51,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="other">Wrapper to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public bool Equals(PropertyComparisonWrapper other)
 		{
 			if (Name != other.Name) return false;
 			if (PropertyType != other.PropertyType) return false;
-			if (!GetAccessor.Equals(other.GetAccessor)) return false;
-			if (!SetAccessor.Equals(other.SetAccessor)) return false;
-			return true;
+			return GetAccessor.Equals(other.GetAccessor) && SetAccessor.Equals(other.SetAccessor);
 		}
 
 		/// <summary>
@@ -67,13 +66,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="obj">Object to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((PropertyComparisonWrapper)obj);
+			return obj.GetType() == GetType() && Equals((PropertyComparisonWrapper)obj);
 		}
 
 		/// <summary>

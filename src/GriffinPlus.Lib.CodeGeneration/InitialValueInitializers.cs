@@ -154,7 +154,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="type">Type of the value to get the initializer for.</param>
 		/// <param name="initializer">Receives the initializer for the specified type.</param>
-		/// <returns><c>true</c> if the specified type is supported; otherwise <c>false</c>.</returns>
+		/// <returns>
+		/// <c>true</c> if the specified type is supported;<br/>
+		/// otherwise <c>false</c>.
+		/// </returns>
 		public static bool TryGetInitializer(Type type, out InitialValueInitializer initializer)
 		{
 			if (type.IsEnum) type = type.GetEnumUnderlyingType();

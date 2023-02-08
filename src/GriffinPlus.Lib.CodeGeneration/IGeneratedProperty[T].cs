@@ -3,15 +3,14 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-
 namespace GriffinPlus.Lib.CodeGeneration
 {
 
 	/// <summary>
-	/// Typed interface of a generated event.
+	/// Typed interface of a generated property.
 	/// </summary>
-	/// <typeparam name="T">Type of the event handler delegate.</typeparam>
-	public interface IGeneratedEvent<T> : IGeneratedEvent where T : Delegate { }
+	/// <typeparam name="T">Type of the property.</typeparam>
+	// ReSharper disable once UnusedTypeParameter
+	public interface IGeneratedProperty<T> : IGeneratedProperty { }
 
 }

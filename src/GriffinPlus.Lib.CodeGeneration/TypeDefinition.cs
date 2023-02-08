@@ -26,7 +26,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="module">Module definition to associate the type definition with (<c>null</c> to create a new module definition).</param>
 		/// <param name="isValueType">
-		/// <c>true</c> if the type to define is a value type (struct);
+		/// <c>true</c> if the type to define is a value type (struct);<br/>
 		/// <c>false</c> if it is a reference type (class).
 		/// </param>
 		/// <param name="name">Name of the type to create (<c>null</c> to create a random name).</param>
@@ -52,8 +52,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="name">Name of the class to create (<c>null</c> to keep the name of the base class).</param>
 		/// <exception cref="ArgumentNullException"><paramref name="baseClass"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="baseClass"/> is not a class
-		/// -or-
+		/// <paramref name="baseClass"/> is not a class.<br/>
+		/// -or-<br/>
 		/// <paramref name="name"/> is not a valid type name.
 		/// </exception>
 		internal TypeDefinition(ModuleDefinition module, Type baseClass, string name = null)
@@ -158,7 +158,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 				// determine base class constructors and cache them
 				mBaseClassConstructors = new List<IConstructor>();
-				BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+				const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 				foreach (ConstructorInfo constructorInfo in BaseClassType.GetConstructors(flags))
 				{
 					// skip constructor if it is private or internal
@@ -194,7 +194,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Gets the methods the type to create inherits from its base type.
-		/// Does not contain inherited add/remove accessor methods of events and get/set accessor methods of properties.
+		/// Does not contain inherited add/remove accessor methods of events and 'get'/'set' accessor methods of properties.
 		/// You can use <see cref="IInheritedEvent.AddAccessor"/> and <see cref="IInheritedEvent.RemoveAccessor"/> to get
 		/// event accessor methods. Property accessor methods are available via <see cref="IInheritedProperty.GetAccessor"/>
 		/// and <see cref="IInheritedProperty.SetAccessor"/>.
@@ -205,14 +205,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets fields inherited from the base class.
 		/// </summary>
 		/// <param name="includeHidden">
-		/// <c>true</c> to include fields that have been hidden by more specific types if the base type derives from some other type on its own;
+		/// <c>true</c> to include fields that have been hidden by more specific types if the base type derives from some other type on its own;<br/>
 		/// <c>false</c> to return only the most specific fields (default, same as <see cref="InheritedFields"/>).
 		/// </param>
 		/// <returns>The inherited fields.</returns>
 		public IEnumerable<IInheritedField> GetInheritedFields(bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<IInheritedField> inheritedFields = new HashSet<IInheritedField>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var inheritedFields = new HashSet<IInheritedField>();
 			Type typeToInspect = BaseClassType;
 			while (typeToInspect != null)
 			{
@@ -229,7 +229,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 					// the field is accessible from a derived class in some other assembly
 					Type inheritedFieldType = typeof(InheritedField<>).MakeGenericType(fieldInfo.FieldType);
-					IInheritedField inheritedField = (IInheritedField)Activator.CreateInstance(
+					var inheritedField = (IInheritedField)Activator.CreateInstance(
 						inheritedFieldType,
 						BindingFlags.Instance | BindingFlags.NonPublic,
 						Type.DefaultBinder,
@@ -249,14 +249,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets events inherited from the base class.
 		/// </summary>
 		/// <param name="includeHidden">
-		/// <c>true</c> to include events that have been hidden by more specific types if the base type derives from some other type on its own;
+		/// <c>true</c> to include events that have been hidden by more specific types if the base type derives from some other type on its own;<br/>
 		/// <c>false</c> to return only the most specific events (default, same as <see cref="InheritedEvents"/>).
 		/// </param>
 		/// <returns>The inherited events.</returns>
 		public IEnumerable<IInheritedEvent> GetInheritedEvents(bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<IInheritedEvent> inheritedEvents = new HashSet<IInheritedEvent>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var inheritedEvents = new HashSet<IInheritedEvent>();
 			Type typeToInspect = BaseClassType;
 			while (typeToInspect != null)
 			{
@@ -281,7 +281,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 					// the event is accessible from a derived class in some other assembly
 					Type inheritedEventType = typeof(InheritedEvent<>).MakeGenericType(eventInfo.EventHandlerType);
-					IInheritedEvent inheritedEvent = (IInheritedEvent)Activator.CreateInstance(
+					var inheritedEvent = (IInheritedEvent)Activator.CreateInstance(
 						inheritedEventType,
 						BindingFlags.Instance | BindingFlags.NonPublic,
 						Type.DefaultBinder,
@@ -301,14 +301,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets properties inherited from the base class.
 		/// </summary>
 		/// <param name="includeHidden">
-		/// <c>true</c> to include properties that have been hidden by more specific types if the base type derives from some other type on its own;
+		/// <c>true</c> to include properties that have been hidden by more specific types if the base type derives from some other type on its own;<br/>
 		/// <c>false</c> to return only the most specific properties (default, same as <see cref="InheritedProperties"/>).
 		/// </param>
 		/// <returns>The inherited properties.</returns>
 		public IEnumerable<IInheritedProperty> GetInheritedProperties(bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<IInheritedProperty> inheritedProperties = new HashSet<IInheritedProperty>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var inheritedProperties = new HashSet<IInheritedProperty>();
 			Type typeToInspect = BaseClassType;
 			while (typeToInspect != null)
 			{
@@ -347,7 +347,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 					// the property is accessible from a derived class in some other assembly
 					Type inheritedPropertyType = typeof(InheritedProperty<>).MakeGenericType(propertyInfo.PropertyType);
-					IInheritedProperty property = (IInheritedProperty)Activator.CreateInstance(
+					var property = (IInheritedProperty)Activator.CreateInstance(
 						inheritedPropertyType,
 						BindingFlags.Instance | BindingFlags.NonPublic,
 						Type.DefaultBinder,
@@ -367,14 +367,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Gets methods inherited from the base class.
 		/// </summary>
 		/// <param name="includeHidden">
-		/// <c>true</c> to include methods that have been hidden by more specific types if the base type derives from some other type on its own;
+		/// <c>true</c> to include methods that have been hidden by more specific types if the base type derives from some other type on its own;<br/>
 		/// <c>false</c> to return only the most specific methods (default, same as <see cref="InheritedMethods"/>).
 		/// </param>
 		/// <returns>The inherited methods.</returns>
 		public IEnumerable<IInheritedMethod> GetInheritedMethods(bool includeHidden)
 		{
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-			HashSet<IInheritedMethod> inheritedMethods = new HashSet<IInheritedMethod>();
+			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+			var inheritedMethods = new HashSet<IInheritedMethod>();
 
 			Type typeToInspect = BaseClassType;
 			while (typeToInspect != null)
@@ -400,7 +400,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 						continue;
 
 					// the method is accessible from a derived class in some other assembly
-					InheritedMethod inheritedMethod = new InheritedMethod(this, methodInfo);
+					var inheritedMethod = new InheritedMethod(this, methodInfo);
 					inheritedMethods.Add(inheritedMethod);
 				}
 
@@ -444,7 +444,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Gets the methods that have already been generated on the type.
-		/// Does not contain generated add/remove accessor methods of events and get/set accessor methods of properties.
+		/// Does not contain generated add/remove accessor methods of events and 'get'/'set' accessor methods of properties.
 		/// You can use <see cref="IGeneratedEvent.AddAccessor"/> and <see cref="IGeneratedEvent.RemoveAccessor"/> to get
 		/// event accessor methods. Property accessor methods are available via <see cref="IGeneratedProperty.GetAccessor"/>
 		/// and <see cref="IGeneratedProperty.SetAccessor"/>.
@@ -516,7 +516,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				throw new CodeGenException("A constructor with the same signature is already part of the definition.");
 
 			// create constructor
-			GeneratedConstructor constructor = new GeneratedConstructor(
+			var constructor = new GeneratedConstructor(
 				this,
 				visibility,
 				parameterTypes,
@@ -541,7 +541,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddField<T>(string name, Visibility visibility)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, false, name, visibility);
+			var field = new GeneratedField<T>(this, false, name, visibility);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -560,7 +560,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -568,7 +568,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -585,7 +585,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddField<T>(string name, Visibility visibility, T initialValue)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, false, name, visibility, initialValue);
+			var field = new GeneratedField<T>(this, false, name, visibility, initialValue);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -600,8 +600,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added field.</returns>
 		/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException">
-		/// The initial value is not assignable to a field of the specified type
-		/// -or-
+		/// The initial value is not assignable to a field of the specified type.<br/>
+		/// -or-<br/>
 		/// The field to add is a value type, initial value <c>null</c> is not allowed.
 		/// </exception>
 		public IGeneratedField AddField(
@@ -620,7 +620,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			if (initialValue == null && type.IsValueType)
 				throw new ArgumentException("The field to add is a value type, initial value <null> is not allowed.", nameof(initialValue));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -628,7 +628,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, false, name, visibility, initialValue });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, false, name, visibility, initialValue });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -649,7 +649,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, false, name, visibility, initializer);
+			var field = new GeneratedField<T>(this, false, name, visibility, initializer);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -678,7 +678,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -686,7 +686,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, initializer });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, initializer });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -704,7 +704,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, false, name, visibility, provideInitialValueCallback);
+			var field = new GeneratedField<T>(this, false, name, visibility, provideInitialValueCallback);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -730,7 +730,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -738,7 +738,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, provideInitialValueCallback });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, false, name, visibility, provideInitialValueCallback });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -754,7 +754,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility);
+			var field = new GeneratedField<T>(this, true, name, visibility);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -772,7 +772,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -780,7 +780,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -797,7 +797,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, T initialValue)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility, initialValue);
+			var field = new GeneratedField<T>(this, true, name, visibility, initialValue);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -812,8 +812,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added field.</returns>
 		/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException">
-		/// The initial value is not assignable to a field of the specified type
-		/// -or-
+		/// The initial value is not assignable to a field of the specified type.<br/>
+		/// -or-<br/>
 		/// The field to add is a value type, initial value <c>null</c> is not allowed.
 		/// </exception>
 		public IGeneratedField AddStaticField(
@@ -832,7 +832,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			if (initialValue == null && type.IsValueType)
 				throw new ArgumentException("The field to add is a value type, initial value <null> is not allowed.", nameof(initialValue));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -840,7 +840,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, true, name, visibility, initialValue });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new[] { this, true, name, visibility, initialValue });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -861,7 +861,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility, initializer);
+			var field = new GeneratedField<T>(this, true, name, visibility, initializer);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -890,7 +890,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -898,7 +898,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, initializer });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, initializer });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -916,7 +916,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedField<T> field = new GeneratedField<T>(this, true, name, visibility, provideInitialValueCallback);
+			var field = new GeneratedField<T>(this, true, name, visibility, provideInitialValueCallback);
 			mGeneratedFields.Add(field);
 			return field;
 		}
@@ -940,7 +940,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
 
-			var constructor = typeof(GeneratedField<>)
+			ConstructorInfo constructor = typeof(GeneratedField<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -948,7 +948,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedFieldInternal field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, provideInitialValueCallback });
+			var field = (IGeneratedFieldInternal)constructor.Invoke(new object[] { this, true, name, visibility, provideInitialValueCallback });
 
 			mGeneratedFields.Add(field);
 			return field;
@@ -972,7 +972,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedEvent<T> AddEvent<T>(string name, Visibility visibility, IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Normal,
 				name,
@@ -1001,7 +1001,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Normal,
 				name,
@@ -1022,7 +1022,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedEvent<T> AddAbstractEvent<T>(string eventName, Visibility visibility) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Abstract,
 				eventName,
@@ -1049,7 +1049,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Virtual,
 				eventName,
@@ -1078,7 +1078,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Virtual,
 				name,
@@ -1106,7 +1106,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			IEventImplementation implementation) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Static,
 				eventName,
@@ -1135,7 +1135,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedEvent<T> generatedEvent = new GeneratedEvent<T>(
+			var generatedEvent = new GeneratedEvent<T>(
 				this,
 				EventKind.Static,
 				name,
@@ -1167,12 +1167,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case EventKind.Override:
 					break;
 
+				case EventKind.Static:
+				case EventKind.Normal:
 				default:
 					throw new CodeGenException($"The specified event ({eventToOverride.Name}) is neither abstract, virtual nor an override of a virtual/abstract event.");
 			}
 
 			// create event override
-			GeneratedEvent<T> overrider = new GeneratedEvent<T>(this, eventToOverride, implementation);
+			var overrider = new GeneratedEvent<T>(this, eventToOverride, implementation);
 			mGeneratedEvents.Add(overrider);
 			return overrider;
 		}
@@ -1202,12 +1204,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case EventKind.Override:
 					break;
 
+				case EventKind.Static:
+				case EventKind.Normal:
 				default:
 					throw new CodeGenException($"The specified event ({eventToOverride.Name}) is neither abstract, virtual nor an override of a virtual/abstract event.");
 			}
 
 			// create event override
-			GeneratedEvent<T> overrider = new GeneratedEvent<T>(this, eventToOverride, addAccessorImplementationCallback, removeAccessorImplementationCallback);
+			var overrider = new GeneratedEvent<T>(this, eventToOverride, addAccessorImplementationCallback, removeAccessorImplementationCallback);
 			mGeneratedEvents.Add(overrider);
 			return overrider;
 		}
@@ -1226,7 +1230,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedProperty<T> AddProperty<T>(string name)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Normal, name);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1245,7 +1249,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1253,7 +1257,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1265,13 +1269,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty<T> AddProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Normal, name, implementation);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name, implementation);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1283,7 +1287,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="type">Type of the property to add.</param>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty AddProperty(Type type, string name, IPropertyImplementation implementation)
@@ -1292,7 +1296,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1300,7 +1304,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name, implementation });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Normal, name, implementation });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1314,7 +1318,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedProperty<T> AddAbstractProperty<T>(string name)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Abstract, name, null);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Abstract, name, null);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1331,7 +1335,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1339,7 +1343,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Abstract, name });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Abstract, name });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1355,7 +1359,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedProperty<T> AddVirtualProperty<T>(string name)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1374,7 +1378,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1382,7 +1386,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1394,13 +1398,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <see cref="IGeneratedProperty.AddSetAccessor"/>).
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty<T> AddVirtualProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name, implementation);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name, implementation);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1412,7 +1416,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="type">Type of the property to add.</param>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty AddVirtualProperty(Type type, string name, IPropertyImplementation implementation)
@@ -1421,7 +1425,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1429,7 +1433,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name, implementation });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Virtual, name, implementation });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1445,7 +1449,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedProperty<T> AddStaticProperty<T>(string name)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Static, name);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Static, name);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1464,7 +1468,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1472,7 +1476,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1482,13 +1486,13 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Adds a new static property to the type definition.
 		/// </summary>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty<T> AddStaticProperty<T>(string name, IPropertyImplementation implementation)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedProperty<T> property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
+			var property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
 			mGeneratedProperties.Add(property);
 			return property;
 		}
@@ -1500,7 +1504,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="type">Type of the property to add.</param>
 		/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty AddStaticProperty(Type type, string name, IPropertyImplementation implementation)
@@ -1509,7 +1513,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(type)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1517,7 +1521,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					new[] { typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation) },
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name, implementation });
+			var property = (IGeneratedProperty)constructor.Invoke(new object[] { this, PropertyKind.Static, name, implementation });
 
 			mGeneratedProperties.Add(property);
 			return property;
@@ -1527,7 +1531,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Adds an override for the specified inherited property.
 		/// </summary>
 		/// <param name="property">Property to add an override for.</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property override.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty<T> AddPropertyOverride<T>(
@@ -1544,12 +1548,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case PropertyKind.Override:
 					break;
 
+				case PropertyKind.Static:
+				case PropertyKind.Normal:
 				default:
 					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// add the property
-			GeneratedProperty<T> overrider = new GeneratedProperty<T>(this, property, implementation);
+			var overrider = new GeneratedProperty<T>(this, property, implementation);
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1558,7 +1564,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// Adds an override for the specified inherited property.
 		/// </summary>
 		/// <param name="property">Property to add an override for.</param>
-		/// <param name="implementation">Implementation strategy that implements the get/set accessors of the property.</param>
+		/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 		/// <returns>The added property override.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 		public IGeneratedProperty AddPropertyOverride(
@@ -1575,12 +1581,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case PropertyKind.Override:
 					break;
 
+				case PropertyKind.Static:
+				case PropertyKind.Normal:
 				default:
 					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// add the property
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(property.PropertyType)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1593,7 +1601,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					},
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, implementation });
+			var overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, implementation });
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1603,18 +1611,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="property">Property to add an override for.</param>
 		/// <param name="getAccessorImplementationCallback">
-		/// A callback that implements the get accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a get accessor method).
+		/// A callback that implements the 'get' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'get' accessor method).
 		/// </param>
 		/// <param name="setAccessorImplementationCallback">
-		/// A callback that implements the set accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a set accessor method).
+		/// A callback that implements the 'set' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'set' accessor method).
 		/// </param>
 		/// <returns>The added property override.</returns>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="property"/> has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
-		/// -or-
-		/// <paramref name="property"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// <paramref name="property"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
+		/// -or-<br/>
+		/// <paramref name="property"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedProperty<T> AddPropertyOverride<T>(
 			IInheritedProperty<T>                  property,
@@ -1631,12 +1639,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case PropertyKind.Override:
 					break;
 
+				case PropertyKind.Static:
+				case PropertyKind.Normal:
 				default:
 					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// add the property
-			GeneratedProperty<T> overrider = new GeneratedProperty<T>(this, property, getAccessorImplementationCallback, setAccessorImplementationCallback);
+			var overrider = new GeneratedProperty<T>(this, property, getAccessorImplementationCallback, setAccessorImplementationCallback);
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1646,18 +1656,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		/// <param name="property">Property to add an override for.</param>
 		/// <param name="getAccessorImplementationCallback">
-		/// A callback that implements the get accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a get accessor method).
+		/// A callback that implements the 'get' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'get' accessor method).
 		/// </param>
 		/// <param name="setAccessorImplementationCallback">
-		/// A callback that implements the set accessor method of the property
-		/// (may be <c>null</c> if the inherited property does not have a set accessor method).
+		/// A callback that implements the 'set' accessor method of the property
+		/// (may be <c>null</c> if the inherited property does not have a 'set' accessor method).
 		/// </param>
 		/// <returns>The added property override.</returns>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="property"/> has a get accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>
-		/// -or-
-		/// <paramref name="property"/> has a set accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>
+		/// <paramref name="property"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
+		/// -or-<br/>
+		/// <paramref name="property"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
 		/// </exception>
 		public IGeneratedProperty AddPropertyOverride(
 			IInheritedProperty                     property,
@@ -1674,12 +1684,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case PropertyKind.Override:
 					break;
 
+				case PropertyKind.Static:
+				case PropertyKind.Normal:
 				default:
 					throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// add the property
-			var constructor = typeof(GeneratedProperty<>)
+			ConstructorInfo constructor = typeof(GeneratedProperty<>)
 				.MakeGenericType(property.PropertyType)
 				.GetConstructor(
 					BindingFlags.NonPublic | BindingFlags.Instance,
@@ -1693,7 +1705,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					},
 					null);
 			Debug.Assert(constructor != null, nameof(constructor) + " != null");
-			IGeneratedProperty overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, getAccessorImplementationCallback, setAccessorImplementationCallback });
+			var overrider = (IGeneratedProperty)constructor.Invoke(new object[] { this, property, getAccessorImplementationCallback, setAccessorImplementationCallback });
 			mGeneratedProperties.Add(overrider);
 			return overrider;
 		}
@@ -1709,14 +1721,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <typeparam name="T">Type of the dependency property.</typeparam>
 		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <returns>The added dependency property.</returns>
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedDependencyProperty<T> dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly);
+			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly);
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1727,7 +1739,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <typeparam name="T">Type of the dependency property.</typeparam>
 		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="initialValue">Initial value of the dependency property.</param>
@@ -1735,7 +1747,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, T initialValue)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedDependencyProperty<T> dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initialValue);
+			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initialValue);
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1746,7 +1758,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <typeparam name="T">Type of the dependency property.</typeparam>
 		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="initializer">
@@ -1758,7 +1770,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, DependencyPropertyInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedDependencyProperty<T> dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initializer);
+			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initializer);
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1769,7 +1781,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <typeparam name="T">Type of the dependency property.</typeparam>
 		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
 		/// <param name="isReadOnly">
-		/// <c>true</c> if the dependency property is read-only;
+		/// <c>true</c> if the dependency property is read-only;<br/>
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
@@ -1778,7 +1790,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, ProvideValueCallback<T> provideInitialValueCallback)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedDependencyProperty<T> dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, provideInitialValueCallback);
+			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, provideInitialValueCallback);
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1807,8 +1819,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddMethod(
@@ -1820,7 +1832,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes      additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+			var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1839,8 +1851,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddMethod(
@@ -1852,7 +1864,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes             additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+			var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1868,8 +1880,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>The added method.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddAbstractMethod(
@@ -1880,7 +1892,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Abstract, name, returnType, parameterTypes, visibility, additionalMethodAttributes, (IMethodImplementation)null);
+			var method = new GeneratedMethod(this, MethodKind.Abstract, name, returnType, parameterTypes, visibility, additionalMethodAttributes, (IMethodImplementation)null);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1899,8 +1911,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddVirtualMethod(
@@ -1912,7 +1924,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes      additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+			var method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1931,8 +1943,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddVirtualMethod(
@@ -1944,7 +1956,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes             additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+			var method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1963,8 +1975,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddStaticMethod(
@@ -1976,7 +1988,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes      additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+			var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -1995,8 +2007,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddStaticMethod(
@@ -2008,7 +2020,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			MethodAttributes             additionalMethodAttributes = 0)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
-			GeneratedMethod method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+			var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -2032,12 +2044,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case MethodKind.Override:
 					break;
 
+				case MethodKind.Static:
+				case MethodKind.Normal:
 				default:
 					throw new CodeGenException($"The specified method ({method.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// create method
-			GeneratedMethod overriddenMethod = new GeneratedMethod(this, method, implementation);
+			var overriddenMethod = new GeneratedMethod(this, method, implementation);
 			mGeneratedMethods.Add(overriddenMethod);
 			return overriddenMethod;
 		}
@@ -2061,12 +2075,14 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case MethodKind.Override:
 					break;
 
+				case MethodKind.Static:
+				case MethodKind.Normal:
 				default:
 					throw new CodeGenException($"The specified method ({method.Name}) is neither abstract, nor virtual nor an overrider.");
 			}
 
 			// create method
-			GeneratedMethod overriddenMethod = new GeneratedMethod(this, method, implementationCallback);
+			var overriddenMethod = new GeneratedMethod(this, method, implementationCallback);
 			mGeneratedMethods.Add(overriddenMethod);
 			return overriddenMethod;
 		}
@@ -2092,10 +2108,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementation"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is an invalid method kind
-		/// -or-
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="kind"/> is an invalid method kind.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddMethod(
@@ -2128,7 +2144,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 
 			// create method
-			GeneratedMethod method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+			var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -2154,10 +2170,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementationCallback"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="kind"/> is an invalid method kind
-		/// -or-
-		/// <paramref name="name"/> is not a valid language independent identifier
-		/// -or-
+		/// <paramref name="kind"/> is an invalid method kind.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> is not a valid language independent identifier.<br/>
+		/// -or-<br/>
 		/// <paramref name="parameterTypes"/> contains a null reference.
 		/// </exception>
 		public IGeneratedMethod AddMethod(
@@ -2190,7 +2206,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 
 			// create method
-			GeneratedMethod method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+			var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
 			mGeneratedMethods.Add(method);
 			return method;
 		}
@@ -2212,7 +2228,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			AddConstructors();
 
 			// implement methods (includes event accessor methods and property accessor methods)
-			foreach (var generatedMethod in mGeneratedMethods) generatedMethod.Implement();
+			foreach (IGeneratedMethodInternal generatedMethod in mGeneratedMethods) generatedMethod.Implement();
 
 			// create the defined type
 			Type createdType = null;
@@ -2242,7 +2258,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			ILGenerator msilGenerator = constructorBuilder.GetILGenerator();
 
 			// add field initialization code
-			foreach (var field in mGeneratedFields.Where(x => x.IsStatic))
+			foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => x.IsStatic))
 			{
 				field.ImplementFieldInitialization(typeBuilder, msilGenerator);
 			}
@@ -2264,7 +2280,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			}
 
 			// create constructors
-			foreach (var constructor in mConstructors)
+			foreach (IGeneratedConstructorInternal constructor in mConstructors)
 			{
 				ILGenerator msilGenerator = constructor.ConstructorBuilder.GetILGenerator();
 
@@ -2280,7 +2296,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					{
 						// the constructor does not have any special handling of the base class constructor call
 						// => call parameterless constructor
-						BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+						const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 						ConstructorInfo constructorInfo = TypeBuilder.BaseType.GetConstructor(bindingFlags, null, Type.EmptyTypes, null);
 						if (constructorInfo == null)
 						{
@@ -2294,7 +2310,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				}
 
 				// emit field initialization code
-				foreach (var field in mGeneratedFields.Where(x => !x.IsStatic))
+				foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => !x.IsStatic))
 				{
 					field.ImplementFieldInitialization(TypeBuilder, msilGenerator);
 				}
@@ -2317,10 +2333,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <returns>Inherited abstract properties that still need to be overridden to allow the type to be created.</returns>
 		public IInheritedProperty[] GetAbstractPropertiesWithoutOverride()
 		{
-			List<IInheritedProperty> abstractProperties = new List<IInheritedProperty>();
-			foreach (var property in InheritedProperties.Where(x => x.Kind == PropertyKind.Abstract))
+			var abstractProperties = new List<IInheritedProperty>();
+			foreach (IInheritedProperty property in InheritedProperties.Where(x => x.Kind == PropertyKind.Abstract))
 			{
-				var overrider = mGeneratedProperties.Find(x => x.Kind == PropertyKind.Override && x.Name == property.Name);
+				IGeneratedProperty overrider = mGeneratedProperties.Find(x => x.Kind == PropertyKind.Override && x.Name == property.Name);
 				if (overrider == null) abstractProperties.Add(property);
 			}
 
@@ -2339,26 +2355,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </returns>
 		public IMethod GetMethod(string name, Type[] parameterTypes)
 		{
-			// check whether the requested method is a generated method
-			foreach (IGeneratedMethodInternal method in mGeneratedMethods)
-			{
-				if (method.Name == name && method.ParameterTypes.SequenceEqual(parameterTypes))
-				{
-					return method;
-				}
-			}
-
-			// check inherited methods
-			foreach (IInheritedMethod method in InheritedMethods)
-			{
-				if (method.Name == name && method.ParameterTypes.SequenceEqual(parameterTypes))
-				{
-					return method;
-				}
-			}
-
-			// method was not found
-			return null;
+			return (IMethod)mGeneratedMethods.FirstOrDefault(m => m.Name == name && m.ParameterTypes.SequenceEqual(parameterTypes)) ??
+			       InheritedMethods.FirstOrDefault(m => m.Name == name && m.ParameterTypes.SequenceEqual(parameterTypes));
 		}
 
 		/// <summary>
@@ -2367,7 +2365,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="x">Field to compare.</param>
 		/// <param name="y">Field to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified fields have the same signature;
+		/// <c>true</c> if the specified fields have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(FieldInfo x, FieldInfo y)
@@ -2382,7 +2380,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="x">Event to compare.</param>
 		/// <param name="y">Event to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified events have the same signature;
+		/// <c>true</c> if the specified events have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(EventInfo x, EventInfo y)
@@ -2397,7 +2395,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="x">Property to compare.</param>
 		/// <param name="y">Property to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified properties have the same signature;
+		/// <c>true</c> if the specified properties have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
 		private static bool HasSameSignature(PropertyInfo x, PropertyInfo y)
@@ -2412,13 +2410,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="x">Method to compare.</param>
 		/// <param name="y">Method to compare to.</param>
 		/// <returns>
-		/// <c>true</c> if the specified methods have the same signature;
+		/// <c>true</c> if the specified methods have the same signature;<br/>
 		/// otherwise <c>false</c>.
 		/// </returns>
-		private static bool HasSameSignature(MethodInfo x, MethodInfo y)
+		private static bool HasSameSignature(MethodBase x, MethodBase y)
 		{
-			if (x.Name != y.Name) return false;
-			return x.GetParameters().Select(z => z.ParameterType).SequenceEqual(y.GetParameters().Select(z => z.ParameterType));
+			return x.Name == y.Name && x.GetParameters().Select(z => z.ParameterType).SequenceEqual(y.GetParameters().Select(z => z.ParameterType));
 		}
 
 		/// <summary>
@@ -2430,36 +2427,24 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			if (identifier == null) return; // null means that a unique name is chosen => no conflict...
 
-			foreach (var field in mGeneratedFields)
+			if (mGeneratedFields.Any(field => field.Name == identifier))
 			{
-				if (field.Name == identifier)
-				{
-					throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a field.");
-				}
+				throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a field.");
 			}
 
-			foreach (var generatedEvent in mGeneratedEvents)
+			if (mGeneratedEvents.Any(@event => @event.Name == identifier))
 			{
-				if (generatedEvent.Name == identifier)
-				{
-					throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare an event.");
-				}
+				throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare an event.");
 			}
 
-			foreach (var generatedProperty in mGeneratedProperties)
+			if (mGeneratedProperties.Any(property => property.Name == identifier))
 			{
-				if (generatedProperty.Name == identifier)
-				{
-					throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a property.");
-				}
+				throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a property.");
 			}
 
-			foreach (var generatedMethod in mGeneratedMethods)
+			if (mGeneratedMethods.Any(method => method.Name == identifier))
 			{
-				if (generatedMethod.Name == identifier)
-				{
-					throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a method.");
-				}
+				throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a method.");
 			}
 		}
 

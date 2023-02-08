@@ -53,8 +53,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// Initializes a new instance of the <see cref="MethodComparisonWrapper"/> struct
 		/// from an <see cref="IGeneratedMethod"/> compliant object.
 		/// </summary>
-		/// <param name="method">A <see cref="IGeneratedMethod"/> compliant object to initialize the wrapper with.</param>
-		public MethodComparisonWrapper(IGeneratedMethod method)
+		/// <param name="method">A <see cref="IMethod"/> compliant object to initialize the wrapper with.</param>
+		public MethodComparisonWrapper(IMethod method)
 		{
 			if (method != null)
 			{
@@ -79,16 +79,15 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="other">Wrapper to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public bool Equals(MethodComparisonWrapper other)
 		{
 			if (Name != other.Name) return false;
 			if (Kind != other.Kind) return false;
 			if (Visibility != other.Visibility) return false;
-			if (ReturnType != other.ReturnType) return false;
-			if (!ParameterTypes.SequenceEqual(other.ParameterTypes)) return false;
-			return true;
+			return ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
 		}
 
 		/// <summary>
@@ -96,13 +95,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="obj">Object to compare with.</param>
 		/// <returns>
-		/// <c>true</c> if the two instances are equal; otherwise <c>false</c>.
+		/// <c>true</c> if the two instances are equal;<br/>
+		/// otherwise <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((MethodComparisonWrapper)obj);
+			return obj.GetType() == GetType() && Equals((MethodComparisonWrapper)obj);
 		}
 
 		/// <summary>
@@ -117,7 +116,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				hashCode = (hashCode * 397) ^ Kind.GetHashCode();
 				hashCode = (hashCode * 397) ^ Visibility.GetHashCode();
 				hashCode = (hashCode * 397) ^ (ReturnType != null ? ReturnType.GetHashCode() : 0);
-				foreach (var type in ParameterTypes)
+				foreach (Type type in ParameterTypes)
 				{
 					hashCode = (hashCode * 397) ^ (type != null ? type.GetHashCode() : 0);
 				}

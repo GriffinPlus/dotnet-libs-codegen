@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System.Diagnostics;
+using System.Reflection;
 using System.Reflection.Emit;
 
 using Xunit;
@@ -49,17 +50,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Implements the get accessor method of the property.
+		/// Implements the 'get' accessor method of the property.
 		/// </summary>
 		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the get accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the get accessor method to implement.</param>
+		/// <param name="property">The property the 'get' accessor method to implement belongs to.</param>
+		/// <param name="msilGenerator">MSIL generator attached to the 'get' accessor method to implement.</param>
 		public override void ImplementGetAccessorMethod(
 			TypeDefinition     typeDefinition,
 			IGeneratedProperty property,
 			ILGenerator        msilGenerator)
 		{
-			var testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
+			MethodInfo testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
 			Debug.Assert(testDataStorage_get != null, nameof(testDataStorage_get) + " != null");
 			msilGenerator.Emit(OpCodes.Ldc_I4, Handle);
 			msilGenerator.Emit(OpCodes.Call, testDataStorage_get);
@@ -68,11 +69,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Implements the set accessor method of the property.
+		/// Implements the 'set' accessor method of the property.
 		/// </summary>
 		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the set accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the set accessor method to implement.</param>
+		/// <param name="property">The property the 'set' accessor method to implement belongs to.</param>
+		/// <param name="msilGenerator">MSIL generator attached to the 'set' accessor method to implement.</param>
 		public override void ImplementSetAccessorMethod(
 			TypeDefinition     typeDefinition,
 			IGeneratedProperty property,
@@ -81,7 +82,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			msilGenerator.Emit(OpCodes.Ldc_I4, Handle);
 			msilGenerator.Emit(property.Kind == PropertyKind.Static ? OpCodes.Ldarg_0 : OpCodes.Ldarg_1);
 			if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
-			var testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
+			MethodInfo testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
 			Debug.Assert(testDataStorage_set != null, nameof(testDataStorage_set) + " != null");
 			msilGenerator.Emit(OpCodes.Call, testDataStorage_set);
 			msilGenerator.Emit(OpCodes.Ret);
