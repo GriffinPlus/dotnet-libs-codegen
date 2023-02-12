@@ -4,16 +4,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-namespace GriffinPlus.Lib.CodeGeneration.Demo
+namespace GriffinPlus.Lib.CodeGeneration.Demo.ViewModelWizard
 {
 
 	/// <summary>
 	/// The View Model Wizard.
 	/// </summary>
-	public static class ViewModelWizard
+	public static class Demonstration
 	{
 		/// <summary>
 		/// Demonstrates the view model wizard.
@@ -79,55 +77,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Demo
 			Type viewModelType = definition.CreateType();
 			return (TViewModel)Activator.CreateInstance(viewModelType);
 		}
-	}
-
-	/// <summary>
-	/// Base class for view models.
-	/// </summary>
-	public class ViewModelBase : INotifyPropertyChanged
-	{
-		/// <summary>
-		/// Occurs when one of the properties of the view model has changed.
-		/// </summary>
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		/// <summary>
-		/// Raises the <see cref="PropertyChanged"/> event.
-		/// </summary>
-		/// <param name="propertyName">Name of the property that has changed.</param>
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
-	}
-
-	/// <summary>
-	/// A custom view model with abstract properties the view model wizard should implement.
-	/// </summary>
-	public abstract class CustomViewModel : ViewModelBase
-	{
-		private string mManuallyImplementedProperty;
-
-		/// <summary>
-		/// A manually implemented property that behaves as the view model wizard would implement it.
-		/// </summary>
-		public string ManuallyImplementedProperty
-		{
-			get => mManuallyImplementedProperty;
-			set
-			{
-				if (!Equals(mManuallyImplementedProperty, value))
-				{
-					mManuallyImplementedProperty = value;
-					OnPropertyChanged(nameof(ManuallyImplementedProperty));
-				}
-			}
-		}
-
-		/// <summary>
-		/// Abstract property the view model wizard should implement.
-		/// </summary>
-		public abstract string AutomaticallyImplementedProperty { get; set; } // may also be only 'get' or 'set'
 	}
 
 }

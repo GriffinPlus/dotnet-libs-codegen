@@ -3,6 +3,7 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 namespace GriffinPlus.Lib.CodeGeneration.Demo
 {
 
@@ -10,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Demo
 	{
 		private static void Main(string[] args)
 		{
-			ViewModelWizard.Demonstrate();
+			ViewModelWizard.Demonstration.Demonstrate();
 		}
 	}
 
