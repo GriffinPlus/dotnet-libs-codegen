@@ -2344,6 +2344,43 @@ namespace GriffinPlus.Lib.CodeGeneration
 		}
 
 		/// <summary>
+		/// Gets properties that have been declared by implemented interfaces.
+		/// </summary>
+		/// <returns>
+		/// Properties that have been declared by implemented interfaces.
+		/// </returns>
+		public PropertyInfo[] GetPropertiesOfImplementedInterfaces()
+		{
+			var interfaceProperties = new HashSet<PropertyInfo>();
+
+			foreach (Type implementedInterface in ImplementedInterfaces)
+			{
+				interfaceProperties.UnionWith(implementedInterface.GetPublicProperties());
+			}
+
+			return interfaceProperties.ToArray();
+		}
+
+		/// <summary>
+		/// Gets methods that have been declared by implemented interfaces.
+		/// </summary>
+		/// <returns>
+		/// Methods that have been declared by implemented interfaces.
+		/// </returns>
+		public MethodInfo[] GetMethodsOfImplementedInterfaces()
+		{
+			var interfaceMethods = new HashSet<MethodInfo>();
+
+			foreach (Type implementedInterface in ImplementedInterfaces)
+			{
+				interfaceMethods.UnionWith(implementedInterface.GetPublicMethods());
+			}
+
+			return interfaceMethods.ToArray();
+		}
+
+
+		/// <summary>
 		/// Gets the method with the specified name and the specified parameters
 		/// (works with inherited and generated methods).
 		/// </summary>

@@ -3,17 +3,18 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-namespace GriffinPlus.Lib.CodeGeneration.Demo
+namespace GriffinPlus.Lib.CodeGeneration.Demo.DuckCasting
 {
 
-	class Program
+	/// <summary>
+	/// Interface of a dog.
+	/// </summary>
+	public interface IDog : IAnimal
 	{
-		private static void Main(string[] args)
-		{
-			// ViewModelWizard.Demonstration.Demonstrate();
-			DuckCasting.Demonstration.Demonstrate();
-		}
+		/// <summary>
+		/// Makes 'Woof!'.
+		/// </summary>
+		void Bark();
 	}
 
 }

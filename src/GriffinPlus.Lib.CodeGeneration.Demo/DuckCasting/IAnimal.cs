@@ -3,17 +3,23 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-namespace GriffinPlus.Lib.CodeGeneration.Demo
+namespace GriffinPlus.Lib.CodeGeneration.Demo.DuckCasting
 {
 
-	class Program
+	/// <summary>
+	/// Interface of a cat.
+	/// </summary>
+	public interface IAnimal
 	{
-		private static void Main(string[] args)
-		{
-			// ViewModelWizard.Demonstration.Demonstrate();
-			DuckCasting.Demonstration.Demonstrate();
-		}
+		/// <summary>
+		/// Gets the name of the animal.
+		/// </summary>
+		string Name { get; }
+
+		/// <summary>
+		/// Just walk.
+		/// </summary>
+		void Walk();
 	}
 
 }
