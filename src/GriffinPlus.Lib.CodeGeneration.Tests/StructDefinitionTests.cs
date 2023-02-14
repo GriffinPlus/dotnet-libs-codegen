@@ -9,7 +9,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 	/// <summary>
 	/// Common tests around the <see cref="StructDefinition"/> class.
 	/// </summary>
-	public class StructDefinitionTests : TypeDefinitionTests<StructDefinition>
+	public class StructDefinitionTests : TypeDefinitionTests_Common<StructDefinition>
 	{
 		/// <summary>
 		/// Creates a new type definition instance to test.

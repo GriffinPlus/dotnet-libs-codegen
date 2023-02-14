@@ -7,6 +7,10 @@
 		<AssemblyName>GriffinPlus.Lib.CodeGeneration.Tests</AssemblyName>
 		<RootNamespace>GriffinPlus.Lib.CodeGeneration.Tests</RootNamespace>
 		<OmitDocumentationFile>true</OmitDocumentationFile>
+		<UseWpf Condition="'$(TargetFramework)'=='net48'">true</UseWpf>
+		<UseWpf Condition="'$(TargetFramework)'=='net5.0-windows7.0'">true</UseWpf>
+		<UseWpf Condition="'$(TargetFramework)'=='net6.0-windows7.0'">true</UseWpf>
+		<UseWpf Condition="'$(TargetFramework)'=='net7.0-windows7.0'">true</UseWpf>
 	</PropertyGroup>
 
 	<ItemGroup>

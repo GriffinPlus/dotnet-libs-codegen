@@ -10,7 +10,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 	/// Common tests around the <see cref="ClassDefinition"/> class.
 	/// The type to create does not explicitly derive from any other class, only implicitly from <see cref="System.Object"/>.
 	/// </summary>
-	public sealed class ClassDefinitionTests_WithoutBaseClass : ClassDefinitionTests
+	public sealed class ClassDefinitionTests_Common_WithoutBaseClass : ClassDefinitionTests_Common
 	{
 		/// <summary>
 		/// Creates a new type definition instance to test.

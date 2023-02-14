@@ -22,7 +22,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 	/// <summary>
 	/// Common tests around the <see cref="TypeDefinition"/> class.
 	/// </summary>
-	public abstract class TypeDefinitionTests<TDefinition> where TDefinition : TypeDefinition
+	public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition : TypeDefinition
 	{
 		/// <summary>
 		/// Creates a new type definition instance with a random name to test.
@@ -3966,10 +3966,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		#endregion // Adding Properties
 
-		#region Adding Dependency Properties (TODO, all test cases missing)
-
-		#endregion // Adding Dependency Properties
-
 		#region Adding Methods (TODO, all test cases missing)
 
 		#endregion // Adding Methods
@@ -3982,7 +3978,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="type">Type to check.</param>
 		/// <param name="definition">Definition the type should comply with.</param>
-		protected static void CheckTypeAgainstDefinition(Type type, TypeDefinition definition)
+		protected internal static void CheckTypeAgainstDefinition(Type type, TypeDefinition definition)
 		{
 			// check whether the full name of the type equals the defined type name
 			Assert.Equal(definition.TypeName, type.FullName);
