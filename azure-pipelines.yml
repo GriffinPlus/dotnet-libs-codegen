@@ -187,7 +187,7 @@ stages:
         nobuild: true
         arguments: '--framework net48 --verbosity normal'
     - task: DotNetCoreCLI@2
-      displayName: 'Test .NET Core 3.1'
+      displayName: 'Test .NET Core 3.1 (netcoreapp3.1)'
       inputs:
         command: 'test'
         projects: '**/*Tests/*.csproj'
