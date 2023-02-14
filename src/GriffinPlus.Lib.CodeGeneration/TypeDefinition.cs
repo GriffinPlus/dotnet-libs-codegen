@@ -11,6 +11,14 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
+#if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
+using System.Windows;
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+// namespace is not needed on non-windows platforms
+#else
+#error Unhandled Target Framework.
+#endif
+
 namespace GriffinPlus.Lib.CodeGeneration
 {
 
@@ -1717,6 +1725,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 #if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
 		/// <summary>
 		/// Adds a new dependency property to the type definition (without initial value).
+		/// The property will have the default value of the specified type initially.
 		/// </summary>
 		/// <typeparam name="T">Type of the dependency property.</typeparam>
 		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
@@ -1725,10 +1734,52 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <c>false</c> if it is read-write.
 		/// </param>
 		/// <returns>The added dependency property.</returns>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
 			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly);
+			mGeneratedDependencyProperties.Add(dependencyProperty);
+			return dependencyProperty;
+		}
+
+		/// <summary>
+		/// Adds a new dependency property to the type definition (without initial value).
+		/// The property will have the default value of the specified type initially.
+		/// </summary>
+		/// <param name="type">Type of the dependency property.</param>
+		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
+		/// <param name="isReadOnly">
+		/// <c>true</c> if the dependency property is read-only;<br/>
+		/// <c>false</c> if it is read-write.
+		/// </param>
+		/// <returns>The added dependency property.</returns>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
+		public IGeneratedDependencyProperty AddDependencyProperty(Type type, string name, bool isReadOnly)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(string), typeof(bool) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke(new object[] { this, name, isReadOnly });
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1744,10 +1795,62 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <param name="initialValue">Initial value of the dependency property.</param>
 		/// <returns>The added dependency property.</returns>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, T initialValue)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
 			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initialValue);
+			mGeneratedDependencyProperties.Add(dependencyProperty);
+			return dependencyProperty;
+		}
+
+		/// <summary>
+		/// Adds a new dependency property to the type definition (with initial value).
+		/// </summary>
+		/// <param name="type">Type of the dependency property.</param>
+		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
+		/// <param name="isReadOnly">
+		/// <c>true</c> if the dependency property is read-only;<br/>
+		/// <c>false</c> if it is read-write.
+		/// </param>
+		/// <param name="initialValue">Initial value of the dependency property.</param>
+		/// <returns>The added dependency property.</returns>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
+		public IGeneratedDependencyProperty AddDependencyProperty(
+			Type   type,
+			string name,
+			bool   isReadOnly,
+			object initialValue)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			if (initialValue == null && type.IsValueType)
+				throw new ArgumentException($"The specified initial value is null, but the property type ({type.FullName}) is a value type.", nameof(initialValue));
+
+			if (initialValue != null && !type.IsInstanceOfType(initialValue))
+				throw new ArgumentException($"The specified initial value ({initialValue}) is not assignable to a property of the specified type ({type.FullName}).", nameof(initialValue));
+
+			ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(string), typeof(bool), type },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke(new[] { this, name, isReadOnly, initialValue });
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1767,10 +1870,64 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </param>
 		/// <returns>The added dependency property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, DependencyPropertyInitializer initializer)
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
+		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(
+			string                        name,
+			bool                          isReadOnly,
+			DependencyPropertyInitializer initializer)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
 			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initializer);
+			mGeneratedDependencyProperties.Add(dependencyProperty);
+			return dependencyProperty;
+		}
+
+		/// <summary>
+		/// Adds a new dependency property to the type definition (with custom initializer).
+		/// </summary>
+		/// <param name="type">Type of the dependency property.</param>
+		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
+		/// <param name="isReadOnly">
+		/// <c>true</c> if the dependency property is read-only;<br/>
+		/// <c>false</c> if it is read-write.
+		/// </param>
+		/// <param name="initializer">
+		/// A callback that provides an implementation pushing an object onto the evaluation stack to use as the initial
+		/// value for the generated dependency property.
+		/// </param>
+		/// <returns>The added dependency property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
+		public IGeneratedDependencyProperty AddDependencyProperty(
+			Type                          type,
+			string                        name,
+			bool                          isReadOnly,
+			DependencyPropertyInitializer initializer)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+			if (initializer == null) throw new ArgumentNullException(nameof(initializer));
+
+			ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke(new object[] { this, name, isReadOnly, initializer });
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -1787,10 +1944,58 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
 		/// <returns>The added dependency property.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
 		public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, ProvideValueCallback<T> provideInitialValueCallback)
 		{
 			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
 			var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, provideInitialValueCallback);
+			mGeneratedDependencyProperties.Add(dependencyProperty);
+			return dependencyProperty;
+		}
+
+		/// <summary>
+		/// Adds a new dependency property to the type definition (with factory callback for an initial value).
+		/// </summary>
+		/// <param name="type">Type of the dependency property.</param>
+		/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
+		/// <param name="isReadOnly">
+		/// <c>true</c> if the dependency property is read-only;<br/>
+		/// <c>false</c> if it is read-write.
+		/// </param>
+		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
+		/// <returns>The added dependency property.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
+		/// <exception cref="CodeGenException">
+		/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
+		/// -or-<br/>
+		/// <paramref name="name"/> was already used to declare some other field, property, event or method.
+		/// </exception>
+		public IGeneratedDependencyProperty AddDependencyProperty(
+			Type                 type,
+			string               name,
+			bool                 isReadOnly,
+			ProvideValueCallback provideInitialValueCallback)
+		{
+			EnsureThatIdentifierHasNotBeenUsedYet(name);
+			EnsureThatTypeDerivesFrom(typeof(DependencyObject));
+
+			if (type == null) throw new ArgumentNullException(nameof(type));
+			if (provideInitialValueCallback == null) throw new ArgumentNullException(nameof(provideInitialValueCallback));
+
+			ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
+				.MakeGenericType(type)
+				.GetConstructor(
+					BindingFlags.NonPublic | BindingFlags.Instance,
+					Type.DefaultBinder,
+					new[] { typeof(TypeDefinition), typeof(string), typeof(bool), typeof(ProvideValueCallback) },
+					null);
+			Debug.Assert(constructor != null, nameof(constructor) + " != null");
+			var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke(new object[] { this, name, isReadOnly, provideInitialValueCallback });
 			mGeneratedDependencyProperties.Add(dependencyProperty);
 			return dependencyProperty;
 		}
@@ -2445,6 +2650,18 @@ namespace GriffinPlus.Lib.CodeGeneration
 			if (mGeneratedMethods.Any(method => method.Name == identifier))
 			{
 				throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a method.");
+			}
+		}
+
+		/// <summary>
+		/// Ensures that the defined type derives from the specified type.
+		/// </summary>
+		/// <param name="type">Type the defined types is expected to derive from.</param>
+		private void EnsureThatTypeDerivesFrom(Type type)
+		{
+			if (!type.IsAssignableFrom(TypeBuilder))
+			{
+				throw new CodeGenException($"The defined type ({TypeBuilder.FullName}) does not derive from '{type.FullName}'.");
 			}
 		}
 

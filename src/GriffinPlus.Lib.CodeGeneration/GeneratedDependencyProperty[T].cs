@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
+
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -20,7 +21,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 	{
 		private readonly DependencyPropertyInitializer mInitializer;
 		private readonly InitialValueInitializer       mInitialValueInitializer;
-		private readonly ProvideValueCallback<T>       mProvideInitialValueCallback;
+		private readonly ProvideValueCallback<T>       mTypedProvideInitialValueCallback;
+		private readonly ProvideValueCallback          mUntypedProvideInitialValueCallback;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class (without initial value).
@@ -74,7 +76,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			HasInitialValue = true;
 			InitialValue = initialValue;
 			if (InitialValueInitializers.TryGetInitializer(typeof(T), out InitialValueInitializer initializer)) mInitialValueInitializer = initializer;
-			else mProvideInitialValueCallback = () => InitialValue;
+			else mTypedProvideInitialValueCallback = () => InitialValue;
 
 			// initialize common parts
 			Initialize(name);
@@ -113,7 +115,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class
-		/// (with initial value provided by a factory callback).
+		/// (with initial value provided by a typed factory callback).
 		/// </summary>
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
@@ -135,7 +137,35 @@ namespace GriffinPlus.Lib.CodeGeneration
 			base(typeDefinition)
 		{
 			IsReadOnly = isReadOnly;
-			mProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
+			mTypedProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
+			Initialize(name);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="GeneratedDependencyProperty{T}"/> class
+		/// (with initial value provided by an untyped factory callback).
+		/// </summary>
+		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
+		/// <param name="name">
+		/// Name of the dependency property and the regular property providing access to the dependency property
+		/// (may be <c>null</c> to create a random name).
+		/// </param>
+		/// <param name="isReadOnly">
+		/// <c>true</c> if the dependency property is read-only;<br/>
+		/// <c>false</c> if it is read-write.
+		/// </param>
+		/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="typeDefinition"/> or <paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
+		internal GeneratedDependencyProperty(
+			TypeDefinition       typeDefinition,
+			string               name,
+			bool                 isReadOnly,
+			ProvideValueCallback provideInitialValueCallback) :
+			base(typeDefinition)
+		{
+			IsReadOnly = isReadOnly;
+			mUntypedProvideInitialValueCallback = provideInitialValueCallback ?? throw new ArgumentNullException(nameof(provideInitialValueCallback));
 			Initialize(name);
 		}
 
@@ -229,9 +259,6 @@ namespace GriffinPlus.Lib.CodeGeneration
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public)
 		{
-			// ensure the dependency property is not frozen
-			EnsureNotFrozen();
-
 			// abort if the accessor property was already added to the type definition
 			if (AccessorProperty != null)
 				throw new InvalidOperationException("The accessor property was already added.");
@@ -272,10 +299,16 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="msilGenerator">MSIL generator to use.</param>
 		private void ImplementReadWrite(IGeneratedField field, ILGenerator msilGenerator)
 		{
+			// get access to the Type.GetTypeFromHandle() method to convert a RuntimeTypeHandle to a Type object
+			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+			Debug.Assert(getTypeFromHandleMethod != null, nameof(getTypeFromHandleMethod) + " != null");
+
 			// push parameters for DependencyProperty.Register() onto the evaluation stack
 			msilGenerator.Emit(OpCodes.Ldstr, Name);
 			msilGenerator.Emit(OpCodes.Ldtoken, typeof(T));
+			msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
 			msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
+			msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
 
 			bool hasInitialValue = false;
 			if (mInitializer != null || mInitialValueInitializer != null)
@@ -285,29 +318,50 @@ namespace GriffinPlus.Lib.CodeGeneration
 				hasInitialValue = true;
 				if (mInitializer != null) mInitializer(this, msilGenerator);
 				else mInitialValueInitializer(this, msilGenerator);
+				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box, typeof(T));
 			}
-			else if (mProvideInitialValueCallback != null)
+			else if (mTypedProvideInitialValueCallback != null)
 			{
 				// the dependency property has a factory method that provides the initial value
 				hasInitialValue = true;
 
 				// put external factory callback into the collection of objects to pass along with the generated type
 				int externalObjectIndex = TypeDefinition.ExternalObjects.Count;
-				TypeDefinition.ExternalObjects.Add(mProvideInitialValueCallback);
+				TypeDefinition.ExternalObjects.Add(mTypedProvideInitialValueCallback);
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
-				MethodInfo type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
-				Debug.Assert(type_getTypeFromHandle != null, nameof(type_getTypeFromHandle) + " != null");
-				msilGenerator.Emit(OpCodes.Call, type_getTypeFromHandle);
-				MethodInfo codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
-				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
-				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
+				msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
+				MethodInfo codeGenExternalStorageGetMethod = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				Debug.Assert(codeGenExternalStorageGetMethod != null, nameof(codeGenExternalStorageGetMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorageGetMethod);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
-				MethodInfo func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
-				Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
-				msilGenerator.Emit(OpCodes.Call, func_invoke);
+				MethodInfo invokeMethod = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+				Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, invokeMethod);
+				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box, typeof(T));
+			}
+			else if (mUntypedProvideInitialValueCallback != null)
+			{
+				// the dependency property has a factory method that provides the initial value
+				hasInitialValue = true;
+
+				// put external factory callback into the collection of objects to pass along with the generated type
+				int externalObjectIndex = TypeDefinition.ExternalObjects.Count;
+				TypeDefinition.ExternalObjects.Add(mUntypedProvideInitialValueCallback);
+
+				// emit code to call the factory callback when the type is constructed.
+				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
+				msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
+				MethodInfo codeGenExternalStorageGetMethod = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				Debug.Assert(codeGenExternalStorageGetMethod != null, nameof(codeGenExternalStorageGetMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorageGetMethod);
+				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
+				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback));
+				MethodInfo invokeMethod = typeof(ProvideValueCallback).GetMethod("Invoke");
+				Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, invokeMethod);
 			}
 
 			if (hasInitialValue)
@@ -316,7 +370,6 @@ namespace GriffinPlus.Lib.CodeGeneration
 				// => create PropertyMetadata object with an initial value
 				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor(new[] { typeof(object) });
 				Debug.Assert(propertyMetadataConstructor != null, nameof(propertyMetadataConstructor) + " != null");
-				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box);
 				msilGenerator.Emit(OpCodes.Newobj, propertyMetadataConstructor);
 			}
 			else
@@ -348,10 +401,16 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="msilGenerator">MSIL generator to use.</param>
 		private void ImplementReadOnly(IGeneratedField field, ILGenerator msilGenerator)
 		{
+			// get access to the Type.GetTypeFromHandle() method to convert a RuntimeTypeHandle to a Type object
+			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+			Debug.Assert(getTypeFromHandleMethod != null, nameof(getTypeFromHandleMethod) + " != null");
+
 			// push parameters for DependencyProperty.RegisterReadOnly() onto the evaluation stack
 			msilGenerator.Emit(OpCodes.Ldstr, Name);
 			msilGenerator.Emit(OpCodes.Ldtoken, typeof(T));
+			msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
 			msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
+			msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
 
 			bool hasInitialValue = false;
 			if (mInitializer != null || mInitialValueInitializer != null)
@@ -361,29 +420,50 @@ namespace GriffinPlus.Lib.CodeGeneration
 				hasInitialValue = true;
 				if (mInitializer != null) mInitializer(this, msilGenerator);
 				else mInitialValueInitializer(this, msilGenerator);
+				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box, typeof(T));
 			}
-			else if (mProvideInitialValueCallback != null)
+			else if (mTypedProvideInitialValueCallback != null)
 			{
 				// the dependency property has a factory method that provides the initial value
 				hasInitialValue = true;
 
 				// put external factory callback into the collection of objects to pass along with the generated type
 				int externalObjectIndex = TypeDefinition.ExternalObjects.Count;
-				TypeDefinition.ExternalObjects.Add(mProvideInitialValueCallback);
+				TypeDefinition.ExternalObjects.Add(mTypedProvideInitialValueCallback);
 
 				// emit code to call the factory callback when the type is constructed.
 				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
-				MethodInfo type_getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
-				Debug.Assert(type_getTypeFromHandle != null, nameof(type_getTypeFromHandle) + " != null");
-				msilGenerator.Emit(OpCodes.Call, type_getTypeFromHandle);
-				MethodInfo codeGenExternalStorage_get = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
-				Debug.Assert(codeGenExternalStorage_get != null, nameof(codeGenExternalStorage_get) + " != null");
-				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorage_get);
+				msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
+				MethodInfo codeGenExternalStorageGetMethod = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				Debug.Assert(codeGenExternalStorageGetMethod != null, nameof(codeGenExternalStorageGetMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorageGetMethod);
 				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
 				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback<T>));
-				MethodInfo func_invoke = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
-				Debug.Assert(func_invoke != null, nameof(func_invoke) + " != null");
-				msilGenerator.Emit(OpCodes.Call, func_invoke);
+				MethodInfo invokeMethod = typeof(ProvideValueCallback<T>).GetMethod("Invoke");
+				Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, invokeMethod);
+				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box, typeof(T));
+			}
+			else if (mUntypedProvideInitialValueCallback != null)
+			{
+				// the dependency property has a factory method that provides the initial value
+				hasInitialValue = true;
+
+				// put external factory callback into the collection of objects to pass along with the generated type
+				int externalObjectIndex = TypeDefinition.ExternalObjects.Count;
+				TypeDefinition.ExternalObjects.Add(mUntypedProvideInitialValueCallback);
+
+				// emit code to call the factory callback when the type is constructed.
+				msilGenerator.Emit(OpCodes.Ldtoken, TypeDefinition.TypeBuilder);
+				msilGenerator.Emit(OpCodes.Call, getTypeFromHandleMethod);
+				MethodInfo codeGenExternalStorageGetMethod = typeof(CodeGenExternalStorage).GetMethod(nameof(CodeGenExternalStorage.Get));
+				Debug.Assert(codeGenExternalStorageGetMethod != null, nameof(codeGenExternalStorageGetMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, codeGenExternalStorageGetMethod);
+				msilGenerator.Emit(OpCodes.Ldc_I4, externalObjectIndex);
+				msilGenerator.Emit(OpCodes.Ldelem, typeof(ProvideValueCallback));
+				MethodInfo invokeMethod = typeof(ProvideValueCallback).GetMethod("Invoke");
+				Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+				msilGenerator.Emit(OpCodes.Call, invokeMethod);
 			}
 
 			if (hasInitialValue)
@@ -392,7 +472,6 @@ namespace GriffinPlus.Lib.CodeGeneration
 				// => create PropertyMetadata object with an initial value
 				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor(new[] { typeof(object) });
 				Debug.Assert(propertyMetadataConstructor != null, nameof(propertyMetadataConstructor) + " != null");
-				if (typeof(T).IsValueType) msilGenerator.Emit(OpCodes.Box);
 				msilGenerator.Emit(OpCodes.Newobj, propertyMetadataConstructor);
 			}
 			else
@@ -408,7 +487,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			// ----------------------------------------------------------------------------------------------------------------
 			MethodInfo registerReadOnlyMethod = typeof(DependencyProperty).GetMethod(
 				"RegisterReadOnly",
-				BindingFlags.Static,
+				BindingFlags.Public | BindingFlags.Static,
 				null,
 				new[] { typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata) },
 				null);

@@ -97,8 +97,10 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 			msilGenerator.Emit(OpCodes.Ldarg_0);
 			msilGenerator.Emit(OpCodes.Ldsfld, mDependencyProperty.DependencyPropertyField.FieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldarg_1);
 			if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
 			msilGenerator.Emit(OpCodes.Call, setValueMethod);
+			msilGenerator.Emit(OpCodes.Ret);
 		}
 	}
 
