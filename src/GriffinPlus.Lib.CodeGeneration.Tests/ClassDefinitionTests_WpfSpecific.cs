@@ -3,7 +3,7 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if NET48 || (NET5_0 || NET6_0 || NET7_0) && WINDOWS
+#if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 
 using System;
 using System.Collections.Generic;
@@ -1615,8 +1615,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 }
 
-#elif NETCOREAPP3_1_OR_GREATER || NET5_0 || NET6_0 || NET7_0
-// Dependency properties are not supported on .NET5/6/7 without Windows extensions...
+#elif NETCOREAPP2_2 || NETCOREAPP3_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+// Dependency properties are not supported on .NET Core 2.2/3.1 and .NET5/6/7/8 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif

@@ -118,9 +118,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Empty(definition.GeneratedFields);
 			Assert.Empty(definition.GeneratedMethods);
 			Assert.Empty(definition.GeneratedProperties);
-#if NET48 || NET5_0 && WINDOWS
+#if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 			Assert.Empty(definition.GeneratedDependencyProperties);
-#elif NETCOREAPP3_1_OR_GREATER
+#elif NETCOREAPP2_2 || NETCOREAPP3_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 			// Dependency properties are not supported on .NET Core
 #else
 #error Unhandled Target Framework.

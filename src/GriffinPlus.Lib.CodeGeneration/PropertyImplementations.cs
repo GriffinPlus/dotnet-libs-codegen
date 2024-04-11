@@ -23,7 +23,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		public static PropertyImplementation_SetterWithPropertyChanged SetterWithPropertyChanged => new PropertyImplementation_SetterWithPropertyChanged();
 
-#if NET461 || NET5_0 && WINDOWS
+#if NET461 ||  NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 		/// <summary>
 		/// Property implementation that provides access to the specified dependency property.
 		/// </summary>
@@ -32,8 +32,8 @@ namespace GriffinPlus.Lib.CodeGeneration
 		{
 			return new PropertyImplementation_DependencyProperty(dp);
 		}
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
-		// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
+#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+		// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
