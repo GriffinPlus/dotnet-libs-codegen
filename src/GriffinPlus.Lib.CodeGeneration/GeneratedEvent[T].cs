@@ -65,7 +65,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				new[] { EventHandlerType },
 				visibility,
 				kind == EventKind.Abstract
-					? (MethodImplementationCallback)null
+					? null
 					: (method, msilGenerator) => Implementation.ImplementAddAccessorMethod(TypeDefinition, this, msilGenerator),
 				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
 
@@ -77,7 +77,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				new[] { EventHandlerType },
 				visibility,
 				kind == EventKind.Abstract
-					? (MethodImplementationCallback)null
+					? null
 					: (method, msilGenerator) => Implementation.ImplementRemoveAccessorMethod(TypeDefinition, this, msilGenerator),
 				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
 
@@ -150,7 +150,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				new[] { EventHandlerType },
 				visibility,
 				kind == EventKind.Abstract
-					? (MethodImplementationCallback)null
+					? null
 					: (method, msilGenerator) => addAccessorImplementationCallback(this, msilGenerator),
 				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
 
@@ -163,7 +163,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				new[] { EventHandlerType },
 				visibility,
 				kind == EventKind.Abstract
-					? (MethodImplementationCallback)null
+					? null
 					: (method, msilGenerator) => removeAccessorImplementationCallback(this, msilGenerator),
 				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
 
