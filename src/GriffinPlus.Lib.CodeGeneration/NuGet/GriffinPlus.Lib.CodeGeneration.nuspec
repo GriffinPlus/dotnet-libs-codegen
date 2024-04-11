@@ -5,7 +5,7 @@
 		<id>GriffinPlus.Lib.CodeGeneration</id>
 		<version>$version$</version>
 		<authors>Sascha Falk</authors>
-		<copyright>Copyright (c) 2023 Sascha Falk and Contributors</copyright>
+		<copyright>Copyright (c) 2024 Sascha Falk and Contributors</copyright>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Simplified code generation at runtime for .NET using building blocks.</description>
 		<license type="expression">MIT</license>
