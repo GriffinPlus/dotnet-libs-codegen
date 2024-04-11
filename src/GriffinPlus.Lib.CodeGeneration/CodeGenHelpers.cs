@@ -10,6 +10,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+
 namespace GriffinPlus.Lib.CodeGeneration
 {
 
@@ -73,7 +75,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 				case FieldAttributes.HasFieldRVA:
 				case FieldAttributes.InitOnly:
 				case FieldAttributes.Literal:
+#pragma warning disable SYSLIB0050 // Formatter-based serialization is obsolete and should not be used
 				case FieldAttributes.NotSerialized:
+#pragma warning restore SYSLIB0050
 				case FieldAttributes.PinvokeImpl:
 				case FieldAttributes.PrivateScope:
 				case FieldAttributes.ReservedMask:

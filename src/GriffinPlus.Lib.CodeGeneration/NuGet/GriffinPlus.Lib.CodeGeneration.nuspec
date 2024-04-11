@@ -22,6 +22,8 @@
 			</group>
 			<group targetFramework="net461">
 			</group>
+			<group targetFramework="net48">
+			</group>
 			<group targetFramework="net5.0">
 				<dependency id="System.CodeDom" version="7.0.0" include="all" />
 			</group>
@@ -37,6 +39,11 @@
 			</group>
 			<group targetFramework="net7.0-windows7.0">
 			</group>
+			<group targetFramework="net8.0">
+				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+			</group>
+			<group targetFramework="net8.0-windows7.0">
+			</group>
 		</dependencies>
 	</metadata>
 	<files>
@@ -50,6 +57,9 @@
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net461\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net461" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net461\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net461" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net461\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net461" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net48\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net48" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net48\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net48" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net48\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net48" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net5.0\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net5.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net5.0\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net5.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net5.0\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net5.0" />
@@ -68,5 +78,11 @@
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net7.0-windows7.0\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net7.0-windows7.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net7.0-windows7.0\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net7.0-windows7.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net7.0-windows7.0\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net7.0-windows7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net8.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net8.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net8.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0-windows7.0\GriffinPlus.Lib.CodeGeneration.dll" target="lib\net8.0-windows7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0-windows7.0\GriffinPlus.Lib.CodeGeneration.pdb" target="lib\net8.0-windows7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.CodeGeneration\AnyCPU.Release\net8.0-windows7.0\GriffinPlus.Lib.CodeGeneration.xml" target="lib\net8.0-windows7.0" />
 	</files>
 </package>
