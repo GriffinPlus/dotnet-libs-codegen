@@ -23,7 +23,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// </summary>
 		public static PropertyImplementation_SetterWithPropertyChanged SetterWithPropertyChanged => new PropertyImplementation_SetterWithPropertyChanged();
 
-#if NET461 ||  NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
+#if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 		/// <summary>
 		/// Property implementation that provides access to the specified dependency property.
 		/// </summary>
