@@ -5,18 +5,15 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Interface of a generated method.
+/// </summary>
+public interface IGeneratedMethod : IMethod
 {
-
 	/// <summary>
-	/// Interface of a generated method.
+	/// Gets the <see cref="System.Reflection.Emit.MethodBuilder"/> associated with the method.
 	/// </summary>
-	public interface IGeneratedMethod : IMethod
-	{
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.Emit.MethodBuilder"/> associated with the method.
-		/// </summary>
-		MethodBuilder MethodBuilder { get; }
-	}
-
+	MethodBuilder MethodBuilder { get; }
 }

@@ -6,38 +6,35 @@
 using System;
 using System.Reflection;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Interface of inherited and generated fields.
+/// </summary>
+public interface IField
 {
+	/// <summary>
+	/// Gets the name of the field.
+	/// </summary>
+	string Name { get; }
 
 	/// <summary>
-	/// Interface of inherited and generated fields.
+	/// Gets the type of the field.
 	/// </summary>
-	public interface IField
-	{
-		/// <summary>
-		/// Gets the name of the field.
-		/// </summary>
-		string Name { get; }
+	Type FieldType { get; }
 
-		/// <summary>
-		/// Gets the type of the field.
-		/// </summary>
-		Type FieldType { get; }
+	/// <summary>
+	/// Gets a value indicating whether the field is class variable (<c>true</c>) or an instance variable (<c>false</c>).
+	/// </summary>
+	bool IsStatic { get; }
 
-		/// <summary>
-		/// Gets a value indicating whether the field is class variable (<c>true</c>) or an instance variable (<c>false</c>).
-		/// </summary>
-		bool IsStatic { get; }
+	/// <summary>
+	/// Gets the access modifier of the field.
+	/// </summary>
+	Visibility Visibility { get; }
 
-		/// <summary>
-		/// Gets the access modifier of the field.
-		/// </summary>
-		Visibility Visibility { get; }
-
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.FieldInfo"/> associated with the field.
-		/// </summary>
-		FieldInfo FieldInfo { get; }
-	}
-
+	/// <summary>
+	/// Gets the <see cref="System.Reflection.FieldInfo"/> associated with the field.
+	/// </summary>
+	FieldInfo FieldInfo { get; }
 }

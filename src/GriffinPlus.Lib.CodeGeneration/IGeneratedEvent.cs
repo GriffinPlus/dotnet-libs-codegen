@@ -5,34 +5,31 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Untyped interface of a generated event.
+/// </summary>
+public interface IGeneratedEvent : IEvent
 {
+	/// <summary>
+	/// Gets the implementation strategy used to implement the event
+	/// (<c>null</c>, if implementation callbacks are used).
+	/// </summary>
+	IEventImplementation Implementation { get; }
 
 	/// <summary>
-	/// Untyped interface of a generated event.
+	/// Gets the <see cref="System.Reflection.Emit.EventBuilder"/> associated with the event.
 	/// </summary>
-	public interface IGeneratedEvent : IEvent
-	{
-		/// <summary>
-		/// Gets the implementation strategy used to implement the event
-		/// (may be <c>null</c> if implementation callbacks are used).
-		/// </summary>
-		IEventImplementation Implementation { get; }
+	EventBuilder EventBuilder { get; }
 
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.Emit.EventBuilder"/> associated with the event.
-		/// </summary>
-		EventBuilder EventBuilder { get; }
+	/// <summary>
+	/// Gets the 'add' accessor method.
+	/// </summary>
+	new IGeneratedMethod AddAccessor { get; }
 
-		/// <summary>
-		/// Gets the 'add' accessor method.
-		/// </summary>
-		new IGeneratedMethod AddAccessor { get; }
-
-		/// <summary>
-		/// Gets the 'remove' accessor method.
-		/// </summary>
-		new IGeneratedMethod RemoveAccessor { get; }
-	}
-
+	/// <summary>
+	/// Gets the 'remove' accessor method.
+	/// </summary>
+	new IGeneratedMethod RemoveAccessor { get; }
 }

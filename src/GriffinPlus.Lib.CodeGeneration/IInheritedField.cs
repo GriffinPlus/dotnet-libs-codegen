@@ -3,12 +3,9 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace GriffinPlus.Lib.CodeGeneration
-{
+namespace GriffinPlus.Lib.CodeGeneration;
 
-	/// <summary>
-	/// Untyped interface of an inherited field.
-	/// </summary>
-	public interface IInheritedField : IField { }
-
-}
+/// <summary>
+/// Untyped interface of an inherited field.
+/// </summary>
+public interface IInheritedField : IField;

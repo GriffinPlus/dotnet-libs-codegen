@@ -3,13 +3,10 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace GriffinPlus.Lib.CodeGeneration.Tests
-{
+namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
-	/// <summary>
-	/// Empty base class for dynamically created classes.
-	/// This class does not define any members and only has a default constructor.
-	/// </summary>
-	public class EmptyTestBaseClass { }
-
-}
+/// <summary>
+/// Empty base class for dynamically created classes.
+/// This class does not define any members and only has a default constructor.
+/// </summary>
+public class EmptyTestBaseClass;

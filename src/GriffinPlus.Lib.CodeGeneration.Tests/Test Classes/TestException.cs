@@ -5,12 +5,9 @@
 
 using System;
 
-namespace GriffinPlus.Lib.CodeGeneration.Tests
-{
+namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
-	/// <summary>
-	/// A dummy exception for testing purposes only.
-	/// </summary>
-	public class TestException : Exception { }
-
-}
+/// <summary>
+/// A dummy exception for testing purposes only.
+/// </summary>
+public class TestException : Exception;

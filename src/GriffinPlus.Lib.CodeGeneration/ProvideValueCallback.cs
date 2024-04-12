@@ -3,13 +3,10 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace GriffinPlus.Lib.CodeGeneration
-{
+namespace GriffinPlus.Lib.CodeGeneration;
 
-	/// <summary>
-	/// A factory callback that provides a value.
-	/// </summary>
-	/// <returns>The provided value.</returns>
-	public delegate object ProvideValueCallback();
-
-}
+/// <summary>
+/// A factory callback that provides a value.
+/// </summary>
+/// <returns>The provided value.</returns>
+public delegate object ProvideValueCallback();

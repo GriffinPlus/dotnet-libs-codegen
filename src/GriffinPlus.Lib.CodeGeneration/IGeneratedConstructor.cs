@@ -5,18 +5,15 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Interface of generated constructors.
+/// </summary>
+public interface IGeneratedConstructor : IConstructor
 {
-
 	/// <summary>
-	/// Interface of generated constructors.
+	/// Gets the <see cref="System.Reflection.Emit.ConstructorBuilder"/> associated with the constructor.
 	/// </summary>
-	public interface IGeneratedConstructor : IConstructor
-	{
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.Emit.ConstructorBuilder"/> associated with the constructor.
-		/// </summary>
-		ConstructorBuilder ConstructorBuilder { get; }
-	}
-
+	ConstructorBuilder ConstructorBuilder { get; }
 }

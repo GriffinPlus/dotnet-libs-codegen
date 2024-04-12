@@ -5,18 +5,15 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Untyped interface of a generated field.
+/// </summary>
+public interface IGeneratedField : IField, IInitialValueProvider
 {
-
 	/// <summary>
-	/// Untyped interface of a generated field.
+	/// Gets the <see cref="System.Reflection.Emit.FieldBuilder"/> associated with the field.
 	/// </summary>
-	public interface IGeneratedField : IField, IInitialValueProvider
-	{
-		/// <summary>
-		/// Gets the <see cref="System.Reflection.Emit.FieldBuilder"/> associated with the field.
-		/// </summary>
-		FieldBuilder FieldBuilder { get; }
-	}
-
+	FieldBuilder FieldBuilder { get; }
 }

@@ -6,42 +6,39 @@
 using System;
 using System.Collections.Generic;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Helper class that stores external objects like initialization callback delegates outside generated types to
+/// allow generated code to access it as it is not possible to use existing objects when generating MSIL.
+/// </summary>
+public static class CodeGenExternalStorage
 {
+	private static readonly Dictionary<Type, object[]> sObjectsByGeneratedType = new();
 
 	/// <summary>
-	/// Helper class that stores external objects like initialization callback delegates outside of generated types to
-	/// allow generated code to access it as it is not possible to use existing objects when generating MSIL.
+	/// Associates a set of external objects with the specified generated type.
 	/// </summary>
-	public static class CodeGenExternalStorage
+	/// <param name="generatedType">The generated Type.</param>
+	/// <param name="objects">Objects to associate with the type.</param>
+	public static void Add(Type generatedType, object[] objects)
 	{
-		private static readonly Dictionary<Type, object[]> sObjectsByGeneratedType = new Dictionary<Type, object[]>();
-
-		/// <summary>
-		/// Associates a set of external objects with the specified generated type.
-		/// </summary>
-		/// <param name="generatedType">The generated Type.</param>
-		/// <param name="objects">Objects to associate with the type.</param>
-		public static void Add(Type generatedType, object[] objects)
+		lock (sObjectsByGeneratedType)
 		{
-			lock (sObjectsByGeneratedType)
-			{
-				sObjectsByGeneratedType.Add(generatedType, objects);
-			}
-		}
-
-		/// <summary>
-		/// Gets the objects associated with the specified generated type.
-		/// </summary>
-		/// <param name="generatedType">The generated type.</param>
-		/// <returns>The objects associated with the specified generated type.</returns>
-		public static object[] Get(Type generatedType)
-		{
-			lock (sObjectsByGeneratedType)
-			{
-				return sObjectsByGeneratedType[generatedType];
-			}
+			sObjectsByGeneratedType.Add(generatedType, objects);
 		}
 	}
 
+	/// <summary>
+	/// Gets the objects associated with the specified generated type.
+	/// </summary>
+	/// <param name="generatedType">The generated type.</param>
+	/// <returns>The objects associated with the specified generated type.</returns>
+	public static object[] Get(Type generatedType)
+	{
+		lock (sObjectsByGeneratedType)
+		{
+			return sObjectsByGeneratedType[generatedType];
+		}
+	}
 }

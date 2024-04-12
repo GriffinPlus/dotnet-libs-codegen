@@ -4,15 +4,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-namespace GriffinPlus.Lib.CodeGeneration.Demo
+namespace GriffinPlus.Lib.CodeGeneration.Demo;
+
+class Program
 {
-
-	class Program
+	private static void Main(string[] _)
 	{
-		private static void Main(string[] args)
-		{
-			ViewModelWizard.Demonstration.Demonstrate();
-		}
+		ViewModelWizard.Demonstration.Demonstrate();
 	}
-
 }

@@ -6,20 +6,17 @@
 using System;
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Internal interface of a generated field.
+/// </summary>
+interface IGeneratedFieldInternal : IGeneratedField
 {
-
 	/// <summary>
-	/// Internal interface of a generated field.
+	/// Adds code to initialize the field with the specified default value (if any).
 	/// </summary>
-	interface IGeneratedFieldInternal : IGeneratedField
-	{
-		/// <summary>
-		/// Adds code to initialize the field with the specified default value (if any).
-		/// </summary>
-		/// <param name="createdType">The created type.</param>
-		/// <param name="msilGenerator">IL Generator attached to a constructor.</param>
-		void ImplementFieldInitialization(Type createdType, ILGenerator msilGenerator);
-	}
-
+	/// <param name="createdType">The created type.</param>
+	/// <param name="msilGenerator">IL Generator attached to a constructor.</param>
+	void ImplementFieldInitialization(Type createdType, ILGenerator msilGenerator);
 }

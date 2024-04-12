@@ -21,7 +21,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 
 		/// <summary>
 		/// Gets the accessor property associated with the dependency property.
-		/// (may be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
+		/// (can be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
 		/// </summary>
 		new IGeneratedProperty<T> AccessorProperty { get; }
 
@@ -33,7 +33,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		new IGeneratedProperty<T> AddAccessorProperty(
-			string     name = null,
+			string     name                  = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public);
 	}

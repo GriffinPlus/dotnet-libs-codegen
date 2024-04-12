@@ -44,7 +44,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 					"GetValue",
 					BindingFlags.Public | BindingFlags.Instance,
 					null,
-					new[] { typeof(DependencyProperty) },
+					[typeof(DependencyProperty)],
 					null);
 
 			Debug.Assert(getValueMethod != null, nameof(getValueMethod) + " != null");
@@ -56,7 +56,9 @@ namespace GriffinPlus.Lib.CodeGeneration
 				msilGenerator.Emit(OpCodes.Ldsfld, mDependencyProperty.DependencyPropertyField.FieldBuilder);
 				PropertyInfo dependencyPropertyProperty = typeof(DependencyPropertyKey).GetProperty("DependencyProperty");
 				Debug.Assert(dependencyPropertyProperty != null, nameof(dependencyPropertyProperty) + " != null");
-				msilGenerator.Emit(OpCodes.Call, dependencyPropertyProperty.GetGetMethod(false));
+				MethodInfo getAccessor = dependencyPropertyProperty.GetGetMethod(false);
+				Debug.Assert(getAccessor != null, nameof(getAccessor) + " != null");
+				msilGenerator.Emit(OpCodes.Call, getAccessor);
 			}
 			else
 			{
@@ -84,13 +86,12 @@ namespace GriffinPlus.Lib.CodeGeneration
 					"SetValue",
 					BindingFlags.Public | BindingFlags.Instance,
 					null,
-					new[]
-					{
+					[
 						mDependencyProperty.IsReadOnly
 							? typeof(DependencyPropertyKey)
 							: typeof(DependencyProperty),
 						typeof(object)
-					},
+					],
 					null);
 
 			Debug.Assert(setValueMethod != null, nameof(setValueMethod) + " != null");
