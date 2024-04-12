@@ -29,7 +29,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
 		/// Name of the dependency property and the regular property providing access to the dependency property
-		/// (may be <c>null</c> to create a random name).
+		/// (<c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
 		/// <c>true</c> if the dependency property is read-only;<br/>
@@ -53,7 +53,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
 		/// Name of the dependency property and the regular property providing access to the dependency property
-		/// (may be <c>null</c> to create a random name).
+		/// (<c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
 		/// <c>true</c> if the dependency property is read-only;<br/>
@@ -88,7 +88,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
 		/// Name of the dependency property and the regular property providing access to the dependency property
-		/// (may be <c>null</c> to create a random name).
+		/// (<c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
 		/// <c>true</c> if the dependency property is read-only;<br/>
@@ -119,7 +119,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
 		/// Name of the dependency property and the regular property providing access to the dependency property
-		/// (may be <c>null</c> to create a random name).
+		/// (<c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
 		/// <c>true</c> if the dependency property is read-only;<br/>
@@ -147,7 +147,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="typeDefinition">The type definition the dependency property belongs to.</param>
 		/// <param name="name">
 		/// Name of the dependency property and the regular property providing access to the dependency property
-		/// (may be <c>null</c> to create a random name).
+		/// (<c>null</c> to create a random name).
 		/// </param>
 		/// <param name="isReadOnly">
 		/// <c>true</c> if the dependency property is read-only;<br/>
@@ -171,7 +171,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <summary>
 		/// Performs common initializations during construction.
 		/// </summary>
-		/// <param name="name">Name of the dependency property (may be <c>null</c> to create a random name).</param>
+		/// <param name="name">Name of the dependency property (<c>null</c> to create a random name).</param>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
 		private void Initialize(string name)
 		{
@@ -229,20 +229,21 @@ namespace GriffinPlus.Lib.CodeGeneration
 		public T InitialValue { get; }
 
 		/// <summary>
-		/// Gets the static field storing the registered dependency property (can be of type <see cref="DependencyProperty"/>
-		/// (<see cref="IsReadOnly"/> is <c>false</c>) or <see cref="DependencyPropertyKey"/> (<see cref="IsReadOnly"/> is <c>true</c>).
+		/// Gets the static field storing the registered dependency property. Can be of type:<br/>
+		/// - <see cref="DependencyProperty"/> (<see cref="IsReadOnly"/> is <c>false</c>)<br/>
+		/// - <see cref="DependencyPropertyKey"/> (<see cref="IsReadOnly"/> is <c>true</c>).
 		/// </summary>
 		public IGeneratedField DependencyPropertyField { get; private set; }
 
 		/// <summary>
 		/// Gets the accessor property associated with the dependency property.
-		/// (may be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
+		/// (can be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
 		/// </summary>
 		public IGeneratedProperty<T> AccessorProperty { get; private set; }
 
 		/// <summary>
 		/// Gets the accessor property associated with the dependency property.
-		/// (may be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
+		/// (can be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
 		/// </summary>
 		IGeneratedProperty IGeneratedDependencyProperty.AccessorProperty => AccessorProperty;
 
@@ -254,7 +255,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		public IGeneratedProperty<T> AddAccessorProperty(
-			string     name = null,
+			string     name                  = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public)
 		{
@@ -299,7 +300,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		private void ImplementReadWrite(IGeneratedField field, ILGenerator msilGenerator)
 		{
 			// get access to the Type.GetTypeFromHandle() method to convert a RuntimeTypeHandle to a Type object
-			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), [typeof(RuntimeTypeHandle)]);
 			Debug.Assert(getTypeFromHandleMethod != null, nameof(getTypeFromHandleMethod) + " != null");
 
 			// push parameters for DependencyProperty.Register() onto the evaluation stack
@@ -367,7 +368,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			{
 				// the dependency property does have an initial value
 				// => create PropertyMetadata object with an initial value
-				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor(new[] { typeof(object) });
+				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor([typeof(object)]);
 				Debug.Assert(propertyMetadataConstructor != null, nameof(propertyMetadataConstructor) + " != null");
 				msilGenerator.Emit(OpCodes.Newobj, propertyMetadataConstructor);
 			}
@@ -387,7 +388,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				"Register",
 				BindingFlags.Public | BindingFlags.Static,
 				null,
-				new[] { typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata) },
+				[typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata)],
 				null);
 			Debug.Assert(registerMethod != null, nameof(registerMethod) + " != null");
 			msilGenerator.Emit(OpCodes.Call, registerMethod);
@@ -401,7 +402,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		private void ImplementReadOnly(IGeneratedField field, ILGenerator msilGenerator)
 		{
 			// get access to the Type.GetTypeFromHandle() method to convert a RuntimeTypeHandle to a Type object
-			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+			MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), [typeof(RuntimeTypeHandle)]);
 			Debug.Assert(getTypeFromHandleMethod != null, nameof(getTypeFromHandleMethod) + " != null");
 
 			// push parameters for DependencyProperty.RegisterReadOnly() onto the evaluation stack
@@ -469,7 +470,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 			{
 				// the dependency property does have an initial value
 				// => create PropertyMetadata object with an initial value
-				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor(new[] { typeof(object) });
+				ConstructorInfo propertyMetadataConstructor = typeof(PropertyMetadata).GetConstructor([typeof(object)]);
 				Debug.Assert(propertyMetadataConstructor != null, nameof(propertyMetadataConstructor) + " != null");
 				msilGenerator.Emit(OpCodes.Newobj, propertyMetadataConstructor);
 			}
@@ -488,7 +489,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 				"RegisterReadOnly",
 				BindingFlags.Public | BindingFlags.Static,
 				null,
-				new[] { typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata) },
+				[typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata)],
 				null);
 			Debug.Assert(registerReadOnlyMethod != null, nameof(registerReadOnlyMethod) + " != null");
 			msilGenerator.Emit(OpCodes.Call, registerReadOnlyMethod);

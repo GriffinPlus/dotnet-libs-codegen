@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,8 @@ using System.Reflection.Emit;
 using System.Windows;
 
 using Xunit;
+
+// ReSharper disable SuggestBaseTypeForParameter
 
 namespace GriffinPlus.Lib.CodeGeneration.Tests
 {
@@ -55,8 +56,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				// check whether a specified name is handled properly
-				yield return new object[]
-				{
+				yield return
+				[
 					"MyDependencyProperty", // name
 					typeof(int),            // property type
 					false,                  // property is read-write
@@ -64,14 +65,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					Visibility.Public,      // 'set' accessor visibility
 					0,                      // expected initial value
 					1                       // value to set
-				};
+				];
 
 				// check whether accessor property visibilities are handled properly
 				foreach (Visibility getAccessorVisibility in Visibilities)
 				foreach (Visibility setAccessorVisibility in Visibilities.Reverse())
 				{
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                  // name
 						typeof(int),           // property type
 						false,                 // property is read-write
@@ -79,7 +80,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						setAccessorVisibility, // 'set' accessor visibility
 						0,                     // expected initial value
 						1                      // value to set
-					};
+					];
 				}
 
 				// check whether value types and reference types of read-only and read-write
@@ -87,8 +88,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				foreach (bool isReadOnly in new[] { false, true })
 				{
 					// value type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,              // name
 						typeof(int),       // property type
 						isReadOnly,        // read-write (false) or read-only (true)
@@ -96,11 +97,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public, // 'set' accessor visibility
 						0,                 // expected initial value
 						1                  // value to set
-					};
+					];
 
 					// reference type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,              // name
 						typeof(string),    // property type
 						isReadOnly,        // read-write (false) or read-only (true)
@@ -108,7 +109,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public, // 'set' accessor visibility
 						null,              // expected initial value
 						"Just a string."   // value to set
-					};
+					];
 				}
 			}
 		}
@@ -123,8 +124,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				// check whether a specified name is handled properly
-				yield return new object[]
-				{
+				yield return
+				[
 					"MyDependencyProperty", // name
 					typeof(int),            // property type (specific initializer is available)
 					false,                  // property is read-write
@@ -132,14 +133,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					Visibility.Public,      // 'set' accessor visibility
 					0,                      // expected initial value
 					1                       // value to set
-				};
+				];
 
 				// check whether accessor property visibilities are handled properly
 				foreach (Visibility getAccessorVisibility in Visibilities)
 				foreach (Visibility setAccessorVisibility in Visibilities.Reverse())
 				{
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                  // name
 						typeof(int),           // property type (specific initializer is available)
 						false,                 // property is read-write
@@ -147,7 +148,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						setAccessorVisibility, // 'set' accessor visibility
 						0,                     // expected initial value
 						1                      // value to set
-					};
+					];
 				}
 
 				// check whether value types and reference types of read-only and read-write
@@ -155,8 +156,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				foreach (bool isReadOnly in new[] { false, true })
 				{
 					// value type (specific initializer is available)
-					yield return new object[]
-					{
+					yield return
+					[
 						null,              // name
 						typeof(int),       // property type
 						isReadOnly,        // read-write (false) or read-only (true)
@@ -164,11 +165,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public, // 'set' accessor visibility
 						100,               // expected initial value
 						200                // value to set
-					};
+					];
 
 					// value type (specific initializer is not available)
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                               // name
 						typeof(DateTime),                   // property type
 						isReadOnly,                         // read-write (false) or read-only (true)
@@ -176,11 +177,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public,                  // 'set' accessor visibility
 						DateTime.Now,                       // expected initial value
 						DateTime.Now + TimeSpan.FromDays(1) // value to set
-					};
+					];
 
 					// reference type (specific initializer is available)
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                 // name
 						typeof(string),       // property type
 						isReadOnly,           // read-write (false) or read-only (true)
@@ -188,12 +189,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public,    // 'set' accessor visibility
 						"Just a string.",     // expected initial value
 						"Yet another string." // value to set
-					};
+					];
 
 					// reference type (specific initializer is not available)
 					// => initializer is realized with factory callback
-					yield return new object[]
-					{
+					yield return
+					[
 						null,              // name
 						typeof(int[]),     // property type
 						false,             // read-write (false) or read-only (true)
@@ -201,7 +202,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						Visibility.Public, // 'set' accessor visibility
 						new[] { 100 },     // expected initial value
 						new[] { 100, 200 } // value to set
-					};
+					];
 				}
 			}
 		}
@@ -217,25 +218,25 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			get
 			{
-				// property type: value type
-				// value type: value type, but not of the property type
-				yield return new object[] { typeof(int), 0L };
+				// - property type: value type
+				// - value type: value type, but not of the property type
+				yield return [typeof(int), 0L];
 
-				// property type: value type
-				// value type: reference type
-				yield return new object[] { typeof(int), "A String." };
+				// - property type: value type
+				// - value type: reference type
+				yield return [typeof(int), "A String."];
 
-				// property type: value type
-				// value type: null
-				yield return new object[] { typeof(int), null };
+				// - property type: value type
+				// - value type: null
+				yield return [typeof(int), null];
 
-				// property type: reference type
-				// value type: value type
-				yield return new object[] { typeof(string), 0 };
+				// - property type: reference type
+				// - value type: value type
+				yield return [typeof(string), 0];
 
-				// property type: reference type
-				// value type: reference type, but not assignable to the property type
-				yield return new object[] { typeof(string), Array.Empty<int>() };
+				// - property type: reference type
+				// - value type: reference type, but not assignable to the property type
+				yield return [typeof(string), Array.Empty<int>()];
 			}
 		}
 
@@ -249,8 +250,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				// check whether a specified name is handled properly
-				yield return new object[]
-				{
+				yield return
+				[
 					"MyDependencyProperty",                                                              // name
 					typeof(int),                                                                         // property type
 					false,                                                                               // property is read-write
@@ -259,14 +260,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					new DependencyPropertyInitializer((_, msil) => { msil.Emit(OpCodes.Ldc_I4, 100); }), // initializer
 					100,                                                                                 // expected initial value
 					200                                                                                  // value to set
-				};
+				];
 
 				// check whether accessor property visibilities are handled properly
 				foreach (Visibility getAccessorVisibility in Visibilities)
 				foreach (Visibility setAccessorVisibility in Visibilities.Reverse())
 				{
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                                                                // name
 						typeof(int),                                                                         // property type
 						false,                                                                               // property is read-write
@@ -275,7 +276,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new DependencyPropertyInitializer((_, msil) => { msil.Emit(OpCodes.Ldc_I4, 100); }), // initializer
 						100,                                                                                 // expected initial value
 						200                                                                                  // value to set
-					};
+					];
 				}
 
 				// check whether value types and reference types of read-only and read-write
@@ -283,8 +284,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				foreach (bool isReadOnly in new[] { false, true })
 				{
 					// value type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                                                                // name
 						typeof(int),                                                                         // property type
 						isReadOnly,                                                                          // read-write (false) or read-only (true)
@@ -293,11 +294,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new DependencyPropertyInitializer((_, msil) => { msil.Emit(OpCodes.Ldc_I4, 100); }), // initializer
 						100,                                                                                 // expected initial value
 						200                                                                                  // value to set
-					};
+					];
 
 					// reference type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                                                                            // name
 						typeof(string),                                                                                  // property type
 						isReadOnly,                                                                                      // read-write (false) or read-only (true)
@@ -306,7 +307,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new DependencyPropertyInitializer((_, msil) => { msil.Emit(OpCodes.Ldstr, "Just a string."); }), // initializer
 						"Just a string.",                                                                                // expected initial value
 						"Yet another string."                                                                            // value to set
-					};
+					];
 				}
 			}
 		}
@@ -320,8 +321,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				// check whether a specified name is handled properly
-				yield return new object[]
-				{
+				yield return
+				[
 					"MyDependencyProperty",                   // name
 					typeof(int),                              // property type
 					false,                                    // property is read-write
@@ -330,14 +331,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					new ProvideValueCallback<int>(() => 100), // initializer
 					100,                                      // expected initial value
 					200                                       // value to set
-				};
+				];
 
 				// check whether accessor property visibilities are handled properly
 				foreach (Visibility getAccessorVisibility in Visibilities)
 				foreach (Visibility setAccessorVisibility in Visibilities.Reverse())
 				{
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                     // name
 						typeof(int),                              // property type
 						false,                                    // property is read-write
@@ -346,7 +347,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback<int>(() => 100), // initializer
 						100,                                      // expected initial value
 						200                                       // value to set
-					};
+					];
 				}
 
 				// check whether value types and reference types of read-only and read-write
@@ -354,8 +355,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				foreach (bool isReadOnly in new[] { false, true })
 				{
 					// value type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                     // name
 						typeof(int),                              // property type
 						isReadOnly,                               // read-write (false) or read-only (true)
@@ -364,11 +365,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback<int>(() => 100), // initializer
 						100,                                      // expected initial value
 						200                                       // value to set
-					};
+					];
 
 					// reference type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                                     // name
 						typeof(string),                                           // property type
 						isReadOnly,                                               // read-write (false) or read-only (true)
@@ -377,7 +378,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback<string>(() => "Just a string."), // initializer
 						"Just a string.",                                         // expected initial value
 						"Yet another string."                                     // value to set
-					};
+					];
 				}
 			}
 		}
@@ -391,8 +392,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			get
 			{
 				// check whether a specified name is handled properly
-				yield return new object[]
-				{
+				yield return
+				[
 					"MyDependencyProperty",              // name
 					typeof(int),                         // property type
 					false,                               // property is read-write
@@ -401,14 +402,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					new ProvideValueCallback(() => 100), // initializer
 					100,                                 // expected initial value
 					200                                  // value to set
-				};
+				];
 
 				// check whether accessor property visibilities are handled properly
 				foreach (Visibility getAccessorVisibility in Visibilities)
 				foreach (Visibility setAccessorVisibility in Visibilities.Reverse())
 				{
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                // name
 						typeof(int),                         // property type
 						false,                               // property is read-write
@@ -417,7 +418,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback(() => 100), // initializer
 						100,                                 // expected initial value
 						200                                  // value to set
-					};
+					];
 				}
 
 				// check whether value types and reference types of read-only and read-write
@@ -425,8 +426,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 				foreach (bool isReadOnly in new[] { false, true })
 				{
 					// value type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                // name
 						typeof(int),                         // property type
 						isReadOnly,                          // read-write (false) or read-only (true)
@@ -435,11 +436,11 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback(() => 100), // initializer
 						100,                                 // expected initial value
 						200                                  // value to set
-					};
+					];
 
 					// reference type
-					yield return new object[]
-					{
+					yield return
+					[
 						null,                                             // name
 						typeof(string),                                   // property type
 						isReadOnly,                                       // read-write (false) or read-only (true)
@@ -448,7 +449,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						new ProvideValueCallback(() => "Just a string."), // initializer
 						"Just a string.",                                 // expected initial value
 						"Yet another string."                             // value to set
-					};
+					];
 				}
 			}
 		}
@@ -494,7 +495,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool) }));
-			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly });
+			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
 			// add an accessor property for the dependency property
@@ -506,7 +507,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -532,8 +533,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyPropertyT_WithDefaultValue_TypeDoesNotDeriveFromDependencyObject()
@@ -554,7 +555,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool) }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		}
@@ -602,7 +603,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -628,8 +629,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyProperty_WithDefaultValue_TypeDoesNotDeriveFromDependencyObject()
@@ -644,7 +645,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -700,7 +701,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), propertyType }));
-			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, new[] { name, isReadOnly, initialValue });
+			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initialValue]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
 			// add an accessor property for the dependency property
@@ -712,7 +713,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -738,8 +739,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyPropertyT_WithInitialValue_TypeDoesNotDeriveFromDependencyObject()
@@ -761,7 +762,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), propertyType }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, initialValue }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initialValue]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		}
@@ -809,7 +810,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -835,8 +836,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyProperty_WithInitialValue_TypeDoesNotDeriveFromDependencyObject()
@@ -869,7 +870,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentException"/> if the specified initial value is not assignable to
 		/// a property of the specified type.
 		/// </summary>
@@ -934,7 +935,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
-			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, initializer });
+			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initializer]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
 			// add an accessor property for the dependency property
@@ -946,7 +947,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -972,8 +973,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyPropertyT_WithCustomInitializer_TypeDoesNotDeriveFromDependencyObject()
@@ -981,7 +982,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const string name = null;
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
-			void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 
 			var definition = new ClassDefinition(null);
 			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
@@ -995,14 +995,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, (DependencyPropertyInitializer)Initializer }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (DependencyPropertyInitializer)Initializer]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
+			return;
+
+			static void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.
-		/// The method should throw an <see cref="ArgumentNullException"/> if the specified initializer is <c>null</c>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// The method should throw a <see cref="ArgumentNullException"/> if the specified initializer is <c>null</c>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyPropertyT_WithCustomInitializer_InitializerIsNull()
@@ -1025,7 +1028,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, initializer }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initializer]));
 			var exception = Assert.IsType<ArgumentNullException>(targetInvocationException.InnerException);
 			Assert.Equal("initializer", exception.ParamName);
 		}
@@ -1079,7 +1082,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -1105,8 +1108,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyProperty_WithCustomInitializer_TypeDoesNotDeriveFromDependencyObject()
@@ -1114,15 +1117,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const string name = null;
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
-			void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 
 			var definition = new ClassDefinition(null);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, Initializer));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
+			return;
+
+			static void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1131,11 +1136,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const string name = null;
 			const Type propertyType = null;
 			const bool isReadOnly = false;
-			void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
 			var exception = Assert.Throws<ArgumentNullException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, Initializer));
 			Assert.Equal("type", exception.ParamName);
+			return;
+
+			static void Initializer(IGeneratedDependencyProperty dp, ILGenerator msil) => msil.Emit(OpCodes.Ldc_I4_0);
 		}
 
 		/// <summary>
@@ -1199,7 +1206,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
-			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, provideInitialValueCallback });
+			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, provideInitialValueCallback]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
 			// add an accessor property for the dependency property
@@ -1211,7 +1218,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -1237,8 +1244,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyPropertyT_WithFactoryCallbackInitializer_TypeDoesNotDeriveFromDependencyObject()
@@ -1246,7 +1253,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const string name = null;
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
-			int ProvideInitialValueCallback() => 0;
 
 			var definition = new ClassDefinition(null);
 			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
@@ -1260,13 +1266,16 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, (ProvideValueCallback<int>)ProvideInitialValueCallback }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (ProvideValueCallback<int>)ProvideInitialValueCallback]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
+			return;
+
+			static int ProvideInitialValueCallback() => 0;
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified callback is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1289,7 +1298,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 						.Select(parameter => parameter.ParameterType)
 						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
 
-			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, new object[] { name, isReadOnly, provideInitialValueCallback }));
+			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, provideInitialValueCallback]));
 			var exception = Assert.IsType<ArgumentNullException>(targetInvocationException.InnerException);
 			Assert.Equal("provideInitialValueCallback", exception.ParamName);
 		}
@@ -1340,7 +1349,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Throws<InvalidOperationException>(() => addedDependencyPropertyDefinition.AddAccessorProperty(null, getAccessorVisibility, setAccessorVisibility));
 
 			// update the name of the property, if it was not specified explicitly
-			name = name ?? addedDependencyPropertyDefinition.Name;
+			name ??= addedDependencyPropertyDefinition.Name;
 
 			// check the definition of the dependency property and its accessor method
 			CheckDependencyPropertyDefinition(
@@ -1366,8 +1375,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.
-		/// The method should throw an <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
+		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
 		public void AddDependencyProperty_WithFactoryCallbackInitializer_TypeDoesNotDeriveFromDependencyObject()
@@ -1375,15 +1384,17 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const string name = null;
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
-			object ProvideInitialValueCallback() => 0;
 
 			var definition = new ClassDefinition(null);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, ProvideInitialValueCallback));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
+			return;
+
+			static object ProvideInitialValueCallback() => 0;
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1400,7 +1411,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.
+		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified callback is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1517,7 +1528,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Checks whether the specified dynamically created type can be instantiated and then checks whether the dependency property
-		/// itself and its accessor property can be get and set.
+		/// itself and its accessor property can be got and set.
 		/// </summary>
 		/// <param name="createdType">The dynamically created type defining the dependency property to test.</param>
 		/// <param name="dependencyPropertyDefinition">The definition of the property to test.</param>
@@ -1563,7 +1574,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Equal(expectedInitialValue, dependencyPropertyValue);
 
 			// check whether the 'get' accessor of the accessor property returns the expected initial value
-			object value = accessorProperty.GetMethod.Invoke(instance, Array.Empty<object>());
+			object value = accessorProperty.GetMethod.Invoke(instance, []);
 			Assert.Equal(expectedInitialValue, value);
 
 			// set the dependency property using the dependency property itself and check whether the dependency
@@ -1585,7 +1596,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Equal(valueToSet, dependencyPropertyValue);
 
 			// check whether the 'get' accessor of the accessor property returns the expected value
-			value = accessorProperty.GetMethod.Invoke(instance, Array.Empty<object>());
+			value = accessorProperty.GetMethod.Invoke(instance, []);
 			Assert.Equal(valueToSet, value);
 
 			// set the dependency property back to the initial value using the 'set' accessor of its accessor property
@@ -1593,7 +1604,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			// --------------------------------------------------------------------------------------------------------
 
 			// set the dependency property using its accessor property
-			accessorProperty.SetMethod.Invoke(instance, new[] { expectedInitialValue });
+			accessorProperty.SetMethod.Invoke(instance, [expectedInitialValue]);
 
 			// now the dependency property and its accessor property should return the initial value once again
 
@@ -1604,7 +1615,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Assert.Equal(expectedInitialValue, dependencyPropertyValue);
 
 			// check whether the 'get' accessor of the accessor property returns the expected value
-			value = accessorProperty.GetMethod.Invoke(instance, Array.Empty<object>());
+			value = accessorProperty.GetMethod.Invoke(instance, []);
 			Assert.Equal(expectedInitialValue, value);
 		}
 

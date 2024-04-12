@@ -3,14 +3,11 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace GriffinPlus.Lib.CodeGeneration
-{
+namespace GriffinPlus.Lib.CodeGeneration;
 
-	/// <summary>
-	/// Typed interface of a generated property.
-	/// </summary>
-	/// <typeparam name="T">Type of the property.</typeparam>
-	// ReSharper disable once UnusedTypeParameter
-	public interface IGeneratedProperty<T> : IGeneratedProperty { }
-
-}
+/// <summary>
+/// Typed interface of a generated property.
+/// </summary>
+/// <typeparam name="T">Type of the property.</typeparam>
+// ReSharper disable once UnusedTypeParameter
+public interface IGeneratedProperty<T> : IGeneratedProperty;

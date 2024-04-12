@@ -5,14 +5,11 @@
 
 using System;
 
-namespace GriffinPlus.Lib.CodeGeneration
-{
+namespace GriffinPlus.Lib.CodeGeneration;
 
-	/// <summary>
-	/// Typed interface of a generated event.
-	/// </summary>
-	/// <typeparam name="T">Type of the event handler delegate.</typeparam>
-	// ReSharper disable once UnusedTypeParameter
-	public interface IGeneratedEvent<T> : IGeneratedEvent where T : Delegate { }
-
-}
+/// <summary>
+/// Typed interface of a generated event.
+/// </summary>
+/// <typeparam name="T">Type of the event handler delegate.</typeparam>
+// ReSharper disable once UnusedTypeParameter
+public interface IGeneratedEvent<T> : IGeneratedEvent where T : Delegate;

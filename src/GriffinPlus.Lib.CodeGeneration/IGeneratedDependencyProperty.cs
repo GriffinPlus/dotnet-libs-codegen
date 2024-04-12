@@ -15,15 +15,15 @@ namespace GriffinPlus.Lib.CodeGeneration
 	public interface IGeneratedDependencyProperty : IDependencyProperty, IInitialValueProvider
 	{
 		/// <summary>
-		/// Gets the static field storing the registered dependency property (can be of type <see cref="DependencyProperty"/>
-		/// (<see cref="IDependencyProperty.IsReadOnly"/> is <c>false</c>) or <see cref="DependencyPropertyKey"/> (<see cref="IDependencyProperty.IsReadOnly"/>
-		/// is <c>true</c>).
+		/// Gets the static field storing the registered dependency property. Can be of type:<br/>
+		/// - <see cref="DependencyProperty"/> (<see cref="IDependencyProperty.IsReadOnly"/> is <c>false</c>)<br/>
+		/// - <see cref="DependencyPropertyKey"/> (<see cref="IDependencyProperty.IsReadOnly"/> is <c>true</c>).
 		/// </summary>
 		IGeneratedField DependencyPropertyField { get; }
 
 		/// <summary>
 		/// Gets the accessor property associated with the dependency property.
-		/// (may be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
+		/// (can be <c>null</c>, call <see cref="AddAccessorProperty"/> to add the accessor property).
 		/// </summary>
 		IGeneratedProperty AccessorProperty { get; }
 
@@ -35,7 +35,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 		/// <param name="setAccessorVisibility">Visibility of the 'set' accessor of the property to create.</param>
 		/// <returns>The added accessor property.</returns>
 		IGeneratedProperty AddAccessorProperty(
-			string     name = null,
+			string     name                  = null,
 			Visibility getAccessorVisibility = Visibility.Public,
 			Visibility setAccessorVisibility = Visibility.Public);
 	}

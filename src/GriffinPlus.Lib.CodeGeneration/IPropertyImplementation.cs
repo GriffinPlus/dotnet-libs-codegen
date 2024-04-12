@@ -5,42 +5,39 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
+namespace GriffinPlus.Lib.CodeGeneration;
+
+/// <summary>
+/// Interface of property implementation strategies that implement the 'get'/'set' accessor methods.
+/// </summary>
+public interface IPropertyImplementation
 {
+	/// <summary>
+	/// Adds other fields, events, properties and methods to the definition of the type in creation.
+	/// </summary>
+	/// <param name="typeDefinition">The type definition.</param>
+	/// <param name="property">The property to implement.</param>
+	void Declare(TypeDefinition typeDefinition, IGeneratedProperty property);
 
 	/// <summary>
-	/// Interface of property implementation strategies that implement the 'get'/'set' accessor methods.
+	/// Implements the 'get' accessor method of the property.
 	/// </summary>
-	public interface IPropertyImplementation
-	{
-		/// <summary>
-		/// Adds other fields, events, properties and methods to the definition of the type in creation.
-		/// </summary>
-		/// <param name="typeDefinition">The type definition.</param>
-		/// <param name="property">The property to implement.</param>
-		void Declare(TypeDefinition typeDefinition, IGeneratedProperty property);
+	/// <param name="typeDefinition">Definition of the type in creation.</param>
+	/// <param name="property">The property the 'get' accessor method to implement belongs to.</param>
+	/// <param name="msilGenerator">MSIL generator attached to the 'get' accessor method to implement.</param>
+	void ImplementGetAccessorMethod(
+		TypeDefinition     typeDefinition,
+		IGeneratedProperty property,
+		ILGenerator        msilGenerator);
 
-		/// <summary>
-		/// Implements the 'get' accessor method of the property.
-		/// </summary>
-		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the 'get' accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the 'get' accessor method to implement.</param>
-		void ImplementGetAccessorMethod(
-			TypeDefinition     typeDefinition,
-			IGeneratedProperty property,
-			ILGenerator        msilGenerator);
-
-		/// <summary>
-		/// Implements the 'set' accessor method of the property.
-		/// </summary>
-		/// <param name="typeDefinition">Definition of the type in creation.</param>
-		/// <param name="property">The property the 'set' accessor method to implement belongs to.</param>
-		/// <param name="msilGenerator">MSIL generator attached to the 'set' accessor method to implement.</param>
-		void ImplementSetAccessorMethod(
-			TypeDefinition     typeDefinition,
-			IGeneratedProperty property,
-			ILGenerator        msilGenerator);
-	}
-
+	/// <summary>
+	/// Implements the 'set' accessor method of the property.
+	/// </summary>
+	/// <param name="typeDefinition">Definition of the type in creation.</param>
+	/// <param name="property">The property the 'set' accessor method to implement belongs to.</param>
+	/// <param name="msilGenerator">MSIL generator attached to the 'set' accessor method to implement.</param>
+	void ImplementSetAccessorMethod(
+		TypeDefinition     typeDefinition,
+		IGeneratedProperty property,
+		ILGenerator        msilGenerator);
 }

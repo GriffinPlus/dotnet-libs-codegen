@@ -5,14 +5,11 @@
 
 using System.Reflection.Emit;
 
-namespace GriffinPlus.Lib.CodeGeneration
-{
+namespace GriffinPlus.Lib.CodeGeneration;
 
-	/// <summary>
-	/// A callback that implements the add/remove accessor method of the specified event.
-	/// </summary>
-	/// <param name="event">The event the accessor method to implement belongs to.</param>
-	/// <param name="msilGenerator">MSIL generator attached to the add/remove accessor method to implement.</param>
-	public delegate void EventAccessorImplementationCallback(IGeneratedEvent @event, ILGenerator msilGenerator);
-
-}
+/// <summary>
+/// A callback that implements the add/remove accessor method of the specified event.
+/// </summary>
+/// <param name="event">The event the accessor method to implement belongs to.</param>
+/// <param name="msilGenerator">MSIL generator attached to the add/remove accessor method to implement.</param>
+public delegate void EventAccessorImplementationCallback(IGeneratedEvent @event, ILGenerator msilGenerator);
