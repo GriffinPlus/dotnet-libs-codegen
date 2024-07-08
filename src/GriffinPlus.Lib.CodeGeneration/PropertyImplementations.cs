@@ -32,7 +32,7 @@ public static class PropertyImplementations
 		return new PropertyImplementation_DependencyProperty(dp);
 	}
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-		// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
+	// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
