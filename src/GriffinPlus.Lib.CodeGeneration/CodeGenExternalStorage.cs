@@ -14,7 +14,7 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// </summary>
 public static class CodeGenExternalStorage
 {
-	private static readonly Dictionary<Type, object[]> sObjectsByGeneratedType = new();
+	private static readonly Dictionary<Type, object[]> sObjectsByGeneratedType = [];
 
 	/// <summary>
 	/// Associates a set of external objects with the specified generated type.

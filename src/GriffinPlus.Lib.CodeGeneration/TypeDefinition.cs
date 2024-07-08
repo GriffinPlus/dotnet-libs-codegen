@@ -433,7 +433,7 @@ public abstract class TypeDefinition
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 	private readonly List<IGeneratedDependencyProperty> mGeneratedDependencyProperties = [];
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-		// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
+	// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
@@ -468,7 +468,7 @@ public abstract class TypeDefinition
 	/// </summary>
 	public IEnumerable<IGeneratedDependencyProperty> GeneratedDependencyProperties => mGeneratedDependencyProperties;
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-		// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
+	// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif
@@ -2014,7 +2014,7 @@ public abstract class TypeDefinition
 	}
 
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-		// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
+	// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
 #else
 #error Unhandled Target Framework.
 #endif

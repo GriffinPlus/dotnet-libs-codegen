@@ -494,7 +494,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool) }));
+						.SequenceEqual([typeof(string), typeof(bool)]));
 			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
@@ -553,7 +553,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool) }));
+						.SequenceEqual([typeof(string), typeof(bool)]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
@@ -700,7 +700,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), propertyType }));
+						.SequenceEqual([typeof(string), typeof(bool), propertyType]));
 			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initialValue]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
@@ -760,7 +760,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), propertyType }));
+						.SequenceEqual([typeof(string), typeof(bool), propertyType]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initialValue]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
@@ -934,7 +934,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(DependencyPropertyInitializer)]));
 			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initializer]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
@@ -993,7 +993,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(DependencyPropertyInitializer)]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (DependencyPropertyInitializer)Initializer]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
@@ -1026,7 +1026,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(DependencyPropertyInitializer) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(DependencyPropertyInitializer)]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initializer]));
 			var exception = Assert.IsType<ArgumentNullException>(targetInvocationException.InnerException);
@@ -1205,7 +1205,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType)]));
 			var addedDependencyPropertyDefinition = (IGeneratedDependencyProperty)addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, provideInitialValueCallback]);
 			Assert.NotNull(addedDependencyPropertyDefinition);
 
@@ -1264,7 +1264,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType)]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (ProvideValueCallback<int>)ProvideInitialValueCallback]));
 			var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
@@ -1296,7 +1296,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 					method => method
 						.GetParameters()
 						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(new[] { typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType) }));
+						.SequenceEqual([typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType)]));
 
 			var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, provideInitialValueCallback]));
 			var exception = Assert.IsType<ArgumentNullException>(targetInvocationException.InnerException);

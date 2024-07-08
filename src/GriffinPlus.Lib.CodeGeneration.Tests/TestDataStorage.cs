@@ -14,9 +14,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// </summary>
 public class TestDataStorage : IDisposable
 {
-	private static readonly Dictionary<int, TestDataStorage> sStorageByHandle = new();
+	private static readonly Dictionary<int, TestDataStorage> sStorageByHandle = [];
 	private static          int                              sNextHandleIndex = 0;
-	private readonly        Dictionary<int, object>          mObjectByHandle  = new();
+	private readonly        Dictionary<int, object>          mObjectByHandle  = [];
 
 	/// <summary>
 	/// Disposes the storage removing any data associated with the instance.

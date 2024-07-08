@@ -1026,7 +1026,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
+					.SequenceEqual([typeof(string), typeof(Visibility)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility]);
 		Assert.NotNull(addedField);
 
@@ -1071,7 +1071,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility]);
 		Assert.NotNull(addedField);
 
@@ -1118,7 +1118,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
+					.SequenceEqual([typeof(string), typeof(Visibility)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility]);
 		Assert.NotNull(addedField);
 
@@ -1165,7 +1165,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility]);
 		Assert.NotNull(addedField);
 
@@ -1362,7 +1362,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			.Where(method => method.Name == nameof(TypeDefinition.AddField))
 			.Where(method => method.GetGenericArguments().Length == 1)
 			.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
-			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(TFieldType) }));
+			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), typeof(TFieldType)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -1560,7 +1560,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(object)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -1755,7 +1755,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 			.Where(method => method.GetGenericArguments().Length == 1)
 			.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
-			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(TFieldType) }));
+			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), typeof(TFieldType)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -1955,7 +1955,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(object) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(object)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -2004,7 +2004,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initializer]);
 		Assert.NotNull(addedField);
 
@@ -2051,7 +2051,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initializer]);
 		Assert.NotNull(addedField);
 
@@ -2100,7 +2100,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initializer]);
 		Assert.NotNull(addedField);
 
@@ -2149,7 +2149,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initializer]);
 		Assert.NotNull(addedField);
 
@@ -2201,7 +2201,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, provideInitialValueCallback]);
 		Assert.NotNull(addedField);
 
@@ -2250,7 +2250,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, provideInitialValueCallback]);
 		Assert.NotNull(addedField);
 
@@ -2302,7 +2302,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(ProvideValueCallback<>).MakeGenericType(fieldType)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, provideInitialValueCallback]);
 		Assert.NotNull(addedField);
 
@@ -2353,7 +2353,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, provideInitialValueCallback]);
 		Assert.NotNull(addedField);
 
@@ -2471,7 +2471,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			{
 				// cycle through event raiser visibilities only if adding a raiser method,
 				// use public visibility only if not adding a raiser method (no effect)
-				IEnumerable<Visibility> eventRaiserVisibilities = addRaiser ? Visibilities : new[] { Visibility.Public };
+				IEnumerable<Visibility> eventRaiserVisibilities = addRaiser ? Visibilities : [Visibility.Public];
 
 				foreach (Visibility eventRaiserVisibility in eventRaiserVisibilities)
 				{
@@ -2673,7 +2673,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
 
 		// invoke the method to add the event to the type definition
 		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
@@ -2751,7 +2751,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
 
 		// invoke the method to add the event to the type definition
 		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
@@ -2781,7 +2781,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion
 
-	#region AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation{T} implementation) --- TODO!
+	#region AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation<T> implementation) --- TODO!
 
 	/// <summary>
 	/// Tests the <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
@@ -2794,7 +2794,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion
 
-	#region AddStaticEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
+	#region AddStaticEvent<T>(string name, Visibility visibility, IEventImplementation<T> implementation)
 
 	/// <summary>
 	/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation)"/> method
@@ -2842,7 +2842,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility), typeof(IEventImplementation) }));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
 
 		// invoke the method to add the event to the type definition
 		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
@@ -3164,7 +3164,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string) }));
+					.SequenceEqual([typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3217,7 +3217,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+					          .SequenceEqual([typeof(Type), typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3273,7 +3273,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+					.SequenceEqual([typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3350,7 +3350,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3434,7 +3434,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string) }));
+					.SequenceEqual([typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3487,7 +3487,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+					          .SequenceEqual([typeof(Type), typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3543,7 +3543,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+					.SequenceEqual([typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3620,7 +3620,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3720,7 +3720,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string) }));
+					.SequenceEqual([typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3773,7 +3773,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string) }));
+					          .SequenceEqual([typeof(Type), typeof(string)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3829,7 +3829,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(IPropertyImplementation) }));
+					.SequenceEqual([typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
@@ -3906,7 +3906,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 				method => !method.IsGenericMethod && method
 					          .GetParameters()
 					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual(new[] { typeof(Type), typeof(string), typeof(IPropertyImplementation) }));
+					          .SequenceEqual([typeof(Type), typeof(string), typeof(IPropertyImplementation)]));
 
 		using var storage = new TestDataStorage();
 		int handle = storage.Add(testObjects[0]);
