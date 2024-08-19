@@ -3,17 +3,15 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System.Reflection.Emit;
-
 namespace GriffinPlus.Lib.CodeGeneration;
 
 /// <summary>
-/// Interface of a generated method.
+/// Common interface of generated members.
 /// </summary>
-public interface IGeneratedMethod : IMethod, IGeneratedMember
+public interface IGeneratedMember
 {
 	/// <summary>
-	/// Gets the <see cref="System.Reflection.Emit.MethodBuilder"/> associated with the method.
+	/// Gets the type definition that member belongs to.
 	/// </summary>
-	MethodBuilder MethodBuilder { get; }
+	TypeDefinition TypeDefinition { get; }
 }

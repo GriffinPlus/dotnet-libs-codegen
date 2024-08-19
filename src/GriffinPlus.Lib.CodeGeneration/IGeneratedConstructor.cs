@@ -10,7 +10,7 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// <summary>
 /// Interface of generated constructors.
 /// </summary>
-public interface IGeneratedConstructor : IConstructor
+public interface IGeneratedConstructor : IConstructor, IGeneratedMember
 {
 	/// <summary>
 	/// Gets the <see cref="System.Reflection.Emit.ConstructorBuilder"/> associated with the constructor.

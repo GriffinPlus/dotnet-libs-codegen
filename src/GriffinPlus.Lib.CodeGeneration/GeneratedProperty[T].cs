@@ -105,17 +105,17 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GeneratedProperty{T}"/> class (for overrides).
 	/// </summary>
-	/// <param name="typeDefinition">The type definition the property belongs to.</param>
+	/// <param name="classDefinition">The class definition the property belongs to.</param>
 	/// <param name="inheritedProperty">Inherited property to override.</param>
 	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessor methods of the property.</param>
 	/// <exception cref="ArgumentNullException">
-	/// <paramref name="typeDefinition"/>, <paramref name="inheritedProperty"/> or <paramref name="implementation"/> is <c>null</c>.
+	/// <paramref name="classDefinition"/>, <paramref name="inheritedProperty"/> or <paramref name="implementation"/> is <c>null</c>.
 	/// </exception>
 	internal GeneratedProperty(
-		TypeDefinition          typeDefinition,
+		ClassDefinition         classDefinition,
 		IInheritedProperty<T>   inheritedProperty,
 		IPropertyImplementation implementation) :
-		base(typeDefinition)
+		base(classDefinition)
 	{
 		// check parameters
 		if (inheritedProperty == null) throw new ArgumentNullException(nameof(inheritedProperty));
@@ -126,7 +126,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 
 		if (inheritedProperty.GetAccessor != null)
 		{
-			GetAccessor = typeDefinition.AddMethodOverride(
+			GetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.GetAccessor,
 				(_, msilGenerator) => Implementation.ImplementGetAccessorMethod(
 					TypeDefinition,
@@ -136,7 +136,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 
 		if (inheritedProperty.SetAccessor != null)
 		{
-			SetAccessor = typeDefinition.AddMethodOverride(
+			SetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.SetAccessor,
 				(_, msilGenerator) => Implementation.ImplementSetAccessorMethod(
 					TypeDefinition,
@@ -153,7 +153,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GeneratedProperty{T}"/> class (for overrides).
 	/// </summary>
-	/// <param name="typeDefinition">The type definition the property belongs to.</param>
+	/// <param name="classDefinition">The class definition the property belongs to.</param>
 	/// <param name="inheritedProperty">Inherited property to override.</param>
 	/// <param name="getAccessorImplementationCallback">
 	/// A callback that implements the 'get' accessor method of the property
@@ -164,18 +164,18 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 	/// (<c>null</c>, if the inherited property does not have a 'set' accessor method).
 	/// </param>
 	/// <exception cref="ArgumentNullException">
-	/// <paramref name="typeDefinition"/> or <paramref name="inheritedProperty"/> is <c>null</c>.<br/>
+	/// <paramref name="classDefinition"/> or <paramref name="inheritedProperty"/> is <c>null</c>.<br/>
 	/// -or-<br/>
 	/// <paramref name="inheritedProperty"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
 	/// -or-<br/>
 	/// <paramref name="inheritedProperty"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
 	/// </exception>
 	internal GeneratedProperty(
-		TypeDefinition                         typeDefinition,
+		ClassDefinition                        classDefinition,
 		IInheritedProperty<T>                  inheritedProperty,
 		PropertyAccessorImplementationCallback getAccessorImplementationCallback,
 		PropertyAccessorImplementationCallback setAccessorImplementationCallback) :
-		base(typeDefinition)
+		base(classDefinition)
 	{
 		// check parameters
 		if (inheritedProperty == null) throw new ArgumentNullException(nameof(inheritedProperty));
@@ -188,7 +188,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		{
 			if (getAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(getAccessorImplementationCallback));
 
-			GetAccessor = typeDefinition.AddMethodOverride(
+			GetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.GetAccessor,
 				(_, msilGenerator) => getAccessorImplementationCallback(this, msilGenerator));
 		}
@@ -197,7 +197,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		{
 			if (setAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(setAccessorImplementationCallback));
 
-			SetAccessor = typeDefinition.AddMethodOverride(
+			SetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.SetAccessor,
 				(_, msilGenerator) => setAccessorImplementationCallback(this, msilGenerator));
 		}
@@ -269,6 +269,9 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 	/// (<c>null</c> to let the implementation strategy implement the method if specified when adding the property).
 	/// </param>
 	/// <returns>The added 'get' accessor method.</returns>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="getAccessorImplementationCallback"/> is not <c>null</c> and the property is abstract.
+	/// </exception>
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="getAccessorImplementationCallback"/> is <c>null</c> and the property was created without an implementation strategy.
 	/// </exception>
@@ -277,11 +280,23 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		Visibility                             visibility                        = Visibility.Public,
 		PropertyAccessorImplementationCallback getAccessorImplementationCallback = null)
 	{
-		if (getAccessorImplementationCallback == null && Implementation == null)
+		if (Kind == PropertyKind.Abstract)
 		{
-			throw new ArgumentNullException(
-				nameof(getAccessorImplementationCallback),
-				"The implementation callback must be specified as the property was generated without an implementation strategy.");
+			if (getAccessorImplementationCallback != null)
+			{
+				throw new ArgumentException(
+					"The implementation callback must not be specified as the property is abstract.",
+					nameof(getAccessorImplementationCallback));
+			}
+		}
+		else
+		{
+			if (getAccessorImplementationCallback == null && Implementation == null)
+			{
+				throw new ArgumentNullException(
+					nameof(getAccessorImplementationCallback),
+					"The implementation callback must be specified as the property was generated without an implementation strategy.");
+			}
 		}
 
 		// ensure the property is not frozen
@@ -293,7 +308,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 			throw new InvalidOperationException("The get accessor method was already added.");
 
 		// add the 'get' accessor method
-		if (getAccessorImplementationCallback != null)
+		if (Kind == PropertyKind.Abstract)
 		{
 			GetAccessor = TypeDefinition.AddMethod(
 				Kind.ToAccessorMethodKind(),
@@ -301,25 +316,39 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 				PropertyType,
 				Type.EmptyTypes,
 				visibility,
-				(_, msilGenerator) =>
-				{
-					getAccessorImplementationCallback(this, msilGenerator);
-				},
-				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+				(MethodImplementationCallback)null,
+				MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Abstract);
 		}
 		else
 		{
-			GetAccessor = TypeDefinition.AddMethod(
-				Kind.ToAccessorMethodKind(),
-				"get_" + Name,
-				PropertyType,
-				Type.EmptyTypes,
-				visibility,
-				(_, msilGenerator) =>
-				{
-					Implementation.ImplementGetAccessorMethod(TypeDefinition, this, msilGenerator);
-				},
-				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			if (getAccessorImplementationCallback != null)
+			{
+				GetAccessor = TypeDefinition.AddMethod(
+					Kind.ToAccessorMethodKind(),
+					"get_" + Name,
+					PropertyType,
+					Type.EmptyTypes,
+					visibility,
+					(_, msilGenerator) =>
+					{
+						getAccessorImplementationCallback(this, msilGenerator);
+					},
+					MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			}
+			else
+			{
+				GetAccessor = TypeDefinition.AddMethod(
+					Kind.ToAccessorMethodKind(),
+					"get_" + Name,
+					PropertyType,
+					Type.EmptyTypes,
+					visibility,
+					(_, msilGenerator) =>
+					{
+						Implementation.ImplementGetAccessorMethod(TypeDefinition, this, msilGenerator);
+					},
+					MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			}
 		}
 
 		// link the accessor method to the property
@@ -337,6 +366,9 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 	/// (<c>null</c> to let the implementation strategy implement the method if specified when adding the property).
 	/// </param>
 	/// <returns>The added 'set' accessor method.</returns>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="setAccessorImplementationCallback"/> is not <c>null</c> and the property is abstract.
+	/// </exception>
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="setAccessorImplementationCallback"/> is <c>null</c> and the property was created without an implementation strategy.
 	/// </exception>
@@ -345,11 +377,23 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		Visibility                             visibility                        = Visibility.Public,
 		PropertyAccessorImplementationCallback setAccessorImplementationCallback = null)
 	{
-		if (setAccessorImplementationCallback == null && Implementation == null)
+		if (Kind == PropertyKind.Abstract)
 		{
-			throw new ArgumentNullException(
-				nameof(setAccessorImplementationCallback),
-				"The implementation callback must be specified as the property was generated without an implementation strategy.");
+			if (setAccessorImplementationCallback != null)
+			{
+				throw new ArgumentException(
+					"The implementation callback must not be specified as the property is abstract.",
+					nameof(setAccessorImplementationCallback));
+			}
+		}
+		else
+		{
+			if (setAccessorImplementationCallback == null && Implementation == null)
+			{
+				throw new ArgumentNullException(
+					nameof(setAccessorImplementationCallback),
+					"The implementation callback must be specified as the property was generated without an implementation strategy.");
+			}
 		}
 
 		// ensure the property is not frozen
@@ -361,7 +405,7 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 			throw new InvalidOperationException("The set accessor method was already added.");
 
 		// add the 'set' accessor method
-		if (setAccessorImplementationCallback != null)
+		if (Kind == PropertyKind.Abstract)
 		{
 			SetAccessor = TypeDefinition.AddMethod(
 				Kind.ToAccessorMethodKind(),
@@ -369,25 +413,39 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 				typeof(void),
 				[PropertyType],
 				visibility,
-				(_, msilGenerator) =>
-				{
-					setAccessorImplementationCallback(this, msilGenerator);
-				},
-				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+				(MethodImplementationCallback)null,
+				MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Abstract);
 		}
 		else
 		{
-			SetAccessor = TypeDefinition.AddMethod(
-				Kind.ToAccessorMethodKind(),
-				"set_" + Name,
-				typeof(void),
-				[PropertyType],
-				visibility,
-				(_, msilGenerator) =>
-				{
-					Implementation.ImplementSetAccessorMethod(TypeDefinition, this, msilGenerator);
-				},
-				MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			if (setAccessorImplementationCallback != null)
+			{
+				SetAccessor = TypeDefinition.AddMethod(
+					Kind.ToAccessorMethodKind(),
+					"set_" + Name,
+					typeof(void),
+					[PropertyType],
+					visibility,
+					(_, msilGenerator) =>
+					{
+						setAccessorImplementationCallback(this, msilGenerator);
+					},
+					MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			}
+			else
+			{
+				SetAccessor = TypeDefinition.AddMethod(
+					Kind.ToAccessorMethodKind(),
+					"set_" + Name,
+					typeof(void),
+					[PropertyType],
+					visibility,
+					(_, msilGenerator) =>
+					{
+						Implementation.ImplementSetAccessorMethod(TypeDefinition, this, msilGenerator);
+					},
+					MethodAttributes.SpecialName | MethodAttributes.HideBySig);
+			}
 		}
 
 		// link the accessor method to the property

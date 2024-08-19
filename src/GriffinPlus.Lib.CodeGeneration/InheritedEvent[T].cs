@@ -30,6 +30,11 @@ class InheritedEvent<T> : Member, IInheritedEvent<T> where T : Delegate
 	}
 
 	/// <summary>
+	/// Gets the class definition the member belongs to.
+	/// </summary>
+	public new ClassDefinition TypeDefinition => (ClassDefinition)base.TypeDefinition;
+
+	/// <summary>
 	/// Gets the name of the event.
 	/// </summary>
 	public string Name => EventInfo.Name;

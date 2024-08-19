@@ -48,8 +48,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool)"/> and
-		/// <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool)"/> and
+		/// <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool)"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddDependencyPropertyTestData_WithDefaultValue
 		{
@@ -116,8 +116,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> and
-		/// <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,T)"/> and
+		/// <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddDependencyPropertyTestData_WithInitialValue
 		{
@@ -209,8 +209,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> and
-		/// <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,T)"/> and
+		/// <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/>.
 		/// The methods should throw an <see cref="ArgumentException"/> if the specified initial value is not
 		/// assignable to a property of the specified type.
 		/// </summary>
@@ -242,8 +242,8 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> and
-		/// <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> and
+		/// <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddDependencyPropertyTestData_WithCustomInitializer
 		{
@@ -314,7 +314,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddDependencyPropertyTestData_WithTypedFactoryCallbackInitializer
 		{
@@ -385,7 +385,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 		/// <summary>
 		/// Test data for tests targeting
-		/// <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/>.
+		/// <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/>.
 		/// </summary>
 		public static IEnumerable<object[]> AddDependencyPropertyTestData_WithUntypedFactoryCallbackInitializer
 		{
@@ -459,7 +459,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty<T>(string name, bool isReadOnly)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool)"/> method to add the dependency property
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool)"/> method to add the dependency property
 		/// and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/> to add an accessor property.
 		/// </summary>
 		/// <param name="name">Name of the dependency property to add.</param>
@@ -485,9 +485,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the dependency property
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -533,7 +533,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -543,10 +543,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			var definition = new ClassDefinition(null, ClassAttributes.None);
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -565,7 +565,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty(Type type, string name, bool isReadOnly)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method to add the dependency property
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool)"/> method to add the dependency property
 		/// and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/> to add an accessor property.
 		/// </summary>
 		/// <param name="name">Name of the dependency property to add.</param>
@@ -629,7 +629,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -639,13 +639,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
+			var definition = new ClassDefinition(null, ClassAttributes.None);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -665,7 +665,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty<T>(string name, bool isReadOnly, T initialValue)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> method to add the dependency property
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,T)"/> method to add the dependency property
 		/// and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/> to add an accessor property.
 		/// </summary>
 		/// <param name="name">Name of the dependency property to add.</param>
@@ -691,9 +691,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the dependency property
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -739,7 +739,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,T)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,T)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -750,10 +750,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const bool isReadOnly = false;
 			const int initialValue = 0;
 
-			var definition = new ClassDefinition(null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			var definition = new ClassDefinition(null, ClassAttributes.None);
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -772,7 +772,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty(Type type, string name, bool isReadOnly, object initialValue)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method to add the dependency property
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/> method to add the dependency property
 		/// and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/> to add an accessor property.
 		/// </summary>
 		/// <param name="name">Name of the dependency property to add.</param>
@@ -836,7 +836,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -847,13 +847,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const bool isReadOnly = false;
 			const int initialValue = 0;
 
-			var definition = new ClassDefinition(null);
+			var definition = new ClassDefinition(null, ClassAttributes.None);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, initialValue));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -870,7 +870,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,object)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentException"/> if the specified initial value is not assignable to
 		/// a property of the specified type.
 		/// </summary>
@@ -893,7 +893,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty<T>(string name, bool isReadOnly, DependencyPropertyInitializer initializer)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/>
 		/// method to add the dependency property and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/>
 		/// to add an accessor property.
 		/// </summary>
@@ -925,9 +925,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the dependency property
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -973,7 +973,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -983,10 +983,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			var definition = new ClassDefinition(null, ClassAttributes.None);
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -1004,7 +1004,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,DependencyPropertyInitializer)"/> method.<br/>
 		/// The method should throw a <see cref="ArgumentNullException"/> if the specified initializer is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1017,9 +1017,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 
 			// create a new type definition and add the dependency property
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -1038,7 +1038,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty(Type type, string name, bool isReadOnly, DependencyPropertyInitializer initializer)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/>
 		/// method to add the dependency property and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/>
 		/// to add an accessor property.
 		/// </summary>
@@ -1108,7 +1108,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -1118,7 +1118,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
+			var definition = new ClassDefinition(null, ClassAttributes.None);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, Initializer));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 			return;
@@ -1127,7 +1127,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1146,7 +1146,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,DependencyPropertyInitializer)"/> method.
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified initializer is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1167,7 +1167,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty<T>(string name, bool isReadOnly, ProvideValueCallback<T> provideInitialValueCallback)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/>
 		/// method to add the dependency property and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/>
 		/// to add an accessor property.
 		/// </summary>
@@ -1196,9 +1196,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		{
 			// create a new type definition and add the dependency property
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -1244,7 +1244,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -1254,10 +1254,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			var definition = new ClassDefinition(null, ClassAttributes.None);
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -1275,7 +1275,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty{T}(string,bool,ProvideValueCallback{T})"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified callback is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1287,9 +1287,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			const ProvideValueCallback<int> provideInitialValueCallback = null;
 
 			var definition = new ClassDefinition(typeof(DependencyObject), null);
-			MethodInfo addDependencyPropertyMethod = typeof(TypeDefinition)
+			MethodInfo addDependencyPropertyMethod = typeof(ClassDefinition)
 				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(TypeDefinition.AddDependencyProperty))
+				.Where(method => method.Name == nameof(ClassDefinition.AddDependencyProperty))
 				.Where(method => method.GetGenericArguments().Length == 1)
 				.Select(method => method.MakeGenericMethod(propertyType))
 				.Single(
@@ -1308,7 +1308,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		#region AddDependencyProperty(Type type, string name, bool isReadOnly, ProvideValueCallback provideInitialValueCallback)
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/>
 		/// method to add the dependency property and the <see cref="IGeneratedDependencyProperty.AddAccessorProperty"/>
 		/// to add an accessor property.
 		/// </summary>
@@ -1375,7 +1375,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
 		/// The method should throw a <see cref="CodeGenException"/> if the created type does not derive from <see cref="DependencyObject"/>.
 		/// </summary>
 		[Fact]
@@ -1385,7 +1385,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 			Type propertyType = typeof(int);
 			const bool isReadOnly = false;
 
-			var definition = new ClassDefinition(null);
+			var definition = new ClassDefinition(null, ClassAttributes.None);
 			var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, ProvideInitialValueCallback));
 			Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 			return;
@@ -1394,7 +1394,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified type is <c>null</c>.
 		/// </summary>
 		[Fact]
@@ -1411,7 +1411,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests
 		}
 
 		/// <summary>
-		/// Tests the <see cref="TypeDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
+		/// Tests the <see cref="ClassDefinition.AddDependencyProperty(Type,string,bool,ProvideValueCallback)"/> method.<br/>
 		/// The method should throw an <see cref="ArgumentNullException"/> if the specified callback is <c>null</c>.
 		/// </summary>
 		[Fact]

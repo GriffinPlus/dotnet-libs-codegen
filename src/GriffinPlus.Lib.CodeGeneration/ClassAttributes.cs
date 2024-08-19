@@ -3,17 +3,28 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System.Reflection.Emit;
+using System.Reflection;
 
 namespace GriffinPlus.Lib.CodeGeneration;
 
 /// <summary>
-/// Interface of a generated method.
+/// Attributes of a class.<br/>
+/// This is a subset of the <see cref="TypeAttributes"/> flags.
 /// </summary>
-public interface IGeneratedMethod : IMethod, IGeneratedMember
+public enum ClassAttributes
 {
 	/// <summary>
-	/// Gets the <see cref="System.Reflection.Emit.MethodBuilder"/> associated with the method.
+	/// No class attributes.
 	/// </summary>
-	MethodBuilder MethodBuilder { get; }
+	None = 0,
+
+	/// <summary>
+	/// The class is abstract.
+	/// </summary>
+	Abstract = TypeAttributes.Abstract,
+
+	/// <summary>
+	/// The class is sealed.
+	/// </summary>
+	Sealed = TypeAttributes.Sealed
 }

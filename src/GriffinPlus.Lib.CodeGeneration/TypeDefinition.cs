@@ -11,15 +11,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-#if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
-using System.Windows;
-
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-// namespace is not needed on non-windows platforms
-#else
-#error Unhandled Target Framework.
-#endif
-
 // ReSharper disable SuggestBaseTypeForParameter
 
 namespace GriffinPlus.Lib.CodeGeneration;
@@ -40,7 +31,12 @@ public abstract class TypeDefinition
 	/// <c>false</c> if it is a reference type (class).
 	/// </param>
 	/// <param name="name">Name of the type to create (<c>null</c> to create a random name).</param>
-	internal TypeDefinition(ModuleDefinition module, bool isValueType, string name = null)
+	/// <param name="attributes">Attributes of the type.</param>
+	internal TypeDefinition(
+		ModuleDefinition module,
+		bool             isValueType,
+		string           name       = null,
+		TypeAttributes   attributes = 0)
 	{
 		// no base class means that the type effectively derives from System.ValueType for value types and System.Object for classes
 		BaseClassType = isValueType ? typeof(ValueType) : typeof(object);
@@ -51,7 +47,7 @@ public abstract class TypeDefinition
 
 		// create a builder for type to create
 		ModuleDefinition = module ?? new ModuleDefinition();
-		TypeBuilder = CreateTypeBuilder(out mTypeBuilders);
+		TypeBuilder = CreateTypeBuilder(attributes, out mTypeBuilders);
 	}
 
 	/// <summary>
@@ -60,13 +56,18 @@ public abstract class TypeDefinition
 	/// <param name="module">Module definition to associate the type definition with (<c>null</c> to create a new module definition).</param>
 	/// <param name="baseClass">Base class to derive the created class from.</param>
 	/// <param name="name">Name of the class to create (<c>null</c> to keep the name of the base class).</param>
+	/// <param name="attributes">Attributes of the type.</param>
 	/// <exception cref="ArgumentNullException"><paramref name="baseClass"/> is <c>null</c>.</exception>
 	/// <exception cref="ArgumentException">
 	/// <paramref name="baseClass"/> is not a class.<br/>
 	/// -or-<br/>
 	/// <paramref name="name"/> is not a valid type name.
 	/// </exception>
-	internal TypeDefinition(ModuleDefinition module, Type baseClass, string name = null)
+	internal TypeDefinition(
+		ModuleDefinition module,
+		Type             baseClass,
+		string           name       = null,
+		TypeAttributes   attributes = 0)
 	{
 		if (baseClass == null) throw new ArgumentNullException(nameof(baseClass));
 
@@ -83,43 +84,44 @@ public abstract class TypeDefinition
 
 		// create a builder for type to create
 		ModuleDefinition = module ?? new ModuleDefinition();
-		TypeBuilder = CreateTypeBuilder(out mTypeBuilders);
+		TypeBuilder = CreateTypeBuilder(attributes, out mTypeBuilders);
 	}
 
 	/// <summary>
 	/// Creates a builder for the type to generate.
 	/// </summary>
+	/// <param name="attributes">Attributes of the type to create (access modifiers are set automatically).</param>
 	/// <param name="typeBuilders">
 	/// Receives the type builders that are needed to generate the requested type as well
 	/// (nested types need to be generated bottom up, so each nesting level has its own type builder).
 	/// </param>
 	/// <returns>The created type builder.</returns>
-	private TypeBuilder CreateTypeBuilder(out Stack<TypeBuilder> typeBuilders)
+	private TypeBuilder CreateTypeBuilder(TypeAttributes attributes, out Stack<TypeBuilder> typeBuilders)
 	{
 		// create a type builder
 		typeBuilders = new Stack<TypeBuilder>();
 		string[] splitTypeNameTokens = TypeName.Split('+');
 		if (splitTypeNameTokens.Length > 1)
 		{
-			TypeBuilder parent = ModuleDefinition.ModuleBuilder.DefineType(splitTypeNameTokens[0], TypeAttributes.Public | TypeAttributes.Class, null);
+			TypeBuilder parent = ModuleDefinition.ModuleBuilder.DefineType(splitTypeNameTokens[0], TypeAttributes.Public | attributes, null);
 			typeBuilders.Push(parent);
 			for (int i = 1; i < splitTypeNameTokens.Length; i++)
 			{
 				if (i + 1 < splitTypeNameTokens.Length)
 				{
-					parent = parent.DefineNestedType(splitTypeNameTokens[i], TypeAttributes.NestedPublic | TypeAttributes.Class);
+					parent = parent.DefineNestedType(splitTypeNameTokens[i], TypeAttributes.NestedPublic | attributes);
 					typeBuilders.Push(parent);
 				}
 				else
 				{
-					parent = parent.DefineNestedType(splitTypeNameTokens[i], TypeAttributes.NestedPublic | TypeAttributes.Class, BaseClassType);
+					parent = parent.DefineNestedType(splitTypeNameTokens[i], TypeAttributes.NestedPublic | attributes, BaseClassType);
 					typeBuilders.Push(parent);
 				}
 			}
 		}
 		else
 		{
-			TypeBuilder builder = ModuleDefinition.ModuleBuilder.DefineType(splitTypeNameTokens[0], TypeAttributes.Public | TypeAttributes.Class, BaseClassType);
+			TypeBuilder builder = ModuleDefinition.ModuleBuilder.DefineType(splitTypeNameTokens[0], TypeAttributes.Public | attributes, BaseClassType);
 			typeBuilders.Push(builder);
 		}
 
@@ -425,13 +427,13 @@ public abstract class TypeDefinition
 
 	#region Information about Generated Fields, Events, Properties and Methods
 
-	private readonly List<IGeneratedFieldInternal>  mGeneratedFields     = [];
-	private readonly List<IGeneratedEvent>          mGeneratedEvents     = [];
-	private readonly List<IGeneratedProperty>       mGeneratedProperties = [];
-	private readonly List<IGeneratedMethodInternal> mGeneratedMethods    = [];
+	internal readonly List<IGeneratedFieldInternal>  GeneratedFieldsInternal     = [];
+	internal readonly List<IGeneratedEvent>          GeneratedEventsInternal     = [];
+	internal readonly List<IGeneratedProperty>       GeneratedPropertiesInternal = [];
+	internal readonly List<IGeneratedMethodInternal> GeneratedMethodsInternal    = [];
 
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
-	private readonly List<IGeneratedDependencyProperty> mGeneratedDependencyProperties = [];
+	internal readonly List<IGeneratedDependencyProperty> GeneratedDependencyPropertiesInternal = [];
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 	// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
 #else
@@ -441,17 +443,17 @@ public abstract class TypeDefinition
 	/// <summary>
 	/// Gets the fields that have already been generated on the type.
 	/// </summary>
-	public IEnumerable<IGeneratedField> GeneratedFields => mGeneratedFields;
+	public IEnumerable<IGeneratedField> GeneratedFields => GeneratedFieldsInternal;
 
 	/// <summary>
 	/// Gets the events that have already been generated on the type.
 	/// </summary>
-	public IEnumerable<IGeneratedEvent> GeneratedEvents => mGeneratedEvents;
+	public IEnumerable<IGeneratedEvent> GeneratedEvents => GeneratedEventsInternal;
 
 	/// <summary>
 	/// Gets the properties that have already been generated on the type.
 	/// </summary>
-	public IEnumerable<IGeneratedProperty> GeneratedProperties => mGeneratedProperties;
+	public IEnumerable<IGeneratedProperty> GeneratedProperties => GeneratedPropertiesInternal;
 
 	/// <summary>
 	/// Gets the methods that have already been generated on the type.
@@ -460,13 +462,13 @@ public abstract class TypeDefinition
 	/// event accessor methods. Property accessor methods are available via <see cref="IGeneratedProperty.GetAccessor"/>
 	/// and <see cref="IGeneratedProperty.SetAccessor"/>.
 	/// </summary>
-	public IEnumerable<IGeneratedMethod> GeneratedMethods => mGeneratedMethods.Where(x => !x.MethodInfo.IsSpecialName);
+	public IEnumerable<IGeneratedMethod> GeneratedMethods => GeneratedMethodsInternal.Where(x => !x.MethodInfo.IsSpecialName);
 
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 	/// <summary>
 	/// Gets the dependency properties that have already been generated on the type.
 	/// </summary>
-	public IEnumerable<IGeneratedDependencyProperty> GeneratedDependencyProperties => mGeneratedDependencyProperties;
+	public IEnumerable<IGeneratedDependencyProperty> GeneratedDependencyProperties => GeneratedDependencyPropertiesInternal;
 #elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 	// Dependency properties are not supported on .NET Standard and .NET5/6/7 without Windows extensions...
 #else
@@ -553,7 +555,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, false, name, visibility);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -581,7 +583,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -597,7 +599,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, false, name, visibility, initialValue);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -641,7 +643,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, initialValue]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -661,7 +663,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, false, name, visibility, initializer);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -699,7 +701,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, initializer]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -716,7 +718,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, false, name, visibility, provideInitialValueCallback);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -751,7 +753,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, provideInitialValueCallback]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -766,7 +768,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, true, name, visibility);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -793,7 +795,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -809,7 +811,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, true, name, visibility, initialValue);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -853,7 +855,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, initialValue]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -873,7 +875,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, true, name, visibility, initializer);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -911,7 +913,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, initializer]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -928,7 +930,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var field = new GeneratedField<T>(this, true, name, visibility, provideInitialValueCallback);
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -961,7 +963,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, provideInitialValueCallback]);
 
-		mGeneratedFields.Add(field);
+		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
 
@@ -989,7 +991,7 @@ public abstract class TypeDefinition
 			name,
 			visibility,
 			implementation);
-		mGeneratedEvents.Add(generatedEvent);
+		GeneratedEventsInternal.Add(generatedEvent);
 		return generatedEvent;
 	}
 
@@ -1019,84 +1021,7 @@ public abstract class TypeDefinition
 			visibility,
 			addAccessorImplementationCallback,
 			removeAccessorImplementationCallback);
-		mGeneratedEvents.Add(generatedEvent);
-		return generatedEvent;
-	}
-
-	/// <summary>
-	/// Adds a new abstract instance event to the type definition (add/remove methods only).
-	/// </summary>
-	/// <typeparam name="T">Type of the event to add.</typeparam>
-	/// <param name="eventName">Name of the event to add (<c>null</c> to create a random name).</param>
-	/// <param name="visibility">Visibility of the event.</param>
-	/// <returns>The added event.</returns>
-	public IGeneratedEvent<T> AddAbstractEvent<T>(string eventName, Visibility visibility) where T : Delegate
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
-			EventKind.Abstract,
-			eventName,
-			visibility,
-			null);
-		mGeneratedEvents.Add(generatedEvent);
-		return generatedEvent;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance event to the type definition.
-	/// </summary>
-	/// <typeparam name="T">Type of the event to add.</typeparam>
-	/// <param name="eventName">Name of the event to add (<c>null</c> to create a random name).</param>
-	/// <param name="visibility">Visibility of the event.</param>
-	/// <param name="implementation">
-	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
-	/// </param>
-	/// <returns>The added event.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedEvent<T> AddVirtualEvent<T>(
-		string               eventName,
-		Visibility           visibility,
-		IEventImplementation implementation) where T : Delegate
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
-			EventKind.Virtual,
-			eventName,
-			visibility,
-			implementation);
-		mGeneratedEvents.Add(generatedEvent);
-		return generatedEvent;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance event to the type definition.
-	/// </summary>
-	/// <typeparam name="T">Type of the event to add.</typeparam>
-	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
-	/// <param name="visibility">Visibility of the event.</param>
-	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
-	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
-	/// <returns>The added event.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
-	/// </exception>
-	public IGeneratedEvent<T> AddVirtualEvent<T>(
-		string                              name,
-		Visibility                          visibility,
-		EventAccessorImplementationCallback addAccessorImplementationCallback,
-		EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
-			EventKind.Virtual,
-			name,
-			visibility,
-			addAccessorImplementationCallback,
-			removeAccessorImplementationCallback);
-		mGeneratedEvents.Add(generatedEvent);
+		GeneratedEventsInternal.Add(generatedEvent);
 		return generatedEvent;
 	}
 
@@ -1123,7 +1048,7 @@ public abstract class TypeDefinition
 			eventName,
 			visibility,
 			implementation);
-		mGeneratedEvents.Add(generatedEvent);
+		GeneratedEventsInternal.Add(generatedEvent);
 		return generatedEvent;
 	}
 
@@ -1153,78 +1078,8 @@ public abstract class TypeDefinition
 			visibility,
 			addAccessorImplementationCallback,
 			removeAccessorImplementationCallback);
-		mGeneratedEvents.Add(generatedEvent);
+		GeneratedEventsInternal.Add(generatedEvent);
 		return generatedEvent;
-	}
-
-	/// <summary>
-	/// Overrides the specified inherited event in the type definition.
-	/// </summary>
-	/// <param name="eventToOverride">Event to override.</param>
-	/// <param name="implementation">
-	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
-	/// </param>
-	/// <returns>The added event overriding the specified inherited event.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedEvent<T> AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation implementation) where T : Delegate
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(eventToOverride.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (eventToOverride.Kind)
-		{
-			case EventKind.Abstract:
-			case EventKind.Virtual:
-			case EventKind.Override:
-				break;
-
-			case EventKind.Static:
-			case EventKind.Normal:
-			default:
-				throw new CodeGenException($"The specified event ({eventToOverride.Name}) is neither abstract, virtual nor an override of a virtual/abstract event.");
-		}
-
-		// create event override
-		var overrider = new GeneratedEvent<T>(this, eventToOverride, implementation);
-		mGeneratedEvents.Add(overrider);
-		return overrider;
-	}
-
-	/// <summary>
-	/// Overrides the specified inherited event in the type definition.
-	/// </summary>
-	/// <param name="eventToOverride">Event to override.</param>
-	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
-	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
-	/// <returns>The added event overriding the specified inherited event.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
-	/// </exception>
-	public IGeneratedEvent<T> AddEventOverride<T>(
-		IInheritedEvent<T>                  eventToOverride,
-		EventAccessorImplementationCallback addAccessorImplementationCallback,
-		EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(eventToOverride.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (eventToOverride.Kind)
-		{
-			case EventKind.Abstract:
-			case EventKind.Virtual:
-			case EventKind.Override:
-				break;
-
-			case EventKind.Static:
-			case EventKind.Normal:
-			default:
-				throw new CodeGenException($"The specified event ({eventToOverride.Name}) is neither abstract, virtual nor an override of a virtual/abstract event.");
-		}
-
-		// create event override
-		var overrider = new GeneratedEvent<T>(this, eventToOverride, addAccessorImplementationCallback, removeAccessorImplementationCallback);
-		mGeneratedEvents.Add(overrider);
-		return overrider;
 	}
 
 	#endregion
@@ -1244,7 +1099,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name);
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1260,9 +1115,8 @@ public abstract class TypeDefinition
 	/// <returns>The added property.</returns>
 	public IGeneratedProperty AddProperty(Type type, string name)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
 		if (type == null) throw new ArgumentNullException(nameof(type));
+		EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
@@ -1274,7 +1128,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Normal, name]);
 
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1289,8 +1143,9 @@ public abstract class TypeDefinition
 	public IGeneratedProperty<T> AddProperty<T>(string name, IPropertyImplementation implementation)
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
+
 		var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name, implementation);
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1305,9 +1160,8 @@ public abstract class TypeDefinition
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 	public IGeneratedProperty AddProperty(Type type, string name, IPropertyImplementation implementation)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
 		if (type == null) throw new ArgumentNullException(nameof(type));
+		EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
@@ -1319,138 +1173,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Normal, name, implementation]);
 
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new abstract instance property to the type definition.
-	/// </summary>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <returns>The added property.</returns>
-	public IGeneratedProperty<T> AddAbstractProperty<T>(string name)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var property = new GeneratedProperty<T>(this, PropertyKind.Abstract, name, null);
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new abstract instance property to the type definition.
-	/// </summary>
-	/// <param name="type">Type of the property to add.</param>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <returns>The added property.</returns>
-	public IGeneratedProperty AddAbstractProperty(Type type, string name)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-
-		ConstructorInfo constructor = typeof(GeneratedProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Abstract, name]);
-
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance property to the type definition.<br/>
-	/// The property does not have accessor methods.<br/>
-	/// The desired accessor methods can be added using:<br/>
-	/// - <see cref="IGeneratedProperty.AddGetAccessor"/><br/>
-	/// - <see cref="IGeneratedProperty.AddSetAccessor"/>
-	/// </summary>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <returns>The added property.</returns>
-	public IGeneratedProperty<T> AddVirtualProperty<T>(string name)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name);
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance property to the type definition.<br/>
-	/// The property does not have accessor methods.<br/>
-	/// The desired accessor methods can be added using:<br/>
-	/// - <see cref="IGeneratedProperty.AddGetAccessor"/><br/>
-	/// - <see cref="IGeneratedProperty.AddSetAccessor"/>
-	/// </summary>
-	/// <param name="type">Type of the property to add.</param>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <returns>The added property.</returns>
-	public IGeneratedProperty AddVirtualProperty(Type type, string name)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-
-		ConstructorInfo constructor = typeof(GeneratedProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Virtual, name]);
-
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance property to the type definition.<br/>
-	/// The property has accessor methods implemented by the specified implementation strategy.
-	/// </summary>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
-	/// <returns>The added property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty<T> AddVirtualProperty<T>(string name, IPropertyImplementation implementation)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var property = new GeneratedProperty<T>(this, PropertyKind.Virtual, name, implementation);
-		mGeneratedProperties.Add(property);
-		return property;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance property to the type definition.<br/>
-	/// The property has accessor methods implemented by the specified implementation strategy.
-	/// </summary>
-	/// <param name="type">Type of the property to add.</param>
-	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
-	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
-	/// <returns>The added property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty AddVirtualProperty(Type type, string name, IPropertyImplementation implementation)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-
-		ConstructorInfo constructor = typeof(GeneratedProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Virtual, name, implementation]);
-
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1466,8 +1189,9 @@ public abstract class TypeDefinition
 	public IGeneratedProperty<T> AddStaticProperty<T>(string name)
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
+
 		var property = new GeneratedProperty<T>(this, PropertyKind.Static, name);
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1483,9 +1207,8 @@ public abstract class TypeDefinition
 	/// <returns>The added property.</returns>
 	public IGeneratedProperty AddStaticProperty(Type type, string name)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
 		if (type == null) throw new ArgumentNullException(nameof(type));
+		EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
@@ -1497,7 +1220,7 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Static, name]);
 
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1513,7 +1236,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
 
@@ -1528,9 +1251,8 @@ public abstract class TypeDefinition
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 	public IGeneratedProperty AddStaticProperty(Type type, string name, IPropertyImplementation implementation)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-
 		if (type == null) throw new ArgumentNullException(nameof(type));
+		EnsureThatIdentifierHasNotBeenUsedYet(name);
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
@@ -1542,482 +1264,9 @@ public abstract class TypeDefinition
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
 		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Static, name, implementation]);
 
-		mGeneratedProperties.Add(property);
+		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
-
-	/// <summary>
-	/// Adds an override for the specified inherited property.<br/>
-	/// The property has accessor methods implemented by the specified implementation strategy.
-	/// </summary>
-	/// <param name="property">Property to add an override for.</param>
-	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
-	/// <returns>The added property override.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty<T> AddPropertyOverride<T>(
-		IInheritedProperty<T>   property,
-		IPropertyImplementation implementation)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
-
-		// ensure that the property is abstract, virtual or overriding an abstract/virtual property
-		switch (property.Kind)
-		{
-			case PropertyKind.Abstract:
-			case PropertyKind.Virtual:
-			case PropertyKind.Override:
-				break;
-
-			case PropertyKind.Static:
-			case PropertyKind.Normal:
-			default:
-				throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// add the property
-		var overrider = new GeneratedProperty<T>(this, property, implementation);
-		mGeneratedProperties.Add(overrider);
-		return overrider;
-	}
-
-	/// <summary>
-	/// Adds an override for the specified inherited property.<br/>
-	/// The property has accessor methods implemented by the specified implementation strategy.
-	/// </summary>
-	/// <param name="property">Property to add an override for.</param>
-	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
-	/// <returns>The added property override.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty AddPropertyOverride(
-		IInheritedProperty      property,
-		IPropertyImplementation implementation)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
-
-		// ensure that the property is abstract, virtual or overriding an abstract/virtual property
-		switch (property.Kind)
-		{
-			case PropertyKind.Abstract:
-			case PropertyKind.Virtual:
-			case PropertyKind.Override:
-				break;
-
-			case PropertyKind.Static:
-			case PropertyKind.Normal:
-			default:
-				throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// add the property
-		ConstructorInfo constructor = typeof(GeneratedProperty<>)
-			.MakeGenericType(property.PropertyType)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[
-					typeof(TypeDefinition),
-					typeof(IInheritedProperty<>).MakeGenericType(property.PropertyType),
-					typeof(PropertyImplementation)
-				],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var overrider = (IGeneratedProperty)constructor.Invoke([this, property, implementation]);
-		mGeneratedProperties.Add(overrider);
-		return overrider;
-	}
-
-	/// <summary>
-	/// Adds an override for the specified inherited property.<br/>
-	/// The property accessors are implemented by the specified implementation callbacks.
-	/// </summary>
-	/// <param name="property">Property to add an override for.</param>
-	/// <param name="getAccessorImplementationCallback">
-	/// A callback that implements the 'get' accessor method of the property
-	/// (<c>null</c>, if the inherited property does not have a 'get' accessor method).
-	/// </param>
-	/// <param name="setAccessorImplementationCallback">
-	/// A callback that implements the 'set' accessor method of the property
-	/// (<c>null</c>, if the inherited property does not have a 'set' accessor method).
-	/// </param>
-	/// <returns>The added property override.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="property"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
-	/// -or-<br/>
-	/// <paramref name="property"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
-	/// </exception>
-	public IGeneratedProperty<T> AddPropertyOverride<T>(
-		IInheritedProperty<T>                  property,
-		PropertyAccessorImplementationCallback getAccessorImplementationCallback,
-		PropertyAccessorImplementationCallback setAccessorImplementationCallback)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (property.Kind)
-		{
-			case PropertyKind.Abstract:
-			case PropertyKind.Virtual:
-			case PropertyKind.Override:
-				break;
-
-			case PropertyKind.Static:
-			case PropertyKind.Normal:
-			default:
-				throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// add the property
-		var overrider = new GeneratedProperty<T>(this, property, getAccessorImplementationCallback, setAccessorImplementationCallback);
-		mGeneratedProperties.Add(overrider);
-		return overrider;
-	}
-
-	/// <summary>
-	/// Adds an override for the specified inherited property.<br/>
-	/// The property accessors are implemented by the specified implementation callbacks.
-	/// </summary>
-	/// <param name="property">Property to add an override for.</param>
-	/// <param name="getAccessorImplementationCallback">
-	/// A callback that implements the 'get' accessor method of the property
-	/// (<c>null</c>, if the inherited property does not have a 'get' accessor method).
-	/// </param>
-	/// <param name="setAccessorImplementationCallback">
-	/// A callback that implements the 'set' accessor method of the property
-	/// (<c>null</c>, if the inherited property does not have a 'set' accessor method).
-	/// </param>
-	/// <returns>The added property override.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="property"/> has a 'get' accessor, but <paramref name="getAccessorImplementationCallback"/> is <c>null</c>.<br/>
-	/// -or-<br/>
-	/// <paramref name="property"/> has a 'set' accessor, but <paramref name="setAccessorImplementationCallback"/> is <c>null</c>.
-	/// </exception>
-	public IGeneratedProperty AddPropertyOverride(
-		IInheritedProperty                     property,
-		PropertyAccessorImplementationCallback getAccessorImplementationCallback,
-		PropertyAccessorImplementationCallback setAccessorImplementationCallback)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(property.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (property.Kind)
-		{
-			case PropertyKind.Abstract:
-			case PropertyKind.Virtual:
-			case PropertyKind.Override:
-				break;
-
-			case PropertyKind.Static:
-			case PropertyKind.Normal:
-			default:
-				throw new CodeGenException($"The specified property ({property.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// add the property
-		ConstructorInfo constructor = typeof(GeneratedProperty<>)
-			.MakeGenericType(property.PropertyType)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[
-					typeof(TypeDefinition),
-					typeof(IInheritedProperty<>).MakeGenericType(property.PropertyType),
-					typeof(PropertyAccessorImplementationCallback),
-					typeof(PropertyAccessorImplementationCallback)
-				],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var overrider = (IGeneratedProperty)constructor.Invoke([this, property, getAccessorImplementationCallback, setAccessorImplementationCallback]);
-		mGeneratedProperties.Add(overrider);
-		return overrider;
-	}
-
-	#endregion
-
-	#region Adding Dependency Properties
-
-#if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
-	/// <summary>
-	/// Adds a new dependency property to the type definition (without initial value).<br/>
-	/// The property will have the default value of the specified type initially.
-	/// </summary>
-	/// <typeparam name="T">Type of the dependency property.</typeparam>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-		var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (without initial value).<br/>
-	/// The property will have the default value of the specified type initially.
-	/// </summary>
-	/// <param name="type">Type of the dependency property.</param>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty AddDependencyProperty(Type type, string name, bool isReadOnly)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-
-		ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(string), typeof(bool)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke([this, name, isReadOnly]);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with initial value).
-	/// </summary>
-	/// <typeparam name="T">Type of the dependency property.</typeparam>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="initialValue">Initial value of the dependency property.</param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, T initialValue)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-		var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initialValue);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with initial value).
-	/// </summary>
-	/// <param name="type">Type of the dependency property.</param>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="initialValue">Initial value of the dependency property.</param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty AddDependencyProperty(
-		Type   type,
-		string name,
-		bool   isReadOnly,
-		object initialValue)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-
-		if (initialValue == null && type.IsValueType)
-			throw new ArgumentException($"The specified initial value is null, but the property type ({type.FullName}) is a value type.", nameof(initialValue));
-
-		if (initialValue != null && !type.IsInstanceOfType(initialValue))
-			throw new ArgumentException($"The specified initial value ({initialValue}) is not assignable to a property of the specified type ({type.FullName}).", nameof(initialValue));
-
-		ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(string), typeof(bool), type],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke([this, name, isReadOnly, initialValue]);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with custom initializer).
-	/// </summary>
-	/// <typeparam name="T">Type of the dependency property.</typeparam>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="initializer">
-	/// A callback that provides an implementation pushing an object onto the evaluation stack to use as the initial
-	/// value for the generated dependency property.
-	/// </param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(
-		string                        name,
-		bool                          isReadOnly,
-		DependencyPropertyInitializer initializer)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-		var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, initializer);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with custom initializer).
-	/// </summary>
-	/// <param name="type">Type of the dependency property.</param>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="initializer">
-	/// A callback that provides an implementation pushing an object onto the evaluation stack to use as the initial
-	/// value for the generated dependency property.
-	/// </param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty AddDependencyProperty(
-		Type                          type,
-		string                        name,
-		bool                          isReadOnly,
-		DependencyPropertyInitializer initializer)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-		if (initializer == null) throw new ArgumentNullException(nameof(initializer));
-
-		ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(string), typeof(bool), typeof(DependencyPropertyInitializer)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke([this, name, isReadOnly, initializer]);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with factory callback for an initial value).
-	/// </summary>
-	/// <typeparam name="T">Type of the dependency property.</typeparam>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty<T> AddDependencyProperty<T>(string name, bool isReadOnly, ProvideValueCallback<T> provideInitialValueCallback)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-		var dependencyProperty = new GeneratedDependencyProperty<T>(this, name, isReadOnly, provideInitialValueCallback);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-	/// <summary>
-	/// Adds a new dependency property to the type definition (with factory callback for an initial value).
-	/// </summary>
-	/// <param name="type">Type of the dependency property.</param>
-	/// <param name="name">Name of the dependency property (just the name, not with the 'Property' suffix).</param>
-	/// <param name="isReadOnly">
-	/// <c>true</c> if the dependency property is read-only;<br/>
-	/// <c>false</c> if it is read-write.
-	/// </param>
-	/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the dependency property.</param>
-	/// <returns>The added dependency property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
-	/// <exception cref="CodeGenException">
-	/// The created type does not derive from <see cref="DependencyObject"/>.<br/>
-	/// -or-<br/>
-	/// <paramref name="name"/> was already used to declare some other field, property, event or method.
-	/// </exception>
-	public IGeneratedDependencyProperty AddDependencyProperty(
-		Type                 type,
-		string               name,
-		bool                 isReadOnly,
-		ProvideValueCallback provideInitialValueCallback)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		EnsureThatTypeDerivesFrom(typeof(DependencyObject));
-
-		if (type == null) throw new ArgumentNullException(nameof(type));
-		if (provideInitialValueCallback == null) throw new ArgumentNullException(nameof(provideInitialValueCallback));
-
-		ConstructorInfo constructor = typeof(GeneratedDependencyProperty<>)
-			.MakeGenericType(type)
-			.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(string), typeof(bool), typeof(ProvideValueCallback)],
-				null);
-		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var dependencyProperty = (IGeneratedDependencyProperty)constructor.Invoke([this, name, isReadOnly, provideInitialValueCallback]);
-		mGeneratedDependencyProperties.Add(dependencyProperty);
-		return dependencyProperty;
-	}
-
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0 || NET8_0
-	// Dependency properties are not supported on .NET Standard and .NET5/6/7/8 without Windows extensions...
-#else
-#error Unhandled Target Framework.
-#endif
 
 	#endregion
 
@@ -2051,7 +1300,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
 
@@ -2083,99 +1332,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
-		mGeneratedMethods.Add(method);
-		return method;
-	}
-
-	/// <summary>
-	/// Adds a new abstract instance method to the type definition.
-	/// </summary>
-	/// <param name="name">Name of the method to add (<c>null</c> to create a random name).</param>
-	/// <param name="returnType">Return type of the method.</param>
-	/// <param name="parameterTypes">Types of the method's parameters.</param>
-	/// <param name="visibility">Visibility of the method.</param>
-	/// <param name="additionalMethodAttributes">Additional method attributes to 'or' with other attributes.</param>
-	/// <returns>The added method.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="returnType"/> or <paramref name="parameterTypes"/> is <c>null</c>.</exception>
-	/// <exception cref="ArgumentException">
-	/// <paramref name="name"/> is not a valid language independent identifier.<br/>
-	/// -or-<br/>
-	/// <paramref name="parameterTypes"/> contains a null reference.
-	/// </exception>
-	public IGeneratedMethod AddAbstractMethod(
-		string           name,
-		Type             returnType,
-		Type[]           parameterTypes,
-		Visibility       visibility,
-		MethodAttributes additionalMethodAttributes = 0)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Abstract, name, returnType, parameterTypes, visibility, additionalMethodAttributes, (IMethodImplementation)null);
-		mGeneratedMethods.Add(method);
-		return method;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance method to the type definition.
-	/// </summary>
-	/// <param name="name">Name of the method to add (<c>null</c> to create a random name).</param>
-	/// <param name="returnType">Return type of the method.</param>
-	/// <param name="parameterTypes">Types of the method's parameters.</param>
-	/// <param name="visibility">Visibility of the method.</param>
-	/// <param name="implementation">Implementation strategy that implements the method.</param>
-	/// <param name="additionalMethodAttributes">Additional method attributes to 'or' with other attributes.</param>
-	/// <returns>The added method.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementation"/> is <c>null</c>.
-	/// </exception>
-	/// <exception cref="ArgumentException">
-	/// <paramref name="name"/> is not a valid language independent identifier.<br/>
-	/// -or-<br/>
-	/// <paramref name="parameterTypes"/> contains a null reference.
-	/// </exception>
-	public IGeneratedMethod AddVirtualMethod(
-		string                name,
-		Type                  returnType,
-		Type[]                parameterTypes,
-		Visibility            visibility,
-		IMethodImplementation implementation,
-		MethodAttributes      additionalMethodAttributes = 0)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
-		mGeneratedMethods.Add(method);
-		return method;
-	}
-
-	/// <summary>
-	/// Adds a new virtual instance method to the type definition.
-	/// </summary>
-	/// <param name="name">Name of the method to add (<c>null</c> to create a random name).</param>
-	/// <param name="returnType">Return type of the method.</param>
-	/// <param name="parameterTypes">Types of the method's parameters.</param>
-	/// <param name="visibility">Visibility of the method.</param>
-	/// <param name="implementationCallback">Callback that implements the method.</param>
-	/// <param name="additionalMethodAttributes">Additional method attributes to 'or' with other attributes.</param>
-	/// <returns>The added method.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// <paramref name="returnType"/>, <paramref name="parameterTypes"/> or <paramref name="implementationCallback"/> is <c>null</c>.
-	/// </exception>
-	/// <exception cref="ArgumentException">
-	/// <paramref name="name"/> is not a valid language independent identifier.<br/>
-	/// -or-<br/>
-	/// <paramref name="parameterTypes"/> contains a null reference.
-	/// </exception>
-	public IGeneratedMethod AddVirtualMethod(
-		string                       name,
-		Type                         returnType,
-		Type[]                       parameterTypes,
-		Visibility                   visibility,
-		MethodImplementationCallback implementationCallback,
-		MethodAttributes             additionalMethodAttributes = 0)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Virtual, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
 
@@ -2207,7 +1364,7 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
 
@@ -2239,70 +1396,8 @@ public abstract class TypeDefinition
 	{
 		EnsureThatIdentifierHasNotBeenUsedYet(name);
 		var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
-	}
-
-	/// <summary>
-	/// Adds an override for an inherited method.
-	/// </summary>
-	/// <param name="method">Method to add an override for.</param>
-	/// <param name="implementation">Implementation strategy that implements the method.</param>
-	/// <returns>The added method override.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="method"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedMethod AddMethodOverride(IInheritedMethod method, IMethodImplementation implementation)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(method.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (method.Kind)
-		{
-			case MethodKind.Abstract:
-			case MethodKind.Virtual:
-			case MethodKind.Override:
-				break;
-
-			case MethodKind.Static:
-			case MethodKind.Normal:
-			default:
-				throw new CodeGenException($"The specified method ({method.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// create method
-		var overriddenMethod = new GeneratedMethod(this, method, implementation);
-		mGeneratedMethods.Add(overriddenMethod);
-		return overriddenMethod;
-	}
-
-	/// <summary>
-	/// Adds an override for an inherited method.
-	/// </summary>
-	/// <param name="method">Method to add an override for.</param>
-	/// <param name="implementationCallback">Callback that implements the method.</param>
-	/// <returns>The added method override.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="method"/> or <paramref name="implementationCallback"/> is <c>null</c>.</exception>
-	public IGeneratedMethod AddMethodOverride(IInheritedMethod method, MethodImplementationCallback implementationCallback)
-	{
-		EnsureThatIdentifierHasNotBeenUsedYet(method.Name);
-
-		// ensure that the property is abstract, virtual or an overrider
-		switch (method.Kind)
-		{
-			case MethodKind.Abstract:
-			case MethodKind.Virtual:
-			case MethodKind.Override:
-				break;
-
-			case MethodKind.Static:
-			case MethodKind.Normal:
-			default:
-				throw new CodeGenException($"The specified method ({method.Name}) is neither abstract, nor virtual nor an overrider.");
-		}
-
-		// create method
-		var overriddenMethod = new GeneratedMethod(this, method, implementationCallback);
-		mGeneratedMethods.Add(overriddenMethod);
-		return overriddenMethod;
 	}
 
 	/// <summary>
@@ -2363,7 +1458,7 @@ public abstract class TypeDefinition
 
 		// create method
 		var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
 
@@ -2425,7 +1520,7 @@ public abstract class TypeDefinition
 
 		// create method
 		var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
-		mGeneratedMethods.Add(method);
+		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
 
@@ -2446,7 +1541,7 @@ public abstract class TypeDefinition
 		AddConstructors();
 
 		// implement methods (includes event accessor methods and property accessor methods)
-		foreach (IGeneratedMethodInternal generatedMethod in mGeneratedMethods) generatedMethod.Implement();
+		foreach (IGeneratedMethodInternal generatedMethod in GeneratedMethodsInternal) generatedMethod.Implement();
 
 		// create the defined type
 		Type createdType = null;
@@ -2476,7 +1571,7 @@ public abstract class TypeDefinition
 		ILGenerator msilGenerator = constructorBuilder.GetILGenerator();
 
 		// add field initialization code
-		foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => x.IsStatic))
+		foreach (IGeneratedFieldInternal field in GeneratedFieldsInternal.Where(x => x.IsStatic))
 		{
 			field.ImplementFieldInitialization(typeBuilder, msilGenerator);
 		}
@@ -2528,7 +1623,7 @@ public abstract class TypeDefinition
 			}
 
 			// emit field initialization code
-			foreach (IGeneratedFieldInternal field in mGeneratedFields.Where(x => !x.IsStatic))
+			foreach (IGeneratedFieldInternal field in GeneratedFieldsInternal.Where(x => !x.IsStatic))
 			{
 				field.ImplementFieldInitialization(TypeBuilder, msilGenerator);
 			}
@@ -2553,7 +1648,7 @@ public abstract class TypeDefinition
 	{
 		IEnumerable<IInheritedProperty> abstractProperties =
 			from property in InheritedProperties.Where(x => x.Kind == PropertyKind.Abstract)
-			let overrider = mGeneratedProperties.Find(x => x.Kind == PropertyKind.Override && x.Name == property.Name)
+			let overrider = GeneratedPropertiesInternal.Find(x => x.Kind == PropertyKind.Override && x.Name == property.Name)
 			where overrider == null
 			select property;
 
@@ -2572,7 +1667,7 @@ public abstract class TypeDefinition
 	/// </returns>
 	public IMethod GetMethod(string name, Type[] parameterTypes)
 	{
-		return (IMethod)mGeneratedMethods.FirstOrDefault(m => m.Name == name && m.ParameterTypes.SequenceEqual(parameterTypes)) ??
+		return (IMethod)GeneratedMethodsInternal.FirstOrDefault(m => m.Name == name && m.ParameterTypes.SequenceEqual(parameterTypes)) ??
 		       InheritedMethods.FirstOrDefault(m => m.Name == name && m.ParameterTypes.SequenceEqual(parameterTypes));
 	}
 
@@ -2640,26 +1735,26 @@ public abstract class TypeDefinition
 	/// </summary>
 	/// <param name="identifier">Name of the identifier to check.</param>
 	/// <exception cref="CodeGenException">The identifier with the specified name has already been declared.</exception>
-	private void EnsureThatIdentifierHasNotBeenUsedYet(string identifier)
+	internal void EnsureThatIdentifierHasNotBeenUsedYet(string identifier)
 	{
 		if (identifier == null) return; // null means that a unique name is chosen => no conflict...
 
-		if (mGeneratedFields.Any(field => field.Name == identifier))
+		if (GeneratedFieldsInternal.Any(field => field.Name == identifier))
 		{
 			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a field.");
 		}
 
-		if (mGeneratedEvents.Any(@event => @event.Name == identifier))
+		if (GeneratedEventsInternal.Any(@event => @event.Name == identifier))
 		{
 			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare an event.");
 		}
 
-		if (mGeneratedProperties.Any(property => property.Name == identifier))
+		if (GeneratedPropertiesInternal.Any(property => property.Name == identifier))
 		{
 			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a property.");
 		}
 
-		if (mGeneratedMethods.Any(method => method.Name == identifier))
+		if (GeneratedMethodsInternal.Any(method => method.Name == identifier))
 		{
 			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a method.");
 		}
@@ -2669,7 +1764,7 @@ public abstract class TypeDefinition
 	/// Ensures that the defined type derives from the specified type.
 	/// </summary>
 	/// <param name="type">Type the defined types is expected to derive from.</param>
-	private void EnsureThatTypeDerivesFrom(Type type)
+	internal void EnsureThatTypeDerivesFrom(Type type)
 	{
 		if (!type.IsAssignableFrom(TypeBuilder))
 		{

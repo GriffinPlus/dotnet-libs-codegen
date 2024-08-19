@@ -30,6 +30,11 @@ class InheritedMethod : Member, IInheritedMethod
 	}
 
 	/// <summary>
+	/// Gets the class definition the member belongs to.
+	/// </summary>
+	public new ClassDefinition TypeDefinition => (ClassDefinition)base.TypeDefinition;
+
+	/// <summary>
 	/// Gets the name of the method.
 	/// </summary>
 	public string Name => MethodInfo.Name;

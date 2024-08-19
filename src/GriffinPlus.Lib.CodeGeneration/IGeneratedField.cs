@@ -10,7 +10,7 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// <summary>
 /// Untyped interface of a generated field.
 /// </summary>
-public interface IGeneratedField : IField, IInitialValueProvider
+public interface IGeneratedField : IField, IGeneratedMember, IInitialValueProvider
 {
 	/// <summary>
 	/// Gets the <see cref="System.Reflection.Emit.FieldBuilder"/> associated with the field.

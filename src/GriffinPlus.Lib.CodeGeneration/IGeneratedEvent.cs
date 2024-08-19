@@ -10,7 +10,7 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// <summary>
 /// Untyped interface of a generated event.
 /// </summary>
-public interface IGeneratedEvent : IEvent
+public interface IGeneratedEvent : IEvent, IGeneratedMember
 {
 	/// <summary>
 	/// Gets the implementation strategy used to implement the event

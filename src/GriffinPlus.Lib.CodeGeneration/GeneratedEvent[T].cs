@@ -143,7 +143,7 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 		// add 'add' accessor method if the event is not abstract
 		Debug.Assert(addAccessorImplementationCallback != null, nameof(addAccessorImplementationCallback) + " != null");
 		AddAccessor = TypeDefinition.AddMethod(
-			Kind.ToMethodKind(),
+			kind.ToMethodKind(),
 			"add_" + Name,
 			typeof(void),
 			[EventHandlerType],
@@ -156,7 +156,7 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 		// add 'remove' accessor method if the event is not abstract
 		Debug.Assert(removeAccessorImplementationCallback != null, nameof(removeAccessorImplementationCallback) + " != null");
 		RemoveAccessor = TypeDefinition.AddMethod(
-			Kind.ToMethodKind(),
+			kind.ToMethodKind(),
 			"remove_" + Name,
 			typeof(void),
 			[EventHandlerType],
@@ -175,19 +175,19 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GeneratedEvent{T}"/> class (for overrides).
 	/// </summary>
-	/// <param name="typeDefinition">The type definition the property belongs to.</param>
+	/// <param name="classDefinition">The type definition the property belongs to.</param>
 	/// <param name="inheritedEvent">Inherited event to override.</param>
 	/// <param name="implementation">
 	/// Implementation strategy that implements the add/remove accessor methods of the event and the event raiser method, if any.
 	/// </param>
 	/// <exception cref="ArgumentNullException">
-	/// <paramref name="typeDefinition"/>, <paramref name="inheritedEvent"/> or <paramref name="implementation"/> is <c>null</c>.
+	/// <paramref name="classDefinition"/>, <paramref name="inheritedEvent"/> or <paramref name="implementation"/> is <c>null</c>.
 	/// </exception>
 	internal GeneratedEvent(
-		TypeDefinition       typeDefinition,
+		ClassDefinition      classDefinition,
 		IInheritedEvent<T>   inheritedEvent,
 		IEventImplementation implementation) :
-		base(typeDefinition)
+		base(classDefinition)
 	{
 		if (inheritedEvent == null) throw new ArgumentNullException(nameof(inheritedEvent));
 
@@ -195,15 +195,15 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 		Name = inheritedEvent.Name;
 
 		// add an override for the 'add' accessor and the 'remove' accessor methods
-		AddAccessor = TypeDefinition.AddMethodOverride(
+		AddAccessor = classDefinition.AddMethodOverride(
 			inheritedEvent.AddAccessor,
 			(_, msilGenerator) => Implementation.ImplementAddAccessorMethod(TypeDefinition, this, msilGenerator));
-		RemoveAccessor = TypeDefinition.AddMethodOverride(
+		RemoveAccessor = classDefinition.AddMethodOverride(
 			inheritedEvent.RemoveAccessor,
 			(_, msilGenerator) => Implementation.ImplementRemoveAccessorMethod(TypeDefinition, this, msilGenerator));
 
 		// add the actual event and wire up the add/remove accessor
-		EventBuilder = TypeDefinition.TypeBuilder.DefineEvent(Name, EventAttributes.None, EventHandlerType);
+		EventBuilder = classDefinition.TypeBuilder.DefineEvent(Name, EventAttributes.None, EventHandlerType);
 		EventBuilder.SetAddOnMethod(AddAccessor.MethodBuilder);
 		EventBuilder.SetRemoveOnMethod(RemoveAccessor.MethodBuilder);
 
@@ -214,20 +214,20 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GeneratedEvent{T}"/> class (for overrides).
 	/// </summary>
-	/// <param name="typeDefinition">The type definition the property belongs to.</param>
+	/// <param name="classDefinition">The type definition the property belongs to.</param>
 	/// <param name="inheritedEvent">Inherited event to override.</param>
 	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
 	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
 	/// <exception cref="ArgumentNullException">
-	/// <paramref name="typeDefinition"/>, <paramref name="inheritedEvent"/>, <paramref name="addAccessorImplementationCallback"/> or
+	/// <paramref name="classDefinition"/>, <paramref name="inheritedEvent"/>, <paramref name="addAccessorImplementationCallback"/> or
 	/// <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
 	/// </exception>
 	internal GeneratedEvent(
-		TypeDefinition                      typeDefinition,
+		ClassDefinition                     classDefinition,
 		IInheritedEvent<T>                  inheritedEvent,
 		EventAccessorImplementationCallback addAccessorImplementationCallback,
 		EventAccessorImplementationCallback removeAccessorImplementationCallback) :
-		base(typeDefinition)
+		base(classDefinition)
 	{
 		if (inheritedEvent == null) throw new ArgumentNullException(nameof(inheritedEvent));
 		if (addAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(addAccessorImplementationCallback));
@@ -236,15 +236,15 @@ class GeneratedEvent<T> : Member, IGeneratedEvent<T> where T : Delegate
 		Name = inheritedEvent.Name;
 
 		// add an override for the 'add' accessor and the 'remove' accessor method
-		AddAccessor = TypeDefinition.AddMethodOverride(
+		AddAccessor = classDefinition.AddMethodOverride(
 			inheritedEvent.AddAccessor,
 			(_, msilGenerator) => addAccessorImplementationCallback(this, msilGenerator));
-		RemoveAccessor = TypeDefinition.AddMethodOverride(
+		RemoveAccessor = classDefinition.AddMethodOverride(
 			inheritedEvent.RemoveAccessor,
 			(_, msilGenerator) => removeAccessorImplementationCallback(this, msilGenerator));
 
 		// add the actual event and wire up the add/remove accessor
-		EventBuilder = TypeDefinition.TypeBuilder.DefineEvent(Name, EventAttributes.None, EventHandlerType);
+		EventBuilder = classDefinition.TypeBuilder.DefineEvent(Name, EventAttributes.None, EventHandlerType);
 		EventBuilder.SetAddOnMethod(AddAccessor.MethodBuilder);
 		EventBuilder.SetRemoveOnMethod(RemoveAccessor.MethodBuilder);
 	}

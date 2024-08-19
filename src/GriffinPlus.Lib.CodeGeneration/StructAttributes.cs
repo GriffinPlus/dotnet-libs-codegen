@@ -3,17 +3,18 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System.Reflection.Emit;
+using System.Reflection;
 
 namespace GriffinPlus.Lib.CodeGeneration;
 
 /// <summary>
-/// Interface of a generated method.
+/// Attributes of a struct.<br/>
+/// This is a subset of the <see cref="TypeAttributes"/> flags.
 /// </summary>
-public interface IGeneratedMethod : IMethod, IGeneratedMember
+public enum StructAttributes
 {
 	/// <summary>
-	/// Gets the <see cref="System.Reflection.Emit.MethodBuilder"/> associated with the method.
+	/// No struct attributes.
 	/// </summary>
-	MethodBuilder MethodBuilder { get; }
+	None = 0
 }

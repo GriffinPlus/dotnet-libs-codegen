@@ -19,21 +19,26 @@ class InheritedProperty<T> : Member, IInheritedProperty<T>
 	/// <summary>
 	/// Initializes a new instance of the <see cref="InheritedProperty{T}"/> class.
 	/// </summary>
-	/// <param name="typeDefinition">The type definition the member belongs to.</param>
+	/// <param name="classDefinition">The class definition the member belongs to.</param>
 	/// <param name="property">Property the type in creation has inherited.</param>
-	internal InheritedProperty(TypeDefinition typeDefinition, PropertyInfo property) :
-		base(typeDefinition)
+	internal InheritedProperty(TypeDefinition classDefinition, PropertyInfo property) :
+		base(classDefinition)
 	{
 		PropertyInfo = property;
 
 		// init get accessor method
 		MethodInfo getAccessor = PropertyInfo.GetGetMethod(true);
-		if (getAccessor != null) GetAccessor = new InheritedMethod(typeDefinition, getAccessor);
+		if (getAccessor != null) GetAccessor = new InheritedMethod(classDefinition, getAccessor);
 
 		// init set accessor method
 		MethodInfo setAccessor = PropertyInfo.GetSetMethod(true);
-		if (setAccessor != null) SetAccessor = new InheritedMethod(typeDefinition, setAccessor);
+		if (setAccessor != null) SetAccessor = new InheritedMethod(classDefinition, setAccessor);
 	}
+
+	/// <summary>
+	/// Gets the class definition the member belongs to.
+	/// </summary>
+	public new ClassDefinition TypeDefinition => (ClassDefinition)base.TypeDefinition;
 
 	/// <summary>
 	/// Gets the name of the property.

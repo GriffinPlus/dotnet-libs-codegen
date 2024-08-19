@@ -12,7 +12,7 @@ namespace GriffinPlus.Lib.CodeGeneration
 	/// <summary>
 	/// Untyped interface of a generated dependency property.
 	/// </summary>
-	public interface IGeneratedDependencyProperty : IDependencyProperty, IInitialValueProvider
+	public interface IGeneratedDependencyProperty : IDependencyProperty, IGeneratedMember, IInitialValueProvider
 	{
 		/// <summary>
 		/// Gets the static field storing the registered dependency property. Can be of type:<br/>

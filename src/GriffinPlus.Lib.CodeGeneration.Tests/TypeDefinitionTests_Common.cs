@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 
 using Xunit;
 
@@ -27,15 +28,19 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// Creates a new type definition instance with a random name to test.
 	/// </summary>
 	/// <param name="name">Name of the type to create (<c>null</c> to create a random name).</param>
+	/// <param name="attributes">
+	/// Attributes of the type to create
+	/// (only flags that are part of <see cref="ClassAttributes"/> and <see cref="StructAttributes"/> are valid).
+	/// </param>
 	/// <returns>The created type definition instance.</returns>
-	public abstract TDefinition CreateTypeDefinition(string name = null);
+	public abstract TDefinition CreateTypeDefinition(string name = null, TypeAttributes attributes = 0);
 
 	#region Common Test Data
 
 	/// <summary>
 	/// All supported visibilities.
 	/// </summary>
-	private static IEnumerable<Visibility> Visibilities
+	internal static IEnumerable<Visibility> Visibilities
 	{
 		get
 		{
@@ -2374,7 +2379,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion // Adding Fields
 
-	#region Adding Events (TODO, abstract and override test cases missing)
+	#region Adding Events
 
 	#region Test Data
 
@@ -2387,78 +2392,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	}
 
 	/// <summary>
-	/// Test data for tests targeting <see cref="TypeDefinition.AddAbstractEvent{T}(string,Visibility)"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddAbstractEventTestData
-	{
-		get
-		{
-			foreach (string name in new[] { "Event", null })
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.EventHandler
-				yield return
-				[
-					name,                // name of the event
-					visibility,          // visibility of the event
-					typeof(EventHandler) // event handler type
-				];
-
-				// System.EventHandler<EventArgs>
-				yield return
-				[
-					name,                           // name of the event
-					visibility,                     // visibility of the event
-					typeof(EventHandler<EventArgs>) // event handler type
-				];
-
-				// System.EventHandler<SpecializedEventArgs>
-				yield return
-				[
-					name,                                      // name of the event
-					visibility,                                // visibility of the event
-					typeof(EventHandler<SpecializedEventArgs>) // event handler type
-				];
-
-				// System.Action
-				yield return
-				[
-					name,          // name of the event
-					visibility,    // visibility of the event
-					typeof(Action) // event handler type
-				];
-
-				// System.Action<int>
-				yield return
-				[
-					name,               // name of the event
-					visibility,         // visibility of the event
-					typeof(Action<int>) // event handler type
-				];
-
-				// System.Func<int>
-				yield return
-				[
-					name,              // name of the event
-					visibility,        // visibility of the event
-					typeof(Func<long>) // event handler type
-				];
-
-				// System.Func<int,long>
-				yield return
-				[
-					name,                   // name of the event
-					visibility,             // visibility of the event
-					typeof(Func<int, long>) // event handler type
-				];
-			}
-		}
-	}
-
-	/// <summary>
 	/// Test data for tests targeting <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/>,
-	/// <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> and
-	/// <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> using
+	/// <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> and
+	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> using
 	/// <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	public static IEnumerable<object[]> AddEventTestData_WithImplementationStrategy_Standard
@@ -2577,51 +2513,30 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		}
 	}
 
-	#endregion
-
-	#region AddAbstractEvent<T>(string name, Visibility visibility) --- TODO!
-
-	/*
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddAbstractEvent{T}(string,Visibility)"/> method.
+	/// Test data for tests targeting
+	/// <see cref="TypeDefinition.AddEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>,
+	/// <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/> and
+	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>.
 	/// </summary>
-	/// <param name="name">Name of the event to add.</param>
-	/// <param name="visibility">Visibility of the event to add.</param>
-	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-	[Theory]
-	[MemberData(nameof(AddAbstractEventTestData))]
-	public void AddAbstractEvent(string name, Visibility visibility, Type eventHandlerType)
+	public static IEnumerable<object[]> AddEventTestData_WithImplementationCallbacks
 	{
-		// create a new type definition
-		var definition = CreateTypeDefinition();
-
-		// get the AddAbstractEvent(...) method to test
-		var addEventMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddAbstractEvent))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(eventHandlerType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual(new[] { typeof(string), typeof(Visibility) }));
-
-		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
-			definition,
-			new object[] { name, visibility });
-		Assert.Equal(EventKind.Abstract, addedEvent.Kind);
-		Assert.Equal(visibility, addedEvent.Visibility);
-		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Null(addedEvent.Implementation);
-
-		// create the defined type and check the result against the definition
-		// (creating an instance of that type is not possible as it contains an abstract member)
-		Type type = definition.CreateType();
-		CheckTypeAgainstDefinition(type, definition);
+		get
+		{
+			foreach (string name in new[] { "Event", null })
+			foreach (Visibility visibility in Visibilities)
+			{
+				// always:
+				// event type: System.EventHandler<TEventArgs>
+				// event raiser: void OnEvent())
+				yield return
+				[
+					name,      // name of the event
+					visibility // visibility of the event
+				];
+			}
+		}
 	}
-	*/
 
 	#endregion
 
@@ -2703,63 +2618,69 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion
 
-	#region AddVirtualEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
+	#region AddEvent<T>(string name, Visibility visibility, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback)
 
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// Tests the <see cref="TypeDefinition.AddEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/> method
+	/// using a callback to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
-	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-	/// <param name="addEventRaiserMethod">
-	/// <c>true</c> to add the event raiser method;<br/>
-	/// otherwise <c>false</c>.
-	/// </param>
-	/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
-	/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
-	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
-	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
 	[Theory]
-	[MemberData(nameof(AddEventTestData_WithImplementationStrategy_Standard))]
-	public void AddVirtualEvent_WithImplementationStrategy_Standard(
-		string     name,
-		Visibility visibility,
-		Type       eventHandlerType,
-		bool       addEventRaiserMethod,
-		string     eventRaiserName,
-		Visibility eventRaiserVisibility,
-		Type       expectedEventRaiserReturnType,
-		Type[]     expectedEventRaiserParameterTypes)
+	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
+	public void AddEvent_WithImplementationCallbacks(string name, Visibility visibility)
 	{
 		// create a new type definition
 		TDefinition definition = CreateTypeDefinition();
 
-		// create an instance of the implementation strategy
-		Type implementationType = typeof(EventImplementation_Standard);
-		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-			                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
+		// add a backing field for the event's multicast delegate
+		// (always of type EventHandler<EventArgs>, no need to test other types as this affects raising the event only)
+		Type eventHandlerType = typeof(EventHandler<EventArgs>);
+		IGeneratedField backingField = definition.AddField(eventHandlerType, name: null, Visibility.Public);
 
-		// get the AddEvent(...) method to test
+		// prepare callback to add the 'add' accessor and the 'remove' accessor
+		// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+		EventAccessorImplementationCallback implementAddAccessorCallback = (@event,    msilGenerator) => ImplementEventAccessor(@event, true, backingField.FieldBuilder, msilGenerator);
+		EventAccessorImplementationCallback implementRemoveAccessorCallback = (@event, msilGenerator) => ImplementEventAccessor(@event, false, backingField.FieldBuilder, msilGenerator);
+
+		// get the AddEvent<T>(...) method to test
 		MethodInfo addEventMethod = typeof(TypeDefinition)
 			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddVirtualEvent))
+			.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
 			.Where(method => method.GetGenericArguments().Length == 1)
 			.Select(method => method.MakeGenericMethod(eventHandlerType))
 			.Single(
 				method => method
 					.GetParameters()
 					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
 
 		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
+		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementAddAccessorCallback, implementRemoveAccessorCallback]);
 		Assert.NotNull(addedEvent);
-		Assert.Equal(EventKind.Virtual, addedEvent.Kind);
+		Assert.Equal(EventKind.Normal, addedEvent.Kind);
 		Assert.Equal(visibility, addedEvent.Visibility);
 		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Same(implementation, addedEvent.Implementation);
+		Assert.Null(addedEvent.Implementation);
+
+		// add an event raiser method to the type definition
+		// (should always just be: public void FireMyEvent();
+		const MethodKind kind = MethodKind.Normal;
+		string eventRaiserName = "FireMyEvent";
+		Type eventRaiserReturnType = typeof(void);
+		Type[] eventRaiserParameterTypes = [];
+		var eventRaiserVisibility = Visibility.Public;
+		definition.AddMethod(
+			kind,
+			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes,
+			eventRaiserVisibility,
+			(method, msilGenerator) => ImplementEventRaiserMethod(
+				method,
+				backingField.FieldBuilder,
+				addedEvent,
+				msilGenerator));
 
 		// create the defined type, check the result against the definition and create an instance of that type
 		Type type = definition.CreateType();
@@ -2767,29 +2688,17 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// test the implementation of the event
+		// (the implemented event should behave the same as a standard event implementation, use the same test code...)
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			false,
+			isStaticEvent: false,
 			addedEvent.Name,
 			eventHandlerType,
-			addEventRaiserMethod,
+			true,
 			eventRaiserName,
-			expectedEventRaiserReturnType,
-			expectedEventRaiserParameterTypes);
-	}
-
-	#endregion
-
-	#region AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation<T> implementation) --- TODO!
-
-	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
-	/// </summary>
-	public void AddEventOverride_WithImplementationStrategy_Standard()
-	{
-		// TODO: Implement...
+			eventRaiserReturnType,
+			eventRaiserParameterTypes);
 	}
 
 	#endregion
@@ -2868,6 +2777,92 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			eventRaiserName,
 			expectedEventRaiserReturnType,
 			expectedEventRaiserParameterTypes);
+	}
+
+	#endregion
+
+	#region AddStaticEvent<T>(string name, Visibility visibility, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback)
+
+	/// <summary>
+	/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>
+	/// method
+	/// using a callback to implement add/remove accessors and the event raiser method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
+	public void AddStaticEvent_WithImplementationCallbacks(string name, Visibility visibility)
+	{
+		// create a new type definition
+		TDefinition definition = CreateTypeDefinition();
+
+		// add a backing field for the event's multicast delegate
+		// (always of type EventHandler<EventArgs>, no need to test other types as this affects raising the event only)
+		Type eventHandlerType = typeof(EventHandler<EventArgs>);
+		IGeneratedField backingField = definition.AddStaticField(eventHandlerType, name: null, Visibility.Public);
+
+		// prepare callback to add the 'add' accessor and the 'remove' accessor
+		// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+		EventAccessorImplementationCallback implementAddAccessorCallback = (@event,    msilGenerator) => ImplementEventAccessor(@event, true, backingField.FieldBuilder, msilGenerator);
+		EventAccessorImplementationCallback implementRemoveAccessorCallback = (@event, msilGenerator) => ImplementEventAccessor(@event, false, backingField.FieldBuilder, msilGenerator);
+
+		// get the AddStaticEvent<T>(...) method to test
+		MethodInfo addEventMethod = typeof(TypeDefinition)
+			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+			.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
+			.Where(method => method.GetGenericArguments().Length == 1)
+			.Select(method => method.MakeGenericMethod(eventHandlerType))
+			.Single(
+				method => method
+					.GetParameters()
+					.Select(parameter => parameter.ParameterType)
+					.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
+
+		// invoke the method to add the event to the type definition
+		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementAddAccessorCallback, implementRemoveAccessorCallback]);
+		Assert.NotNull(addedEvent);
+		Assert.Equal(EventKind.Static, addedEvent.Kind);
+		Assert.Equal(visibility, addedEvent.Visibility);
+		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
+		Assert.Null(addedEvent.Implementation);
+
+		// add an event raiser method to the type definition
+		// (should always just be: void FireMyEvent();
+		const MethodKind kind = MethodKind.Static;
+		const string eventRaiserName = "FireMyEvent";
+		Type eventRaiserReturnType = typeof(void);
+		Type[] eventRaiserParameterTypes = [];
+		const Visibility eventRaiserVisibility = Visibility.Public;
+		definition.AddMethod(
+			kind,
+			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes,
+			eventRaiserVisibility,
+			(method, msilGenerator) => ImplementEventRaiserMethod(
+				method,
+				backingField.FieldBuilder,
+				addedEvent,
+				msilGenerator));
+
+		// create the defined type, check the result against the definition and create an instance of that type
+		Type type = definition.CreateType();
+		CheckTypeAgainstDefinition(type, definition);
+		object instance = Activator.CreateInstance(type);
+
+		// test the implementation of the event
+		// (the implemented event should behave the same as a standard event implementation, use the same test code...)
+		TestEventImplementation_Standard(
+			definition,
+			instance,
+			isStaticEvent: true,
+			addedEvent.Name,
+			eventHandlerType,
+			true,
+			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes);
 	}
 
 	#endregion
@@ -3085,11 +3080,159 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.False(handlerWasCalled);
 	}
 
+	/// <summary>
+	/// Implements the add/remove accessor of the event.
+	/// </summary>
+	/// <param name="isAdd">
+	/// <c>true</c> to implement the 'add' accessor method;<br/>
+	/// <c>false</c> to implement the 'remove' accessor method.
+	/// </param>
+	/// <param name="eventToImplement">Event to implement.</param>
+	/// <param name="backingFieldBuilder">The field builder of the backing field.</param>
+	/// <param name="msilGenerator">MSIL generator to use for implementing the accessor.</param>
+	private void ImplementEventAccessor(
+		IGeneratedEvent eventToImplement,
+		bool            isAdd,
+		FieldBuilder    backingFieldBuilder,
+		ILGenerator     msilGenerator)
+	{
+		// the type of the event to implement should be the same as the type of the backing field
+		Assert.Same(backingFieldBuilder.FieldType, eventToImplement.EventHandlerType);
+
+		// the MSIL generator should be the same as the MSIL generator returned by the generated event
+		Assert.Same(
+			msilGenerator,
+			isAdd
+				? eventToImplement.AddAccessor.MethodBuilder.GetILGenerator()
+				: eventToImplement.RemoveAccessor.MethodBuilder.GetILGenerator());
+
+		Type backingFieldType = backingFieldBuilder.FieldType;
+
+		// get the Delegate.Combine() method  when adding a handler and Delegate.Remove() when removing a handler
+		MethodInfo delegateMethod = typeof(Delegate).GetMethod(isAdd ? "Combine" : "Remove", [typeof(Delegate), typeof(Delegate)]);
+		Debug.Assert(delegateMethod != null, nameof(delegateMethod) + " != null");
+
+		// get the System.Threading.Interlocked.CompareExchange(ref object, object, object) method
+		MethodInfo interlockedCompareExchangeGenericMethod = typeof(Interlocked).GetMethods().Single(m => m.Name == "CompareExchange" && m.GetGenericArguments().Length == 1);
+		MethodInfo interlockedCompareExchangeMethod = interlockedCompareExchangeGenericMethod.MakeGenericMethod(backingFieldType);
+
+		// emit code to combine the handler with the multicast delegate in the backing field respectively remove the handler from it
+		Debug.Assert(msilGenerator == (isAdd ? eventToImplement.AddAccessor.MethodBuilder.GetILGenerator() : eventToImplement.RemoveAccessor.MethodBuilder.GetILGenerator()));
+		msilGenerator.DeclareLocal(backingFieldType); // local 0
+		msilGenerator.DeclareLocal(backingFieldType); // local 1
+		msilGenerator.DeclareLocal(backingFieldType); // local 2
+		Label retryLabel = msilGenerator.DefineLabel();
+		if (eventToImplement.Kind == EventKind.Static)
+		{
+			msilGenerator.Emit(OpCodes.Ldsfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.MarkLabel(retryLabel);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Stloc_1);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.EmitCall(OpCodes.Call, delegateMethod, null);
+			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
+			msilGenerator.Emit(OpCodes.Stloc_2);
+			msilGenerator.Emit(OpCodes.Ldsflda, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc_2);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Bne_Un_S, retryLabel);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+		else
+		{
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.MarkLabel(retryLabel);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Stloc_1);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Ldarg_1);
+			msilGenerator.EmitCall(OpCodes.Call, delegateMethod, null);
+			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
+			msilGenerator.Emit(OpCodes.Stloc_2);
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldflda, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc_2);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Bne_Un_S, retryLabel);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+	}
+
+	/// <summary>
+	/// Implements the event raiser method.
+	/// </summary>
+	/// <param name="method">The method to implement.</param>
+	/// <param name="backingFieldBuilder">The field builder of the backing field.</param>
+	/// <param name="event">The event the raiser method to implement belongs to.</param>
+	/// <param name="msilGenerator">MSIL generator attached to the event raiser method to implement.</param>
+	private void ImplementEventRaiserMethod(
+		IGeneratedMethod method,
+		FieldBuilder     backingFieldBuilder,
+		IGeneratedEvent  @event,
+		ILGenerator      msilGenerator)
+	{
+		Assert.Same(msilGenerator, method.MethodBuilder.GetILGenerator());
+		Assert.Equal(typeof(EventHandler<EventArgs>), @event.EventHandlerType);
+
+		// the event type is System.EventHandler<EventArgs>
+		// => the event raiser will have the signature: void OnEvent()
+		FieldInfo eventArgsEmpty = typeof(EventArgs).GetField("Empty");
+		Debug.Assert(eventArgsEmpty != null);
+		LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(backingFieldBuilder.FieldType);
+		Label label = msilGenerator.DefineLabel();
+
+		if (@event.Kind == EventKind.Static)
+		{
+			msilGenerator.Emit(OpCodes.Ldsfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Brfalse_S, label);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldnull);                 // load sender (null)
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
+		}
+		else
+		{
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Brfalse_S, label);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldarg_0); // load sender (this)
+			if (method.TypeDefinition.TypeBuilder.IsValueType)
+			{
+				msilGenerator.Emit(OpCodes.Ldobj, method.TypeDefinition.TypeBuilder);
+				msilGenerator.Emit(OpCodes.Box, method.TypeDefinition.TypeBuilder);
+			}
+
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
+		}
+
+		MethodInfo invokeMethod = backingFieldBuilder.FieldType.GetMethod("Invoke");
+		Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+		msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
+		msilGenerator.MarkLabel(label);
+		msilGenerator.Emit(OpCodes.Ret);
+	}
+
 	#endregion
 
 	#endregion // Adding Events
 
-	#region Adding Properties (TODO, abstract and override test cases missing)
+	#region Adding Properties
 
 	#region Test Data
 
@@ -3124,14 +3267,6 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			}
 		}
 	}
-
-	#endregion
-
-	#region AddAbstractProperty<T>(string name) --- TODO!
-
-	#endregion
-
-	#region AddAbstractProperty(Type type, string name) --- TODO!
 
 	#endregion
 
@@ -3402,292 +3537,6 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			addedProperty_setOnly,
 			addedProperty_none);
 	}
-
-	#endregion
-
-	#region AddVirtualProperty<T>(string name)
-
-	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddVirtualProperty{T}(string)"/> method.
-	/// </summary>
-	/// <param name="name">Name of the property to add.</param>
-	/// <param name="propertyType">Type of the property to add.</param>
-	/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
-	/// <param name="testObjects">Test values to use when playing with accessor methods.</param>
-	[Theory]
-	[MemberData(nameof(AddPropertyTestData))]
-	public void AddVirtualPropertyT_WithoutImplementationStrategy(
-		string     name,
-		Type       propertyType,
-		Visibility accessorVisibility,
-		object[]   testObjects)
-	{
-		// create a new type definition and add the property (actually one property with get/set accessors,
-		// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addPropertyMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(propertyType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string)]));
-
-		using var storage = new TestDataStorage();
-		int handle = storage.Add(testObjects[0]);
-
-		var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [name != null ? name + "_getSet" : null]);
-		var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [name != null ? name + "_getOnly" : null]);
-		var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [name != null ? name + "_setOnly" : null]);
-		var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [name != null ? name + "_none" : null]);
-
-		// add accessor methods and test the property
-		AddProperty_CommonPart(
-			definition,
-			PropertyKind.Virtual,
-			propertyType,
-			accessorVisibility,
-			null,
-			handle,
-			testObjects,
-			addedProperty_getSet,
-			addedProperty_getOnly,
-			addedProperty_setOnly,
-			addedProperty_none);
-	}
-
-	#endregion
-
-	#region AddVirtualProperty(Type type, string name)
-
-	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddVirtualProperty(Type,string)"/> method.
-	/// </summary>
-	/// <param name="name">Name of the property to add.</param>
-	/// <param name="propertyType">Type of the property to add.</param>
-	/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
-	/// <param name="testObjects">Test values to use when playing with accessor methods.</param>
-	[Theory]
-	[MemberData(nameof(AddPropertyTestData))]
-	public void AddVirtualProperty_WithoutImplementationStrategy(
-		string     name,
-		Type       propertyType,
-		Visibility accessorVisibility,
-		object[]   testObjects)
-	{
-		// create a new type definition and add the property
-		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addPropertyMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string)]));
-
-		using var storage = new TestDataStorage();
-		int handle = storage.Add(testObjects[0]);
-
-		var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [propertyType, name != null ? name + "_getSet" : null]);
-		var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [propertyType, name != null ? name + "_getOnly" : null]);
-		var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [propertyType, name != null ? name + "_setOnly" : null]);
-		var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(definition, [propertyType, name != null ? name + "_none" : null]);
-
-		// add accessor methods and test the property
-		AddProperty_CommonPart(
-			definition,
-			PropertyKind.Virtual,
-			propertyType,
-			accessorVisibility,
-			null,
-			handle,
-			testObjects,
-			addedProperty_getSet,
-			addedProperty_getOnly,
-			addedProperty_setOnly,
-			addedProperty_none);
-	}
-
-	#endregion
-
-	#region AddVirtualProperty<T>(string name, IPropertyImplementation implementation)
-
-	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddVirtualProperty{T}(string,IPropertyImplementation)"/> method.
-	/// </summary>
-	/// <param name="name">Name of the property to add.</param>
-	/// <param name="propertyType">Type of the property to add.</param>
-	/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
-	/// <param name="testObjects">Test values to use when playing with accessor methods.</param>
-	[Theory]
-	[MemberData(nameof(AddPropertyTestData))]
-	public void AddVirtualPropertyT_WithImplementationStrategy(
-		string     name,
-		Type       propertyType,
-		Visibility accessorVisibility,
-		object[]   testObjects)
-	{
-		// create a new type definition and add the property (actually one property with get/set accessors,
-		// one property with get accessor only, one property with set accessor only and one property without a get/set accessor)
-		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addPropertyMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(propertyType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(IPropertyImplementation)]));
-
-		using var storage = new TestDataStorage();
-		int handle = storage.Add(testObjects[0]);
-		var implementation = new PropertyImplementation_TestDataStorage(handle);
-
-		var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				name != null ? name + "_getSet" : null,
-				implementation
-			]);
-
-		var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				name != null ? name + "_getOnly" : null,
-				implementation
-			]);
-
-		var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				name != null ? name + "_setOnly" : null,
-				implementation
-			]);
-
-		var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				name != null ? name + "_none" : null,
-				implementation
-			]);
-
-		// add accessor methods and test the property
-		AddProperty_CommonPart(
-			definition,
-			PropertyKind.Virtual,
-			propertyType,
-			accessorVisibility,
-			implementation,
-			handle,
-			testObjects,
-			addedProperty_getSet,
-			addedProperty_getOnly,
-			addedProperty_setOnly,
-			addedProperty_none);
-	}
-
-	#endregion
-
-	#region AddVirtualProperty(Type type, string name, IPropertyImplementation implementation)
-
-	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddVirtualProperty(Type,string,IPropertyImplementation)"/> method.
-	/// </summary>
-	/// <param name="name">Name of the property to add.</param>
-	/// <param name="propertyType">Type of the property to add.</param>
-	/// <param name="accessorVisibility">Visibility the 'get'/'set' accessor should have.</param>
-	/// <param name="testObjects">Test values to use when playing with accessor methods.</param>
-	[Theory]
-	[MemberData(nameof(AddPropertyTestData))]
-	public void AddVirtualProperty_WithImplementationStrategy(
-		string     name,
-		Type       propertyType,
-		Visibility accessorVisibility,
-		object[]   testObjects)
-	{
-		// create a new type definition and add the property
-		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addPropertyMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddVirtualProperty))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(IPropertyImplementation)]));
-
-		using var storage = new TestDataStorage();
-		int handle = storage.Add(testObjects[0]);
-		var implementation = new PropertyImplementation_TestDataStorage(handle);
-
-		var addedProperty_getSet = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				propertyType,
-				name != null ? name + "_getSet" : null,
-				implementation
-			]);
-
-		var addedProperty_getOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				propertyType,
-				name != null ? name + "_getOnly" : null,
-				implementation
-			]);
-
-		var addedProperty_setOnly = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				propertyType,
-				name != null ? name + "_setOnly" : null,
-				implementation
-			]);
-
-		var addedProperty_none = (IGeneratedProperty)addPropertyMethod.Invoke(
-			definition,
-			[
-				propertyType,
-				name != null ? name + "_none" : null,
-				implementation
-			]);
-
-		// add accessor methods and test the property
-		AddProperty_CommonPart(
-			definition,
-			PropertyKind.Virtual,
-			propertyType,
-			accessorVisibility,
-			implementation,
-			handle,
-			testObjects,
-			addedProperty_getSet,
-			addedProperty_getOnly,
-			addedProperty_setOnly,
-			addedProperty_none);
-	}
-
-	#endregion
-
-	#region AddPropertyOverride<T>(IInheritedProperty<T> property, IPropertyImplementation implementation) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride(IInheritedProperty property, IPropertyImplementation implementation) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride<T>(IInheritedProperty<T> property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride(IInheritedProperty property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
 
 	#endregion
 
@@ -3978,7 +3827,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <param name="addedProperty_getOnly">The added property to test (with 'get' accessor only).</param>
 	/// <param name="addedProperty_setOnly">The added property to test (with 'set' accessor only).</param>
 	/// <param name="addedProperty_none">The added property to test (without 'get'/'set' accessor).</param>
-	private static void AddProperty_CommonPart(
+	internal static void AddProperty_CommonPart(
 		TDefinition             definition,
 		PropertyKind            expectedPropertyKind,
 		Type                    expectedPropertyType,
@@ -4003,14 +3852,14 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TestAddedProperty(addedProperty_setOnly, expectedPropertyKind, expectedPropertyType, implementation);
 		TestAddedProperty(addedProperty_none, expectedPropertyKind, expectedPropertyType, implementation);
 
-		// implement get/set accessor methods
+		// implement get/set accessor methods (abstract properties are declared only)
 		// (the actual data is stored in the test data storage, so it can be inspected more easily)
-		if (implementation != null)
+		if (implementation != null || expectedPropertyKind == PropertyKind.Abstract)
 		{
-			addedProperty_getSet.AddGetAccessor(accessorVisibility);
-			addedProperty_getSet.AddSetAccessor(accessorVisibility);
-			addedProperty_getOnly.AddGetAccessor(accessorVisibility);
-			addedProperty_setOnly.AddSetAccessor(accessorVisibility);
+			addedProperty_getSet.AddGetAccessor(accessorVisibility, getAccessorImplementationCallback: null);
+			addedProperty_getSet.AddSetAccessor(accessorVisibility, setAccessorImplementationCallback: null);
+			addedProperty_getOnly.AddGetAccessor(accessorVisibility, getAccessorImplementationCallback: null);
+			addedProperty_setOnly.AddSetAccessor(accessorVisibility, setAccessorImplementationCallback: null);
 		}
 		else
 		{
@@ -4028,16 +3877,21 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(addedProperty_getSet.GetAccessor);
 		Assert.NotNull(addedProperty_getSet.SetAccessor);
 
-		// create the defined type, check the result against the definition and create an instance of that type
+		// create the defined type, check the result against the definition
 		Type generatedType = definition.CreateType();
 		CheckTypeAgainstDefinition(generatedType, definition);
-		object instance = Activator.CreateInstance(generatedType);
 
-		// test the property implementation
-		TestPropertyImplementation(addedProperty_getSet, instance, testObjects, handle);
-		TestPropertyImplementation(addedProperty_getOnly, instance, testObjects, handle);
-		TestPropertyImplementation(addedProperty_setOnly, instance, testObjects, handle);
-		TestPropertyImplementation(addedProperty_none, instance, testObjects, handle);
+		// create an instance of that generated type and test the property implementation,
+		// if the property has an implementation
+		if (expectedPropertyKind != PropertyKind.Abstract)
+		{
+			// test the property implementation
+			object instance = Activator.CreateInstance(generatedType);
+			TestPropertyImplementation(addedProperty_getSet, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_getOnly, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_setOnly, instance, testObjects, handle);
+			TestPropertyImplementation(addedProperty_none, instance, testObjects, handle);
+		}
 	}
 
 	/// <summary>
@@ -4122,40 +3976,46 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(property);
 
 		// reset instance if the property is static to make getting/setting them below work as expected
-		if (generatedProperty.Kind == PropertyKind.Static) instance = null;
+		if (generatedProperty.Kind == PropertyKind.Static)
+			instance = null;
 
-		// reset test data in the backing storage
-		TestDataStorage.Set(testDataHandle, testObjects[0]);
-
-		// check whether the get accessor returns the expected initial value
-		if (property.CanRead)
-			Assert.Equal(testObjects[0], property.GetValue(instance));
-
-		// check whether the set accessor modifies the test data in the backing storage
-		if (property.CanWrite)
+		if (generatedProperty.Kind != PropertyKind.Abstract)
 		{
-			// property has a set accessor
-			// => use it to modify the data in the backing storage
-			property.SetValue(instance, testObjects[1]);
-			Assert.Equal(testObjects[1], TestDataStorage.Get(testDataHandle));
-		}
-		else
-		{
-			// property does not have a set accessor
-			// => directly change data in the backing storage
-			TestDataStorage.Set(testDataHandle, testObjects[1]);
-		}
+			// reset test data in the backing storage
+			TestDataStorage.Set(testDataHandle, testObjects[0]);
 
-		// check whether the get accessor returns the changed value
-		if (property.CanRead)
-			Assert.Equal(testObjects[1], property.GetValue(instance));
+			// check whether the get accessor returns the expected initial value
+			if (property.CanRead)
+				Assert.Equal(testObjects[0], property.GetValue(instance));
+
+			// check whether the set accessor modifies the test data in the backing storage
+			if (property.CanWrite)
+			{
+				// property has a set accessor
+				// => use it to modify the data in the backing storage
+				property.SetValue(instance, testObjects[1]);
+				Assert.Equal(testObjects[1], TestDataStorage.Get(testDataHandle));
+			}
+			else
+			{
+				// property does not have a set accessor
+				// => directly change data in the backing storage
+				TestDataStorage.Set(testDataHandle, testObjects[1]);
+			}
+
+			// check whether the get accessor returns the changed value
+			if (property.CanRead)
+				Assert.Equal(testObjects[1], property.GetValue(instance));
+		}
 	}
 
 	#endregion
 
 	#endregion // Adding Properties
 
-	#region Adding Methods (TODO, all test cases missing)
+	#region Adding Methods (TODO, all test cases missing!!!)
+
+	// TODO: Add testing adding methods!
 
 	#endregion // Adding Methods
 

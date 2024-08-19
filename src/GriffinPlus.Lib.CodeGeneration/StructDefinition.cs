@@ -3,6 +3,8 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using System.Reflection;
+
 namespace GriffinPlus.Lib.CodeGeneration;
 
 /// <summary>
@@ -14,7 +16,12 @@ public sealed class StructDefinition : TypeDefinition
 	/// Initializes a new definition of a struct.
 	/// </summary>
 	/// <param name="name">Name of the struct to create (<c>null</c> to create a random name).</param>
-	public StructDefinition(string name = null) : base(null, true, name) { }
+	/// <param name="attributes">Attributes of the type.</param>
+	public StructDefinition(string name = null, StructAttributes attributes = StructAttributes.None) : base(
+		module: null,
+		isValueType: true,
+		name: name,
+		attributes: (TypeAttributes)attributes) { }
 
 	/// <summary>
 	/// Initializes a new definition of a struct
@@ -22,5 +29,10 @@ public sealed class StructDefinition : TypeDefinition
 	/// </summary>
 	/// <param name="module">Module definition to associate the class definition with.</param>
 	/// <param name="name">Name of the struct to create (<c>null</c> to create a random name).</param>
-	internal StructDefinition(ModuleDefinition module, string name) : base(module, true, name) { }
+	/// <param name="attributes">Attributes of the type.</param>
+	internal StructDefinition(ModuleDefinition module, string name = null, StructAttributes attributes = StructAttributes.None) : base(
+		module: module,
+		isValueType: true,
+		name: name,
+		attributes: (TypeAttributes)attributes) { }
 }

@@ -11,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// <summary>
 /// Untyped interface of a generated property.
 /// </summary>
-public interface IGeneratedProperty : IProperty
+public interface IGeneratedProperty : IProperty, IGeneratedMember
 {
 	/// <summary>
 	/// Gets the <see cref="System.Reflection.Emit.PropertyBuilder"/> associated with the field.
