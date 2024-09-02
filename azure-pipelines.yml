@@ -12,8 +12,8 @@
 # - Windows Server 2022, .NET 6.0        (tests with build for net6.0 and net6.0-windows7.0)
 # - Windows Server 2022, .NET 7.0        (tests with build for net7.0 and net7.0-windows7.0)
 # - Windows Server 2022, .NET 8.0        (tests with build for net8.0 and net8.0-windows7.0)
-# - Ubuntu 22.04, .NET Core 2.2          (tests with build for netcoreapp2.1)
-# - Ubuntu 22.04, .NET Core 3.1          (tests with build for netcoreapp3.1)
+# - Ubuntu 22.04, .NET Core 2.2          (tests with build for netstandard2.0)
+# - Ubuntu 22.04, .NET Core 3.1          (tests with build for netstandard2.1)
 # - Ubuntu 22.04, .NET 5.0               (tests with build for net5.0)
 # - Ubuntu 22.04, .NET 6.0               (tests with build for net6.0)
 # - Ubuntu 22.04, .NET 7.0               (tests with build for net7.0)
@@ -127,7 +127,7 @@ stages:
         script: |
           New-Item -ItemType Directory -Force -Path '$(Pipeline.Workspace)/variables'
           Set-Location -Path '$(Pipeline.Workspace)/variables'
-          '$(GitVersion.NuGetVersion)' | Out-File GitVersion.NuGetVersion -NoNewLine
+          '$(GitVersion.SemVer)' | Out-File GitVersion.SemVer -NoNewLine
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Pipeline Artifacts'
       inputs:
@@ -144,6 +144,17 @@ stages:
 ########################################################################################################################
 - stage: 'Tests'
   jobs:
+  ######################################################################################################################
+  # Job:
+  # - .NET Framework 4.6.1 on Windows Server 2022
+  # - .NET Framework 4.8 on Windows Server 2022
+  # - .NET Core 2.2 on Windows Server 2022 and Ubuntu 22.04
+  # - .NET Core 3.1 on Windows Server 2022 and Ubuntu 22.04
+  # - .NET 5.0 on Windows Server 2022 and Ubuntu 22.04
+  # - .NET 6.0 on Windows Server 2022 and Ubuntu 22.04
+  # - .NET 7.0 on Windows Server 2022 and Ubuntu 22.04
+  # - .NET 8.0 on Windows Server 2022 and Ubuntu 22.04
+  ######################################################################################################################
   - job:
     displayName: ''
     timeoutInMinutes: 120
@@ -340,7 +351,7 @@ stages:
               "$($file.FullName)" `
               -Symbols `
               -SymbolPackageFormat snupkg `
-              -Properties version=$(GitVersion.NuGetVersion) `
+              -Properties version=$(GitVersion.SemVer) `
               -OutputDirectory "$(Build.ArtifactStagingDirectory)" `
               -Verbosity detailed
             if ($lastexitcode -ne 0) { throw("Creating nuget package failed.") }
