@@ -14,33 +14,33 @@
 		<tags>code generation</tags>
 		<dependencies>
 			<group targetFramework="netstandard2.0">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 				<dependency id="System.Reflection.Emit" version="4.7.0" include="all" />
 			</group>
 			<group targetFramework="netstandard2.1">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 			</group>
 			<group targetFramework="net461">
 			</group>
 			<group targetFramework="net48">
 			</group>
 			<group targetFramework="net5.0">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 			</group>
 			<group targetFramework="net5.0-windows7.0">
 			</group>
 			<group targetFramework="net6.0">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 			</group>
 			<group targetFramework="net6.0-windows7.0">
 			</group>
 			<group targetFramework="net7.0">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 			</group>
 			<group targetFramework="net7.0-windows7.0">
 			</group>
 			<group targetFramework="net8.0">
-				<dependency id="System.CodeDom" version="7.0.0" include="all" />
+				<dependency id="System.CodeDom" version="8.0.0" include="all" />
 			</group>
 			<group targetFramework="net8.0-windows7.0">
 			</group>
