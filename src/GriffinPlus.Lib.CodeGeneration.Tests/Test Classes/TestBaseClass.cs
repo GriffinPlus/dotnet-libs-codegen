@@ -23,37 +23,13 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// Base class for dynamically created classes.
 /// The class does not contain abstract members, therefore it is instantiable.
 /// </summary>
-public class TestBaseClass
+public class TestBaseClass : ITestBaseClass
 {
 	/// <summary>
-	/// Dummy type for parameter for constructors that are public
-	/// (allows to see the type of the constructor in the debugger at the first glance).
+	/// The argument passed to <see cref="TestBaseClass(int)"/> or <see cref="TestBaseClass(string)"/>.
 	/// </summary>
-	public enum ParameterType_Public;
-
-	/// <summary>
-	/// Dummy type for parameter for constructors that are protected internal
-	/// (allows to see the type of the constructor in the debugger at the first glance).
-	/// </summary>
-	public enum ParameterType_ProtectedInternal;
-
-	/// <summary>
-	/// Dummy type for parameter for constructors that are protected
-	/// (allows to see the type of the constructor in the debugger at the first glance).
-	/// </summary>
-	public enum ParameterType_Protected;
-
-	/// <summary>
-	/// Dummy type for parameter for constructors that are internal
-	/// (allows to see the type of the constructor in the debugger at the first glance).
-	/// </summary>
-	public enum ParameterType_Internal;
-
-	/// <summary>
-	/// Dummy type for parameter for constructors that are private
-	/// (allows to see the type of the constructor in the debugger at the first glance).
-	/// </summary>
-	public enum ParameterType_Private;
+	// ReSharper disable once MemberInitializerValueIgnored
+	public object ConstructorArgument { get; set; } = "Unset";
 
 	public             int Field_Public;
 	protected internal int Field_ProtectedInternal;
@@ -118,15 +94,56 @@ public class TestBaseClass
 	internal static            void Method_Static_Internal()           { }
 	private static             void Method_Static_Private()            { }
 
-	public TestBaseClass() { }
-	public TestBaseClass(ParameterType_Public                        x) { }
-	protected internal TestBaseClass(ParameterType_ProtectedInternal x) { }
-	protected TestBaseClass(ParameterType_Protected                  x) { }
-	internal TestBaseClass(ParameterType_Internal                    x) { }
-	private TestBaseClass(ParameterType_Private                      x) { }
+	// -----------------------------------------------------------------------------------------------
+	// constructors with different visibilities
+	// -----------------------------------------------------------------------------------------------
+
+	public TestBaseClass()
+	{
+		ConstructorArgument = null;
+	}
+
+	public TestBaseClass(ParameterType_Public x)
+	{
+		ConstructorArgument = x;
+	}
+
+	protected internal TestBaseClass(ParameterType_ProtectedInternal x)
+	{
+		ConstructorArgument = x;
+	}
+
+	protected TestBaseClass(ParameterType_Protected x)
+	{
+		ConstructorArgument = x;
+	}
+
+	internal TestBaseClass(ParameterType_Internal x)
+	{
+		ConstructorArgument = x;
+	}
+
+	private TestBaseClass(ParameterType_Private x)
+	{
+		ConstructorArgument = x;
+	}
+
+	// -----------------------------------------------------------------------------------------------
+	// constructors for testing passing arguments
+	// -----------------------------------------------------------------------------------------------
+
+	public TestBaseClass(int value) // value type argument
+	{
+		ConstructorArgument = value;
+	}
+
+	public TestBaseClass(string value) // reference type argument
+	{
+		ConstructorArgument = value;
+	}
 }
 
-#pragma warning restore CS0649
-#pragma warning restore CS0169
+#pragma warning restore CS0649  // Field is never assigned to, and will always have its default value
+#pragma warning restore CS0169  // Field is never used
 #pragma warning restore CS0067  // Event is never used
 #pragma warning restore IDE0051 // Remove unused private members

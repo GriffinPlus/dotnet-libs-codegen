@@ -17,8 +17,98 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// </summary>
 public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<ClassDefinition>
 {
-	// TODO: Add tests for...
-	// AddPassThroughConstructors()
+	#region AddPassThroughConstructors()
+
+	/// <summary>
+	/// Tests the <see cref="ClassDefinition.AddPassThroughConstructors"/> method.
+	/// </summary>
+	[Fact]
+	public void AddPassThroughConstructors()
+	{
+		// create a class definition deriving from the base class and creating pass-through constructors
+		ClassDefinition definition = CreateTypeDefinition();
+		definition.AddPassThroughConstructors();
+		Type type = definition.CreateType();
+
+		// check whether the expected constructors have been added
+		CheckTypeAgainstDefinition(type, definition);
+
+		// try to get the generated constructors of our test base class
+		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding;
+		ConstructorInfo constructor1 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [], null);
+		ConstructorInfo constructor2 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_Public)], null);
+		ConstructorInfo constructor3 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_ProtectedInternal)], null);
+		ConstructorInfo constructor4 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_Protected)], null);
+		ConstructorInfo constructor5 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_Internal)], null);
+		ConstructorInfo constructor6 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_Private)], null);
+		ConstructorInfo constructor7 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(int)], null);
+		ConstructorInfo constructor8 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(string)], null);
+
+		if (type.BaseType == typeof(object))
+		{
+			// the generated class does not have a base class,
+			// respectively the base class is System.Object
+
+			// test constructor 1: public default constructor
+			Assert.NotNull(constructor1);
+			object instance1 = constructor1.Invoke([]);
+			Assert.NotNull(instance1);
+
+			// the other constructors expected from the test base classes should not exist
+			// as System.Object does not provide them
+			Assert.Null(constructor2); // public constructor
+			Assert.Null(constructor3); // protected internal constructor
+			Assert.Null(constructor4); // protected constructor
+			Assert.Null(constructor5); // internal constructor
+			Assert.Null(constructor6); // private constructor
+			Assert.Null(constructor7); // public constructor with int argument (value type)
+			Assert.Null(constructor8); // public constructor with string argument (reference type)
+		}
+		else
+		{
+			// the generated class has a base class
+
+			// test constructor 1: public default constructor
+			Assert.NotNull(constructor1);
+			var instance1 = (ITestBaseClass)constructor1.Invoke([]);
+			Assert.Null(instance1.ConstructorArgument);
+
+			// test constructor 2: public constructor with enum argument
+			Assert.NotNull(constructor2);
+			var instance2 = (ITestBaseClass)constructor2.Invoke([ParameterType_Public.Value]);
+			Assert.Equal(ParameterType_Public.Value, instance2.ConstructorArgument);
+
+			// test constructor 3: protected internal constructor with enum argument
+			Assert.NotNull(constructor3);
+			var instance3 = (ITestBaseClass)constructor3.Invoke([ParameterType_ProtectedInternal.Value]);
+			Assert.Equal(ParameterType_ProtectedInternal.Value, instance3.ConstructorArgument);
+
+			// test constructor 4: protected constructor with enum argument
+			Assert.NotNull(constructor4);
+			var instance4 = (ITestBaseClass)constructor4.Invoke([ParameterType_Protected.Value]);
+			Assert.Equal(ParameterType_Protected.Value, instance4.ConstructorArgument);
+
+			// test constructor 5: internal constructor with enum argument
+			// (should not have been generated due to accessibility reasons)
+			Assert.Null(constructor5);
+
+			// test constructor 6: private constructor with enum argument
+			// (should not have been generated due to accessibility reasons)
+			Assert.Null(constructor6);
+
+			// test constructor 7: public constructor with an int argument (value type)
+			Assert.NotNull(constructor7);
+			var instance7 = (ITestBaseClass)constructor7.Invoke([42]);
+			Assert.Equal(42, instance7.ConstructorArgument);
+
+			// test constructor 8: public constructor with a string argument (reference type)
+			Assert.NotNull(constructor8);
+			var instance8 = (ITestBaseClass)constructor8.Invoke(["Test"]);
+			Assert.Equal("Test", instance8.ConstructorArgument);
+		}
+	}
+
+	#endregion
 
 	#region Adding Events (TODO, override test cases missing)
 

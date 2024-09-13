@@ -49,12 +49,23 @@ public class TestBaseClass_WithOverrides : TestBaseClass_Abstract
 	protected override          void Method_Virtual_Protected()          { }
 	internal override           void Method_Virtual_Internal()           { }
 
+	// -----------------------------------------------------------------------------------------------
+	// constructors with different visibilities
+	// -----------------------------------------------------------------------------------------------
+
 	public TestBaseClass_WithOverrides() : base() { }
 	public TestBaseClass_WithOverrides(ParameterType_Public                        x) : base(x) { }
 	protected internal TestBaseClass_WithOverrides(ParameterType_ProtectedInternal x) : base(x) { }
 	protected TestBaseClass_WithOverrides(ParameterType_Protected                  x) : base(x) { }
 	internal TestBaseClass_WithOverrides(ParameterType_Internal                    x) : base(x) { }
 	private TestBaseClass_WithOverrides(ParameterType_Private                      x) : base() { }
+
+	// -----------------------------------------------------------------------------------------------
+	// constructors for testing passing arguments
+	// -----------------------------------------------------------------------------------------------
+
+	public TestBaseClass_WithOverrides(int    value) : base(value) { } // value type argument
+	public TestBaseClass_WithOverrides(string value) : base(value) { } // reference type argument
 }
 
 #pragma warning restore IDE0060 // Remove unused parameter

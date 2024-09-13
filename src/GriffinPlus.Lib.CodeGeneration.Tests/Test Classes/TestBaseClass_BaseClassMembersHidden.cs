@@ -79,16 +79,27 @@ public class TestBaseClass_BaseClassMembersHidden : TestBaseClass
 	internal new static            void Method_Static_Internal()           { }
 	private static                 void Method_Static_Private()            { } // new not needed, private methods are not hidden as not visible to derived classes
 
+	// -----------------------------------------------------------------------------------------------
+	// constructors with different visibilities
+	// -----------------------------------------------------------------------------------------------
+
 	public TestBaseClass_BaseClassMembersHidden() : base() { }
 	public TestBaseClass_BaseClassMembersHidden(ParameterType_Public                        x) : base(x) { }
 	protected internal TestBaseClass_BaseClassMembersHidden(ParameterType_ProtectedInternal x) : base(x) { }
 	protected TestBaseClass_BaseClassMembersHidden(ParameterType_Protected                  x) : base(x) { }
 	internal TestBaseClass_BaseClassMembersHidden(ParameterType_Internal                    x) : base(x) { }
 	private TestBaseClass_BaseClassMembersHidden(ParameterType_Private                      x) : base() { }
+
+	// -----------------------------------------------------------------------------------------------
+	// constructors for testing passing arguments
+	// -----------------------------------------------------------------------------------------------
+
+	public TestBaseClass_BaseClassMembersHidden(int    value) : base(value) { } // value type argument
+	public TestBaseClass_BaseClassMembersHidden(string value) : base(value) { } // reference type argument
 }
 
-#pragma warning restore CS0649
-#pragma warning restore CS0169
+#pragma warning restore CS0649  // Field is never assigned to, and will always have its default value
+#pragma warning restore CS0169  // Field is never used
 #pragma warning restore CS0067  // Event is never used
 #pragma warning restore IDE0060 // Remove unused parameter
 #pragma warning restore IDE0051 // Remove unused private members
