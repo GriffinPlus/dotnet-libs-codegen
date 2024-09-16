@@ -3,13 +3,17 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
-using System;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Threading;
 
 using Xunit;
+
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 
 namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
@@ -407,4 +411,405 @@ public static class Helpers
 		var actualMethods = new HashSet<MethodComparisonWrapper>(type.GetMethods(bindingFlags).Where(x => !x.IsSpecialName).Select(x => new MethodComparisonWrapper(x)));
 		Assert.Equal(expectedMethods, actualMethods);
 	}
+
+	#region Helpers concerning Events
+
+	/// <summary>
+	/// Tests an event that has been implemented using the <see cref="EventImplementation_Standard"/> implementation strategy.
+	/// </summary>
+	/// <param name="definition">Type definition the event to test belongs to.</param>
+	/// <param name="instance">Instance of the dynamically created type that contains the event.</param>
+	/// <param name="eventKind">The expected kind of the generated event.</param>
+	/// <param name="eventName">Name of the added event.</param>
+	/// <param name="eventHandlerType">
+	/// Type of the event handler. For the sake of simplicity only the following event handler types are supported:
+	/// <see cref="EventHandler"/> (should generate a raiser method without return value and arguments),
+	/// <see cref="EventHandler{TEventArgs}"/> with <see cref="EventArgs"/> (should generate a raiser method without return value and arguments),
+	/// <see cref="EventHandler{TEventArgs}"/> with <see cref="SpecializedEventArgs"/> (should generate a raiser method without return value taking
+	/// <see cref="SpecializedEventArgs"/> as argument),
+	/// <see cref="Action"/> (should generate a raiser method without return value and arguments) and
+	/// <see cref="Action{Int32}"/> (should generate a raiser method without return value taking <see cref="Int32"/> as argument) and
+	/// <see cref="Func{Int64}"/> (should generate a raiser method with return value of type <see cref="Int64"/>, but without arguments) and
+	/// <see cref="Func{Int32,Int64}"/> (should generate a raiser method with return value of type <see cref="Int64"/> taking <see cref="Int32"/> as
+	/// argument).
+	/// </param>
+	/// <param name="strategyAddsEventRaiserMethod">
+	/// <c>true</c> if the implementation strategy should have added an event raiser method;<br/>
+	/// otherwise <c>false</c>.
+	/// </param>
+	/// <param name="eventRaiserName">
+	/// Name of the added event raiser method
+	/// (<c>null</c> to let the implementation strategy choose a name).
+	/// </param>
+	/// <param name="expectedEventRaiserReturnType">The expected return type of the event raiser method, if any.</param>
+	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the event raiser method, if any.</param>
+	public static void TestEventImplementation_Standard(
+		TypeDefinition definition,
+		object         instance,
+		EventKind      eventKind,
+		string         eventName,
+		Type           eventHandlerType,
+		bool           strategyAddsEventRaiserMethod,
+		string         eventRaiserName,
+		Type           expectedEventRaiserReturnType,
+		Type[]         expectedEventRaiserParameterTypes)
+	{
+		// get the type of the generated instance
+		Type generatedType = instance.GetType();
+
+		// get generated event accessor methods
+		BindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+		MethodInfo addAccessorMethod = generatedType.GetMethod("add_" + eventName, bindingFlags);
+		MethodInfo removeAccessorMethod = generatedType.GetMethod("remove_" + eventName, bindingFlags);
+
+		// check whether the generated accessor methods have the expected properties
+		Assert.NotNull(addAccessorMethod);
+		Assert.NotNull(removeAccessorMethod);
+		switch (eventKind)
+		{
+			case EventKind.Static:
+				Assert.True(addAccessorMethod.IsStatic);    // static
+				Assert.True(removeAccessorMethod.IsStatic); // static
+				break;
+
+			case EventKind.Normal:
+				Assert.False(addAccessorMethod.IsStatic);     // member
+				Assert.False(addAccessorMethod.IsVirtual);    // regular (not abstract, virtual or override)
+				Assert.False(removeAccessorMethod.IsStatic);  // member
+				Assert.False(removeAccessorMethod.IsVirtual); // regular (not abstract, virtual or override)
+				break;
+
+			case EventKind.Virtual:
+				Assert.False(addAccessorMethod.IsStatic);                                                                         // member
+				Assert.True(addAccessorMethod.IsVirtual && !addAccessorMethod.IsAbstract && !addAccessorMethod.IsFinal);          // => virtual or override
+				Assert.True(addAccessorMethod.Equals(addAccessorMethod.GetBaseDefinition()));                                     // => virtual
+				Assert.False(removeAccessorMethod.IsStatic);                                                                      // member
+				Assert.True(removeAccessorMethod.IsVirtual && !removeAccessorMethod.IsAbstract && !removeAccessorMethod.IsFinal); // => virtual or override
+				Assert.True(removeAccessorMethod.Equals(removeAccessorMethod.GetBaseDefinition()));                               // => virtual
+				break;
+
+			case EventKind.Abstract:
+				Assert.False(addAccessorMethod.IsStatic);     // member
+				Assert.True(addAccessorMethod.IsAbstract);    // abstract (not virtual or override)
+				Assert.False(removeAccessorMethod.IsStatic);  // member
+				Assert.True(removeAccessorMethod.IsAbstract); // abstract (not virtual or override)
+				break;
+
+			case EventKind.Override:
+				Assert.False(addAccessorMethod.IsStatic);                                                                         // member
+				Assert.True(addAccessorMethod.IsVirtual && !addAccessorMethod.IsAbstract && !addAccessorMethod.IsFinal);          // => virtual or override
+				Assert.False(addAccessorMethod.Equals(addAccessorMethod.GetBaseDefinition()));                                    // => override
+				Assert.False(removeAccessorMethod.IsStatic);                                                                      // member
+				Assert.True(removeAccessorMethod.IsVirtual && !removeAccessorMethod.IsAbstract && !removeAccessorMethod.IsFinal); // => virtual or override
+				Assert.False(removeAccessorMethod.Equals(removeAccessorMethod.GetBaseDefinition()));                              // => override
+				break;
+		}
+
+		// abort if the implementation strategy is not expected to have added an event raiser method
+		if (!strategyAddsEventRaiserMethod)
+		{
+			Assert.Empty(definition.GeneratedMethods);
+			return;
+		}
+
+		// the implementation strategy should have added an event raiser method
+
+		// determine the name of the event raiser method the implementation strategy should have added
+		string expectedEventRaiserName = eventRaiserName ?? "On" + eventName;
+
+		// check whether the implementation strategy has added the event raiser method to the type definition
+		Assert.Single(definition.GeneratedMethods);
+		IGeneratedMethod eventRaiserMethodDefinition = definition.GeneratedMethods.Single();
+		Assert.Equal(expectedEventRaiserName, eventRaiserMethodDefinition.Name);
+		Assert.Equal(expectedEventRaiserReturnType, eventRaiserMethodDefinition.ReturnType);
+		Assert.Equal(expectedEventRaiserParameterTypes, eventRaiserMethodDefinition.ParameterTypes);
+
+		// get the event raiser method
+		MethodInfo eventRaiserMethod = generatedType.GetMethods(bindingFlags).SingleOrDefault(x => x.Name == expectedEventRaiserName);
+		Assert.NotNull(eventRaiserMethod);
+
+		// prepare an event handler to register with the event
+		Delegate handler = null;
+		bool handlerWasCalled = false;
+		object[] eventRaiserArguments = null;
+		object expectedReturnValue = null;
+		if (eventHandlerType == typeof(EventHandler))
+		{
+			// set up an event handler to test with
+			eventRaiserArguments = [];
+			handler = new EventHandler(
+				(sender, e) =>
+				{
+					if (eventKind == EventKind.Static)
+					{
+						Assert.Null(sender);
+					}
+					else
+					{
+						if (definition.TypeBuilder.IsValueType) Assert.Equal(instance, sender);
+						else Assert.Same(instance, sender);
+					}
+
+					Assert.Same(EventArgs.Empty, e);
+					handlerWasCalled = true;
+				});
+		}
+		else if (eventHandlerType == typeof(EventHandler<EventArgs>))
+		{
+			// set up an event handler to test with
+			eventRaiserArguments = [];
+			handler = new EventHandler<EventArgs>(
+				(sender, e) =>
+				{
+					if (eventKind == EventKind.Static)
+					{
+						Assert.Null(sender);
+					}
+					else
+					{
+						if (definition.TypeBuilder.IsValueType) Assert.Equal(instance, sender);
+						else Assert.Same(instance, sender);
+					}
+
+					Assert.Same(EventArgs.Empty, e);
+					handlerWasCalled = true;
+				});
+		}
+		else if (eventHandlerType == typeof(EventHandler<SpecializedEventArgs>))
+		{
+			// set up an event handler to test with
+			eventRaiserArguments = [SpecializedEventArgs.Empty];
+			handler = new EventHandler<SpecializedEventArgs>(
+				(sender, e) =>
+				{
+					if (eventKind == EventKind.Static)
+					{
+						Assert.Null(sender);
+					}
+					else
+					{
+						if (definition.TypeBuilder.IsValueType) Assert.Equal(instance, sender);
+						else Assert.Same(instance, sender);
+					}
+
+					Assert.Same(SpecializedEventArgs.Empty, e);
+					handlerWasCalled = true;
+				});
+		}
+		else if (eventHandlerType == typeof(Action))
+		{
+			// set up an event handler to test with
+			eventRaiserArguments = [];
+			handler = new Action(() => { handlerWasCalled = true; });
+		}
+		else if (eventHandlerType == typeof(Action<int>))
+		{
+			// set up an event handler to test with
+			const int testValue = 42;
+			eventRaiserArguments = [testValue];
+			handler = new Action<int>(
+				value =>
+				{
+					Assert.Equal(testValue, value);
+					handlerWasCalled = true;
+				});
+		}
+		else if (eventHandlerType == typeof(Func<long>))
+		{
+			// set up an event handler to test with
+			const long handlerReturnValue = 100;
+			eventRaiserArguments = [];
+			expectedReturnValue = handlerReturnValue;
+			handler = new Func<long>(
+				() =>
+				{
+					handlerWasCalled = true;
+					return handlerReturnValue;
+				});
+		}
+		else if (eventHandlerType == typeof(Func<int, long>))
+		{
+			// set up an event handler to test with
+			const int handlerArgument = 42;
+			const long handlerReturnValue = 100;
+			eventRaiserArguments = [handlerArgument];
+			expectedReturnValue = handlerReturnValue;
+			handler = new Func<int, long>(
+				value =>
+				{
+					Assert.Equal(handlerArgument, value);
+					handlerWasCalled = true;
+					return handlerReturnValue;
+				});
+		}
+		else
+		{
+			Debug.Fail("Unhandled test case.");
+		}
+
+		// add event handler to the event and raise it
+		// => the handler should be called
+		handlerWasCalled = false;
+		addAccessorMethod.Invoke(instance, [handler]);
+		object actualHandlerReturnValue = eventRaiserMethod.Invoke(instance, eventRaiserArguments);
+		Assert.True(handlerWasCalled);
+		Assert.Equal(expectedReturnValue, actualHandlerReturnValue);
+
+		// remove the event handler from the event and raise it
+		// => the handler should not be called anymore
+		handlerWasCalled = false;
+		removeAccessorMethod.Invoke(instance, [handler]);
+		eventRaiserMethod.Invoke(instance, eventRaiserArguments);
+		Assert.False(handlerWasCalled);
+	}
+
+	/// <summary>
+	/// Implements the add/remove accessor of the event.
+	/// </summary>
+	/// <param name="isAdd">
+	/// <c>true</c> to implement the 'add' accessor method;<br/>
+	/// <c>false</c> to implement the 'remove' accessor method.
+	/// </param>
+	/// <param name="eventToImplement">Event to implement.</param>
+	/// <param name="backingFieldBuilder">The field builder of the backing field.</param>
+	/// <param name="msilGenerator">MSIL generator to use for implementing the accessor.</param>
+	public static void ImplementEventAccessor(
+		IGeneratedEvent eventToImplement,
+		bool            isAdd,
+		FieldBuilder    backingFieldBuilder,
+		ILGenerator     msilGenerator)
+	{
+		// the type of the event to implement should be the same as the type of the backing field
+		Assert.Same(backingFieldBuilder.FieldType, eventToImplement.EventHandlerType);
+
+		// the MSIL generator should be the same as the MSIL generator returned by the generated event
+		Assert.Same(
+			msilGenerator,
+			isAdd
+				? eventToImplement.AddAccessor.MethodBuilder.GetILGenerator()
+				: eventToImplement.RemoveAccessor.MethodBuilder.GetILGenerator());
+
+		Type backingFieldType = backingFieldBuilder.FieldType;
+
+		// get the Delegate.Combine() method  when adding a handler and Delegate.Remove() when removing a handler
+		MethodInfo delegateMethod = typeof(Delegate).GetMethod(isAdd ? "Combine" : "Remove", [typeof(Delegate), typeof(Delegate)]);
+		Debug.Assert(delegateMethod != null, nameof(delegateMethod) + " != null");
+
+		// get the System.Threading.Interlocked.CompareExchange(ref object, object, object) method
+		MethodInfo interlockedCompareExchangeGenericMethod = typeof(Interlocked).GetMethods().Single(m => m.Name == "CompareExchange" && m.GetGenericArguments().Length == 1);
+		MethodInfo interlockedCompareExchangeMethod = interlockedCompareExchangeGenericMethod.MakeGenericMethod(backingFieldType);
+
+		// emit code to combine the handler with the multicast delegate in the backing field respectively remove the handler from it
+		Debug.Assert(msilGenerator == (isAdd ? eventToImplement.AddAccessor.MethodBuilder.GetILGenerator() : eventToImplement.RemoveAccessor.MethodBuilder.GetILGenerator()));
+		msilGenerator.DeclareLocal(backingFieldType); // local 0
+		msilGenerator.DeclareLocal(backingFieldType); // local 1
+		msilGenerator.DeclareLocal(backingFieldType); // local 2
+		Label retryLabel = msilGenerator.DefineLabel();
+		if (eventToImplement.Kind == EventKind.Static)
+		{
+			msilGenerator.Emit(OpCodes.Ldsfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.MarkLabel(retryLabel);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Stloc_1);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.EmitCall(OpCodes.Call, delegateMethod, null);
+			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
+			msilGenerator.Emit(OpCodes.Stloc_2);
+			msilGenerator.Emit(OpCodes.Ldsflda, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc_2);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Bne_Un_S, retryLabel);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+		else
+		{
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.MarkLabel(retryLabel);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Stloc_1);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Ldarg_1);
+			msilGenerator.EmitCall(OpCodes.Call, delegateMethod, null);
+			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
+			msilGenerator.Emit(OpCodes.Stloc_2);
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldflda, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc_2);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
+			msilGenerator.Emit(OpCodes.Stloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_0);
+			msilGenerator.Emit(OpCodes.Ldloc_1);
+			msilGenerator.Emit(OpCodes.Bne_Un_S, retryLabel);
+			msilGenerator.Emit(OpCodes.Ret);
+		}
+	}
+
+	/// <summary>
+	/// Implements the event raiser method.
+	/// </summary>
+	/// <param name="method">The method to implement.</param>
+	/// <param name="backingFieldBuilder">The field builder of the backing field.</param>
+	/// <param name="event">The event the raiser method to implement belongs to.</param>
+	/// <param name="msilGenerator">MSIL generator attached to the event raiser method to implement.</param>
+	public static void ImplementEventRaiserMethod(
+		IGeneratedMethod method,
+		FieldBuilder     backingFieldBuilder,
+		IGeneratedEvent  @event,
+		ILGenerator      msilGenerator)
+	{
+		Assert.Same(msilGenerator, method.MethodBuilder.GetILGenerator());
+		Assert.Equal(typeof(EventHandler<EventArgs>), @event.EventHandlerType);
+
+		// the event type is System.EventHandler<EventArgs>
+		// => the event raiser will have the signature: void OnEvent()
+		FieldInfo eventArgsEmpty = typeof(EventArgs).GetField("Empty");
+		Debug.Assert(eventArgsEmpty != null);
+		LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(backingFieldBuilder.FieldType);
+		Label label = msilGenerator.DefineLabel();
+
+		if (@event.Kind == EventKind.Static)
+		{
+			msilGenerator.Emit(OpCodes.Ldsfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Brfalse_S, label);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldnull);                 // load sender (null)
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
+		}
+		else
+		{
+			msilGenerator.Emit(OpCodes.Ldarg_0);
+			msilGenerator.Emit(OpCodes.Ldfld, backingFieldBuilder);
+			msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Brfalse_S, label);
+			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
+			msilGenerator.Emit(OpCodes.Ldarg_0); // load sender (this)
+			if (method.TypeDefinition.TypeBuilder.IsValueType)
+			{
+				msilGenerator.Emit(OpCodes.Ldobj, method.TypeDefinition.TypeBuilder);
+				msilGenerator.Emit(OpCodes.Box, method.TypeDefinition.TypeBuilder);
+			}
+
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
+		}
+
+		MethodInfo invokeMethod = backingFieldBuilder.FieldType.GetMethod("Invoke");
+		Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
+		msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
+		msilGenerator.MarkLabel(label);
+		msilGenerator.Emit(OpCodes.Ret);
+	}
+
+	#endregion
 }

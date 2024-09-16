@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 using Xunit;
 
@@ -52,6 +53,7 @@ public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<C
 			// respectively the base class is System.Object
 
 			// test constructor 1: public default constructor
+			// (this is the only constructor System.Object provides)
 			Assert.NotNull(constructor1);
 			object instance1 = constructor1.Invoke([]);
 			Assert.NotNull(instance1);
@@ -226,7 +228,7 @@ public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<C
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			false,
+			EventKind.Virtual,
 			addedEvent.Name,
 			eventHandlerType,
 			addEventRaiserMethod,
@@ -238,6 +240,98 @@ public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<C
 	#endregion
 
 	#region AddVirtualEvent<T>(string name, Visibility visibility, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback) --- TODO!
+
+	/// <summary>
+	/// Tests the <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>
+	/// method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
+	public void AddVirtualEvent_WithImplementationCallbacks(string name, Visibility visibility)
+	{
+		// create a new type definition
+		ClassDefinition definition = CreateTypeDefinition();
+
+		// add a backing field for the event's multicast delegate
+		// (always of type EventHandler<EventArgs>, no need to test other types as this affects raising the event only)
+		Type eventHandlerType = typeof(EventHandler<EventArgs>);
+		IGeneratedField backingField = definition.AddField(eventHandlerType, name: null, Visibility.Public);
+
+		// get the AddEvent<T>(...) method to test
+		MethodInfo addEventMethod = typeof(ClassDefinition)
+			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+			.Where(method => method.Name == nameof(ClassDefinition.AddVirtualEvent))
+			.Where(method => method.GetGenericArguments().Length == 1)
+			.Select(method => method.MakeGenericMethod(eventHandlerType))
+			.Single(
+				method => method
+					.GetParameters()
+					.Select(parameter => parameter.ParameterType)
+					.SequenceEqual(
+					[
+						typeof(string),
+						typeof(Visibility),
+						typeof(EventAccessorImplementationCallback),
+						typeof(EventAccessorImplementationCallback)
+					]));
+
+		// invoke the method to add the event to the type definition
+		// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+		void ImplementGetAccessor(IGeneratedEvent @event, ILGenerator msilGenerator) => ImplementEventAccessor(@event, true, backingField.FieldBuilder, msilGenerator);
+		void ImplementSetAccessor(IGeneratedEvent @event, ILGenerator msilGenerator) => ImplementEventAccessor(@event, false, backingField.FieldBuilder, msilGenerator);
+		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
+			definition,
+			[
+				name,
+				visibility,
+				(EventAccessorImplementationCallback)ImplementGetAccessor,
+				(EventAccessorImplementationCallback)ImplementSetAccessor
+			]);
+		Assert.NotNull(addedEvent);
+		Assert.Equal(EventKind.Virtual, addedEvent.Kind);
+		Assert.Equal(visibility, addedEvent.Visibility);
+		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
+		Assert.Null(addedEvent.Implementation);
+
+		// add an event raiser method to the type definition
+		// (should always just be: public void FireMyEvent();
+		const MethodKind kind = MethodKind.Normal;
+		string eventRaiserName = "FireMyEvent";
+		Type eventRaiserReturnType = typeof(void);
+		Type[] eventRaiserParameterTypes = [];
+		const Visibility eventRaiserVisibility = Visibility.Public;
+		definition.AddMethod(
+			kind,
+			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes,
+			eventRaiserVisibility,
+			(method, msilGenerator) => ImplementEventRaiserMethod(
+				method,
+				backingField.FieldBuilder,
+				addedEvent,
+				msilGenerator));
+
+		// create the defined type, check the result against the definition and create an instance of that type
+		Type type = definition.CreateType();
+		CheckTypeAgainstDefinition(type, definition);
+		object instance = Activator.CreateInstance(type);
+
+		// test the implementation of the event
+		// (the implemented event should behave the same as a standard event implementation, use the same test code...)
+		TestEventImplementation_Standard(
+			definition,
+			instance,
+			EventKind.Virtual,
+			addedEvent.Name,
+			eventHandlerType,
+			true,
+			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes);
+	}
 
 	#endregion
 
