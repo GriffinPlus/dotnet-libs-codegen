@@ -12,6 +12,8 @@ using Xunit;
 
 namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
+using static Helpers;
+
 /// <summary>
 /// Common tests around the <see cref="ClassDefinition"/> class.
 /// </summary>
