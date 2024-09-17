@@ -9,9 +9,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
 /// <summary>
 /// Common tests around the <see cref="ClassDefinition"/> class.
-/// The type to create does not explicitly derive from any other class, only implicitly from <see cref="System.Object"/>.
+/// The type to create derives from a base class that derives from another class and overrides its abstract and virtual members.
 /// </summary>
-public sealed class ClassDefinitionTests_Common_WithoutBaseClass : ClassDefinitionTests_Common
+public sealed class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassOverridingMembers : ClassDefinitionTests_ConcreteBaseClass_Base
 {
 	/// <summary>
 	/// Creates a new type definition instance to test.
@@ -24,6 +24,6 @@ public sealed class ClassDefinitionTests_Common_WithoutBaseClass : ClassDefiniti
 	/// <returns>The created type definition instance.</returns>
 	public override ClassDefinition CreateTypeDefinition(string name = null, TypeAttributes attributes = 0)
 	{
-		return new ClassDefinition(name, (ClassAttributes)attributes);
+		return new ClassDefinition(typeof(TestBaseClass_WithOverrides), name, (ClassAttributes)attributes);
 	}
 }

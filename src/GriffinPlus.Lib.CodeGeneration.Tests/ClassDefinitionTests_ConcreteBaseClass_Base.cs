@@ -18,7 +18,7 @@ using static Helpers;
 /// <summary>
 /// Common tests around the <see cref="ClassDefinition"/> class.
 /// </summary>
-public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<ClassDefinition>
+public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefinitionTests_Common<ClassDefinition>
 {
 	#region AddPassThroughConstructors()
 
@@ -350,11 +350,20 @@ public abstract class ClassDefinitionTests_Common : TypeDefinitionTests_Common<C
 
 	#region AddEventOverride<T>(IInheritedEvent<T>, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback) --- TODO!
 
-	#endregion
+	/// <summary>
+	/// Tests the
+	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/> method.
+	/// </summary>
+	public void AddEventOverride_WithImplementationCallbacks()
+	{
+		// TODO: Implement...
+	}
 
 	#endregion
 
-	#region Adding Properties (TODO, abstract and override test cases missing)
+	#endregion
+
+	#region Adding Properties (TODO, override test cases missing)
 
 	#region Test Data
 

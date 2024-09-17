@@ -311,6 +311,13 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion
 
+	#region Adding Implemented Interface (TODO)
+
+	[Fact]
+	private void AddImplementedInterface() { }
+
+	#endregion // Adding Implemented Interface
+
 	#region Adding Fields
 
 	#region Test Data
@@ -3643,9 +3650,74 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion // Adding Properties
 
-	#region Adding Methods (TODO, all test cases missing!!!)
+	#region Adding Methods (TODO)
 
-	// TODO: Add testing adding methods!
+	#region AddMethod(MethodKind kind, string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
+
+	[Fact]
+	public void AddMethod_WithImplementationStrategy()
+	{
+		TDefinition definition = CreateTypeDefinition();
+		//definition.AddMethod(kind, name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
+	}
+
+	#endregion
+
+	#region AddMethod(MethodKind kind, string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+
+	[Fact]
+	public void AddMethod_WithImplementationCallback()
+	{
+		TDefinition definition = CreateTypeDefinition();
+		//definition.AddMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
+	}
+
+	#endregion
+
+	//#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
+
+	//[Fact]
+	//public void AddMethod_WithImplementationStrategy()
+	//{
+	//	TDefinition definition = CreateTypeDefinition();
+	//	// definition.AddMethod(name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
+	//}
+
+	//#endregion
+
+	//#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+
+	//[Fact]
+	//public void AddMethod_WithImplementationCallback()
+	//{
+	//	TDefinition definition = CreateTypeDefinition();
+	//	// definition.AddMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
+	//}
+
+	//#endregion
+
+
+	//#region AddStaticMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
+
+	//[Fact]
+	//public void AddStaticMethod_WithImplementationStrategy()
+	//{
+	//	TDefinition definition = CreateTypeDefinition();
+	//	// definition.AddStaticMethod(name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
+	//}
+
+	//#endregion
+
+	//#region AddStaticMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+
+	//[Fact]
+	//public void AddStaticMethod_WithImplementationCallback()
+	//{
+	//	TDefinition definition = CreateTypeDefinition();
+	//	// definition.AddStaticMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
+	//}
+
+	//#endregion
 
 	#endregion // Adding Methods
 }

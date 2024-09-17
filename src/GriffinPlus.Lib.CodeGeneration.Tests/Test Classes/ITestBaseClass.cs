@@ -3,8 +3,6 @@
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-
 namespace GriffinPlus.Lib.CodeGeneration.Tests;
 
 /// <summary>
@@ -17,4 +15,4 @@ public interface ITestBaseClass
 	/// respectively <see cref="TestBaseClass_Abstract(int)"/> or <see cref="TestBaseClass_Abstract(string)"/>.
 	/// </summary>
 	public object ConstructorArgument { get; }
-};
+}
