@@ -68,4 +68,85 @@ public class ClassDefinitionTests_AbstractBaseClass
 	}
 
 	#endregion
+
+
+	//	/// <summary>
+	///// Tests the <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
+	///// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	///// </summary>
+	//[Theory]
+	//[MemberData(nameof(AddEventOverrideTestData_WithImplementationStrategy_Standard))]
+	//public void AddEventOverride_WithImplementationStrategy_Standard(
+	//	string eventName,
+	//	bool       addEventRaiserMethod,
+	//	string     eventRaiserName,
+	//	Visibility eventRaiserVisibility,
+	//	Type       expectedEventRaiserReturnType,
+	//	Type[]     expectedEventRaiserParameterTypes)
+	//{
+	//	// create a new type definition
+	//	ClassDefinition definition = CreateTypeDefinition();
+
+	//	// create an instance of the implementation strategy
+	//	Type implementationType = typeof(EventImplementation_Standard);
+	//	IEventImplementation implementation = addEventRaiserMethod
+	//		                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
+	//		                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
+
+	//	// determine the events that can be overridden
+	//	IInheritedEvent[] eventsToOverride = definition
+	//		.InheritedEvents
+	//		.Where(x => x.Kind is EventKind.Abstract or EventKind.Virtual or EventKind.Override)
+	//		.ToArray();
+
+	//	// just to be sure: check the number of inherited overrideable events
+	//	Assert.Equal(3, eventsToOverride.Length);
+
+	//	foreach (IInheritedEvent @event in eventsToOverride)
+	//	{
+	//		// get the AddEvent(...) method to test
+	//		MethodInfo addEventMethod = typeof(ClassDefinition)
+	//			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+	//			.Where(method => method.Name == nameof(ClassDefinition.AddEventOverride))
+	//			.Where(method => method.GetGenericArguments().Length == 1)
+	//			.Select(method => method.MakeGenericMethod(@event.EventHandlerType))
+	//			.Single(
+	//				method => method
+	//					.GetParameters()
+	//					.Select(parameter => parameter.ParameterType)
+	//					.SequenceEqual(
+	//					[
+	//						typeof(IInheritedEvent<>).MakeGenericType(@event.EventHandlerType),
+	//						typeof(IEventImplementation)
+	//					]));
+
+	//		// invoke the method to add the event to the type definition
+	//		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [@event, implementation]);
+	//		Assert.NotNull(addedEvent);
+	//		Assert.Equal(EventKind.Override, addedEvent.Kind);
+	//		Assert.Equal(@event.Visibility, addedEvent.Visibility);
+	//		Assert.Equal(@event.EventHandlerType, addedEvent.EventHandlerType);
+	//		Assert.Same(implementation, addedEvent.Implementation);
+	//	}
+
+	//	// create the defined type, check the result against the definition and create an instance of that type
+	//	Type type = definition.CreateType();
+	//	CheckTypeAgainstDefinition(type, definition);
+	//	object instance = Activator.CreateInstance(type);
+
+	//	// test the implementation of the events
+	//	foreach (IInheritedEvent @event in eventsToOverride)
+	//	{
+	//		TestEventImplementation_Standard(
+	//			definition,
+	//			instance,
+	//			EventKind.Override,
+	//			@event.Name,
+	//			@event.EventHandlerType,
+	//			addEventRaiserMethod,
+	//			eventRaiserName,
+	//			expectedEventRaiserReturnType,
+	//			expectedEventRaiserParameterTypes);
+	//	}
+	//}
 }

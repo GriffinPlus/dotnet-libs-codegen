@@ -11,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// Common tests around the <see cref="ClassDefinition"/> class.
 /// The type to create derives from a base class that derives from another class on its own and hides its members.
 /// </summary>
-public sealed class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassHidingInheritedMembers : ClassDefinitionTests_ConcreteBaseClass_Base
+public sealed class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassHidingInheritedMembers : ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TestBaseClass_BaseClassMembersHidden>
 {
 	/// <summary>
 	/// Creates a new type definition instance to test.

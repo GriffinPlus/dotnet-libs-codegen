@@ -335,35 +335,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 
 	#endregion
 
-	#region AddEventOverride<T>(IInheritedEvent<T> eventToOverride, IEventImplementation<T> implementation) --- TODO!
-
-	/// <summary>
-	/// Tests the <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
-	/// </summary>
-	public void AddEventOverride_WithImplementationStrategy_Standard()
-	{
-		// TODO: Implement...
-	}
-
 	#endregion
 
-	#region AddEventOverride<T>(IInheritedEvent<T>, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback) --- TODO!
-
-	/// <summary>
-	/// Tests the
-	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/> method.
-	/// </summary>
-	public void AddEventOverride_WithImplementationCallbacks()
-	{
-		// TODO: Implement...
-	}
-
-	#endregion
-
-	#endregion
-
-	#region Adding Properties (TODO, override test cases missing)
+	#region Adding Properties
 
 	#region Test Data
 
@@ -803,22 +777,6 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 			addedProperty_setOnly,
 			addedProperty_none);
 	}
-
-	#endregion
-
-	#region AddPropertyOverride<T>(IInheritedProperty<T> property, IPropertyImplementation implementation) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride(IInheritedProperty property, IPropertyImplementation implementation) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride<T>(IInheritedProperty<T> property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
-
-	#endregion
-
-	#region AddPropertyOverride(IInheritedProperty property, PropertyAccessorImplementationCallback getAccessorImplementationCallback, PropertyAccessorImplementationCallback setAccessorImplementationCallback) --- TODO!
 
 	#endregion
 

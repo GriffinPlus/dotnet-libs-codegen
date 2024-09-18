@@ -11,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// Common tests around the <see cref="ClassDefinition"/> class.
 /// The type to create derives from a base class that derives from another class and overrides its abstract and virtual members.
 /// </summary>
-public sealed class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassOverridingMembers : ClassDefinitionTests_ConcreteBaseClass_Base
+public sealed class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassOverridingMembers : ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TestBaseClass_WithOverrides>
 {
 	/// <summary>
 	/// Creates a new type definition instance to test.
