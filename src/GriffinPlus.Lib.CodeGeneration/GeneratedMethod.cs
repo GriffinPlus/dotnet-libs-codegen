@@ -224,7 +224,7 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	/// <summary>
 	/// Gets the parameter types of the method.
 	/// </summary>
-	public IEnumerable<Type> ParameterTypes => mParameterTypes;
+	public IReadOnlyList<Type> ParameterTypes => mParameterTypes;
 
 	/// <summary>
 	/// Gets the access modifier of the method.

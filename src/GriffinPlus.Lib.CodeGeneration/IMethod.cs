@@ -32,7 +32,7 @@ public interface IMethod
 	/// <summary>
 	/// Gets the parameter types of the method.
 	/// </summary>
-	IEnumerable<Type> ParameterTypes { get; }
+	IReadOnlyList<Type> ParameterTypes { get; }
 
 	/// <summary>
 	/// Gets the access modifier of the method.

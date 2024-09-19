@@ -52,7 +52,7 @@ class InheritedMethod : Member, IInheritedMethod
 	/// <summary>
 	/// Gets the parameter types of the method.
 	/// </summary>
-	public IEnumerable<Type> ParameterTypes { get; }
+	public IReadOnlyList<Type> ParameterTypes { get; }
 
 	/// <summary>
 	/// Gets the access modifier of the method.
