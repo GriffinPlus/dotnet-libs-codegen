@@ -124,6 +124,13 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		Kind = PropertyKind.Override;
 		Implementation = implementation ?? throw new ArgumentNullException(nameof(implementation));
 
+		// create a property builder for the property
+		PropertyBuilder = TypeDefinition.TypeBuilder.DefineProperty(
+			Name,
+			PropertyAttributes.None,
+			PropertyType,
+			Type.EmptyTypes);
+
 		if (inheritedProperty.GetAccessor != null)
 		{
 			GetAccessor = classDefinition.AddMethodOverride(
@@ -132,6 +139,8 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 					TypeDefinition,
 					this,
 					msilGenerator));
+
+			PropertyBuilder.SetGetMethod(GetAccessor.MethodBuilder);
 		}
 
 		if (inheritedProperty.SetAccessor != null)
@@ -142,6 +151,8 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 					TypeDefinition,
 					this,
 					msilGenerator));
+
+			PropertyBuilder.SetSetMethod(SetAccessor.MethodBuilder);
 		}
 
 		// declare implementation strategy specific members
