@@ -37,7 +37,7 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	// public new abstract event             EventHandler<EventArgs> Event_Abstract_Public;            // not allowed, would hide abstract event of base class
 	// protected internal new abstract event EventHandler<EventArgs> Event_Abstract_ProtectedInternal; // not allowed, would hide abstract event of base class
 	// protected new abstract event          EventHandler<EventArgs> Event_Abstract_Protected;         // not allowed, would hide abstract event of base class
-	internal new abstract event          EventHandler<EventArgs> Event_Abstract_Internal;
+	// internal new abstract event           EventHandler<EventArgs> Event_Abstract_Internal;          // cannot be overridden in a derived class due to accessibility issues
 	public new event                     EventHandler<EventArgs> Event_Normal_Public;
 	protected internal new event         EventHandler<EventArgs> Event_Normal_ProtectedInternal;
 	protected new event                  EventHandler<EventArgs> Event_Normal_Protected;
@@ -56,7 +56,7 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	// public new abstract             int Property_Abstract_Public            { get; set; } // not allowed, would hide abstract property of base class
 	// protected internal new abstract int Property_Abstract_ProtectedInternal { get; set; } // not allowed, would hide abstract property of base class
 	// protected new abstract          int Property_Abstract_Protected         { get; set; } // not allowed, would hide abstract property of base class
-	internal new abstract          int Property_Abstract_Internal         { get; set; }
+	// internal new abstract           int Property_Abstract_Internal          { get; set; } // cannot be overridden in a derived class due to accessibility issues
 	public new                     int Property_Normal_Public             { get; set; }
 	protected internal new         int Property_Normal_ProtectedInternal  { get; set; }
 	protected new                  int Property_Normal_Protected          { get; set; }
@@ -75,7 +75,7 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	// public new abstract             void Method_Abstract_Public();            // not allowed, would hide abstract method of base class
 	// protected internal new abstract void Method_Abstract_ProtectedInternal(); // not allowed, would hide abstract method of base class
 	// protected new abstract          void Method_Abstract_Protected();         // not allowed, would hide abstract method of base class
-	internal new abstract          void Method_Abstract_Internal();
+	// internal new abstract          void Method_Abstract_Internal();           // cannot be overridden in a derived class due to accessibility issues
 	public new                     void Method_Normal_Public()             { }
 	protected internal new         void Method_Normal_ProtectedInternal()  { }
 	protected new                  void Method_Normal_Protected()          { }

@@ -37,10 +37,10 @@ public abstract class TestBaseClass_Abstract : ITestBaseClass
 	internal           int Field_Internal;
 	private            int Field_Private;
 
+	// internal abstract event        EventHandler<EventArgs> Event_Abstract_Internal;          // cannot be overridden in a derived class due to accessibility issues
 	public abstract event             EventHandler<EventArgs> Event_Abstract_Public;
 	protected internal abstract event EventHandler<EventArgs> Event_Abstract_ProtectedInternal;
 	protected abstract event          EventHandler<EventArgs> Event_Abstract_Protected;
-	internal abstract event           EventHandler<EventArgs> Event_Abstract_Internal;
 	public event                      EventHandler<EventArgs> Event_Normal_Public;
 	protected internal event          EventHandler<EventArgs> Event_Normal_ProtectedInternal;
 	protected event                   EventHandler<EventArgs> Event_Normal_Protected;
@@ -56,10 +56,10 @@ public abstract class TestBaseClass_Abstract : ITestBaseClass
 	internal static event             EventHandler<EventArgs> Event_Static_Internal;
 	private static event              EventHandler<EventArgs> Event_Static_Private;
 
+	// internal abstract        int Property_Abstract_Internal          { get; set; } // cannot be overridden in a derived class due to accessibility issues
 	public abstract             int Property_Abstract_Public            { get; set; }
 	protected internal abstract int Property_Abstract_ProtectedInternal { get; set; }
 	protected abstract          int Property_Abstract_Protected         { get; set; }
-	internal abstract           int Property_Abstract_Internal          { get; set; }
 	public                      int Property_Normal_Public              { get; set; }
 	protected internal          int Property_Normal_ProtectedInternal   { get; set; }
 	protected                   int Property_Normal_Protected           { get; set; }
@@ -75,10 +75,10 @@ public abstract class TestBaseClass_Abstract : ITestBaseClass
 	internal static             int Property_Static_Internal            { get; set; }
 	private static              int Property_Static_Private             { get; set; }
 
+	// internal abstract        void Method_Abstract_Internal();            // cannot be overridden in a derived class due to accessibility issues
 	public abstract             void Method_Abstract_Public();
 	protected internal abstract void Method_Abstract_ProtectedInternal();
 	protected abstract          void Method_Abstract_Protected();
-	internal abstract           void Method_Abstract_Internal();
 	public                      void Method_Normal_Public()             { }
 	protected internal          void Method_Normal_ProtectedInternal()  { }
 	protected                   void Method_Normal_Protected()          { }

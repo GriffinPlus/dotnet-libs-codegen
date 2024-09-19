@@ -227,17 +227,20 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 		Type eventRaiserReturnType = typeof(void);
 		Type[] eventRaiserParameterTypes = [];
 		const Visibility eventRaiserVisibility = Visibility.Public;
-		definition.AddMethod(
-			kind,
-			eventRaiserName,
-			eventRaiserReturnType,
-			eventRaiserParameterTypes,
-			eventRaiserVisibility,
-			(method, msilGenerator) => ImplementEventRaiserMethod(
-				method,
-				backingField.FieldBuilder,
-				addedEvent,
-				msilGenerator));
+		if (addEventRaiserMethod)
+		{
+			definition.AddMethod(
+				kind,
+				eventRaiserName,
+				eventRaiserReturnType,
+				eventRaiserParameterTypes,
+				eventRaiserVisibility,
+				(method, msilGenerator) => ImplementEventRaiserMethod(
+					method,
+					backingField.FieldBuilder,
+					addedEvent,
+					msilGenerator));
+		}
 
 		// create the defined type, check the result against the definition and create an instance of that type
 		Type type = definition.CreateType();
@@ -253,9 +256,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 			eventToOverride.Name,
 			eventToOverride.EventHandlerType,
 			addEventRaiserMethod,
-			eventRaiserName,
-			expectedEventRaiserReturnType,
-			expectedEventRaiserParameterTypes);
+			addEventRaiserMethod ? eventRaiserName : null,
+			addEventRaiserMethod ? expectedEventRaiserReturnType : null,
+			addEventRaiserMethod ? expectedEventRaiserParameterTypes : null);
 	}
 
 	#endregion
