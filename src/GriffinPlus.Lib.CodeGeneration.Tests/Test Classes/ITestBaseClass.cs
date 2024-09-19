@@ -11,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 public interface ITestBaseClass
 {
 	/// <summary>
-	/// The argument passed to <see cref="TestBaseClass(int)"/> or <see cref="TestBaseClass(string)"/>,
+	/// The argument passed to <see cref="TestBaseClass_Concrete(int)"/> or <see cref="TestBaseClass_Concrete(string)"/>,
 	/// respectively <see cref="TestBaseClass_Abstract(int)"/> or <see cref="TestBaseClass_Abstract(string)"/>.
 	/// </summary>
 	public object ConstructorArgument { get; }

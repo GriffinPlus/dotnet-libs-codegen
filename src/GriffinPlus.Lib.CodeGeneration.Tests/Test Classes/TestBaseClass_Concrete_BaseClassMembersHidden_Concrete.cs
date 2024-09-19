@@ -5,6 +5,7 @@
 
 using System;
 
+// ReSharper disable ArrangeMethodOrOperatorBody
 // ReSharper disable EventNeverSubscribedTo.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable PublicConstructorInAbstractClass
@@ -24,9 +25,9 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// <summary>
 /// Base class for dynamically created classes.
 /// This class hides fields, events, properties and methods with own members.
-/// The class contains abstract members, therefore it is not instantiable.
+/// The class does not contain abstract members, therefore it is instantiable.
 /// </summary>
-public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseClass_Abstract
+public class TestBaseClass_Concrete_BaseClassMembersHidden_Concrete : TestBaseClass_Concrete
 {
 	public new             int Field_Public;
 	protected internal new int Field_ProtectedInternal;
@@ -34,10 +35,6 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	internal new           int Field_Internal;
 	private                int Field_Private; // new not needed, private members are not hidden as not visible to derived classes
 
-	// public new abstract event             EventHandler<EventArgs> Event_Abstract_Public;            // not allowed, would hide abstract event of base class
-	// protected internal new abstract event EventHandler<EventArgs> Event_Abstract_ProtectedInternal; // not allowed, would hide abstract event of base class
-	// protected new abstract event          EventHandler<EventArgs> Event_Abstract_Protected;         // not allowed, would hide abstract event of base class
-	// internal new abstract event           EventHandler<EventArgs> Event_Abstract_Internal;          // cannot be overridden in a derived class due to accessibility issues
 	public new event                     EventHandler<EventArgs> Event_Normal_Public;
 	protected internal new event         EventHandler<EventArgs> Event_Normal_ProtectedInternal;
 	protected new event                  EventHandler<EventArgs> Event_Normal_Protected;
@@ -53,10 +50,6 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	internal new static event            EventHandler<EventArgs> Event_Static_Internal;
 	private static event                 EventHandler<EventArgs> Event_Static_Private; // new not needed, private events are not hidden as not visible to derived classes
 
-	// public new abstract             int Property_Abstract_Public            { get; set; } // not allowed, would hide abstract property of base class
-	// protected internal new abstract int Property_Abstract_ProtectedInternal { get; set; } // not allowed, would hide abstract property of base class
-	// protected new abstract          int Property_Abstract_Protected         { get; set; } // not allowed, would hide abstract property of base class
-	// internal new abstract           int Property_Abstract_Internal          { get; set; } // cannot be overridden in a derived class due to accessibility issues
 	public new                     int Property_Normal_Public             { get; set; }
 	protected internal new         int Property_Normal_ProtectedInternal  { get; set; }
 	protected new                  int Property_Normal_Protected          { get; set; }
@@ -72,42 +65,38 @@ public abstract class TestBaseClass_BaseClassMembersHidden_Abstract : TestBaseCl
 	internal new static            int Property_Static_Internal           { get; set; }
 	private static                 int Property_Static_Private            { get; set; } // new not needed, private properties are not hidden as not visible to derived classes
 
-	// public new abstract             void Method_Abstract_Public();            // not allowed, would hide abstract method of base class
-	// protected internal new abstract void Method_Abstract_ProtectedInternal(); // not allowed, would hide abstract method of base class
-	// protected new abstract          void Method_Abstract_Protected();         // not allowed, would hide abstract method of base class
-	// internal new abstract          void Method_Abstract_Internal();           // cannot be overridden in a derived class due to accessibility issues
-	public new                     void Method_Normal_Public()             { }
-	protected internal new         void Method_Normal_ProtectedInternal()  { }
-	protected new                  void Method_Normal_Protected()          { }
-	internal new                   void Method_Normal_Internal()           { }
-	private                        void Method_Normal_Private()            { } // new not needed, private methods are not hidden as not visible to derived classes
-	public new virtual             void Method_Virtual_Public()            { }
-	protected internal new virtual void Method_Virtual_ProtectedInternal() { }
-	protected new virtual          void Method_Virtual_Protected()         { }
-	internal new virtual           void Method_Virtual_Internal()          { }
-	public new static              void Method_Static_Public()             { }
-	protected internal new static  void Method_Static_ProtectedInternal()  { }
-	protected new static           void Method_Static_Protected()          { }
-	internal new static            void Method_Static_Internal()           { }
-	private static                 void Method_Static_Private()            { } // new not needed, private methods are not hidden as not visible to derived classes
+	public new                     int Method_Normal_Public(int             x) => x;
+	protected internal new         int Method_Normal_ProtectedInternal(int  x) => x;
+	protected new                  int Method_Normal_Protected(int          x) => x;
+	internal new                   int Method_Normal_Internal(int           x) => x;
+	private                        int Method_Normal_Private(int            x) => x; // new not needed, private methods are not hidden as not visible to derived classes
+	public new virtual             int Method_Virtual_Public(int            x) => x;
+	protected internal new virtual int Method_Virtual_ProtectedInternal(int x) => x;
+	protected new virtual          int Method_Virtual_Protected(int         x) => x;
+	internal new virtual           int Method_Virtual_Internal(int          x) => x;
+	public new static              int Method_Static_Public(int             x) => x;
+	protected internal new static  int Method_Static_ProtectedInternal(int  x) => x;
+	protected new static           int Method_Static_Protected(int          x) => x;
+	internal new static            int Method_Static_Internal(int           x) => x;
+	private static                 int Method_Static_Private(int            x) => x; // new not needed, private methods are not hidden as not visible to derived classes
 
 	// -----------------------------------------------------------------------------------------------
 	// constructors with different visibilities
 	// -----------------------------------------------------------------------------------------------
 
-	public TestBaseClass_BaseClassMembersHidden_Abstract() : base() { }
-	public TestBaseClass_BaseClassMembersHidden_Abstract(ParameterType_Public                        x) : base(x) { }
-	protected internal TestBaseClass_BaseClassMembersHidden_Abstract(ParameterType_ProtectedInternal x) : base(x) { }
-	protected TestBaseClass_BaseClassMembersHidden_Abstract(ParameterType_Protected                  x) : base(x) { }
-	internal TestBaseClass_BaseClassMembersHidden_Abstract(ParameterType_Internal                    x) : base(x) { }
-	private TestBaseClass_BaseClassMembersHidden_Abstract(ParameterType_Private                      x) : base() { }
+	public TestBaseClass_Concrete_BaseClassMembersHidden_Concrete() : base() { }
+	public TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(ParameterType_Public                        x) : base(x) { }
+	protected internal TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(ParameterType_ProtectedInternal x) : base(x) { }
+	protected TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(ParameterType_Protected                  x) : base(x) { }
+	internal TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(ParameterType_Internal                    x) : base(x) { }
+	private TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(ParameterType_Private                      x) : base() { }
 
 	// -----------------------------------------------------------------------------------------------
 	// constructors for testing passing arguments
 	// -----------------------------------------------------------------------------------------------
 
-	public TestBaseClass_BaseClassMembersHidden_Abstract(int    value) : base(value) { } // value type argument
-	public TestBaseClass_BaseClassMembersHidden_Abstract(string value) : base(value) { } // reference type argument
+	public TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(int    value) : base(value) { } // value type argument
+	public TestBaseClass_Concrete_BaseClassMembersHidden_Concrete(string value) : base(value) { } // reference type argument
 }
 
 #pragma warning restore CS0649  // Field is never assigned to, and will always have its default value

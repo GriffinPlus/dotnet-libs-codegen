@@ -5,6 +5,7 @@
 
 using System;
 
+// ReSharper disable ArrangeMethodOrOperatorBody
 // ReSharper disable EventNeverSubscribedTo.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable PublicConstructorInAbstractClass
@@ -23,10 +24,10 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// Base class for dynamically created classes.
 /// The class does not contain abstract members, therefore it is instantiable.
 /// </summary>
-public class TestBaseClass : ITestBaseClass
+public class TestBaseClass_Concrete : ITestBaseClass
 {
 	/// <summary>
-	/// The argument passed to <see cref="TestBaseClass(int)"/> or <see cref="TestBaseClass(string)"/>.
+	/// The argument passed to <see cref="TestBaseClass_Concrete(int)"/> or <see cref="TestBaseClass_Concrete(string)"/>.
 	/// </summary>
 	// ReSharper disable once MemberInitializerValueIgnored
 	public object ConstructorArgument { get; set; } = "Unset";
@@ -79,51 +80,51 @@ public class TestBaseClass : ITestBaseClass
 	// protected internal abstract void Method_Abstract_ProtectedInternal();
 	// protected abstract          void Method_Abstract_Protected();
 	// internal abstract           void Method_Abstract_Internal();
-	public                     void Method_Normal_Public()             { }
-	protected internal         void Method_Normal_ProtectedInternal()  { }
-	protected                  void Method_Normal_Protected()          { }
-	internal                   void Method_Normal_Internal()           { }
-	private                    void Method_Normal_Private()            { }
-	public virtual             void Method_Virtual_Public()            { }
-	protected internal virtual void Method_Virtual_ProtectedInternal() { }
-	protected virtual          void Method_Virtual_Protected()         { }
-	internal virtual           void Method_Virtual_Internal()          { }
-	public static              void Method_Static_Public()             { }
-	protected internal static  void Method_Static_ProtectedInternal()  { }
-	protected static           void Method_Static_Protected()          { }
-	internal static            void Method_Static_Internal()           { }
-	private static             void Method_Static_Private()            { }
+	public                     int Method_Normal_Public(int             x) => x;
+	protected internal         int Method_Normal_ProtectedInternal(int  x) => x;
+	protected                  int Method_Normal_Protected(int          x) => x;
+	internal                   int Method_Normal_Internal(int           x) => x;
+	private                    int Method_Normal_Private(int            x) => x;
+	public virtual             int Method_Virtual_Public(int            x) => x;
+	protected internal virtual int Method_Virtual_ProtectedInternal(int x) => x;
+	protected virtual          int Method_Virtual_Protected(int         x) => x;
+	internal virtual           int Method_Virtual_Internal(int          x) => x;
+	public static              int Method_Static_Public(int             x) => x;
+	protected internal static  int Method_Static_ProtectedInternal(int  x) => x;
+	protected static           int Method_Static_Protected(int          x) => x;
+	internal static            int Method_Static_Internal(int           x) => x;
+	private static             int Method_Static_Private(int            x) => x;
 
 	// -----------------------------------------------------------------------------------------------
 	// constructors with different visibilities
 	// -----------------------------------------------------------------------------------------------
 
-	public TestBaseClass()
+	public TestBaseClass_Concrete()
 	{
 		ConstructorArgument = null;
 	}
 
-	public TestBaseClass(ParameterType_Public x)
+	public TestBaseClass_Concrete(ParameterType_Public x)
 	{
 		ConstructorArgument = x;
 	}
 
-	protected internal TestBaseClass(ParameterType_ProtectedInternal x)
+	protected internal TestBaseClass_Concrete(ParameterType_ProtectedInternal x)
 	{
 		ConstructorArgument = x;
 	}
 
-	protected TestBaseClass(ParameterType_Protected x)
+	protected TestBaseClass_Concrete(ParameterType_Protected x)
 	{
 		ConstructorArgument = x;
 	}
 
-	internal TestBaseClass(ParameterType_Internal x)
+	internal TestBaseClass_Concrete(ParameterType_Internal x)
 	{
 		ConstructorArgument = x;
 	}
 
-	private TestBaseClass(ParameterType_Private x)
+	private TestBaseClass_Concrete(ParameterType_Private x)
 	{
 		ConstructorArgument = x;
 	}
@@ -132,12 +133,12 @@ public class TestBaseClass : ITestBaseClass
 	// constructors for testing passing arguments
 	// -----------------------------------------------------------------------------------------------
 
-	public TestBaseClass(int value) // value type argument
+	public TestBaseClass_Concrete(int value) // value type argument
 	{
 		ConstructorArgument = value;
 	}
 
-	public TestBaseClass(string value) // reference type argument
+	public TestBaseClass_Concrete(string value) // reference type argument
 	{
 		ConstructorArgument = value;
 	}

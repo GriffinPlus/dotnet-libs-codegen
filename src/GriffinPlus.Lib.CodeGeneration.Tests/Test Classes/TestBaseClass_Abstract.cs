@@ -5,6 +5,7 @@
 
 using System;
 
+// ReSharper disable ArrangeMethodOrOperatorBody
 // ReSharper disable EventNeverSubscribedTo.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable PublicConstructorInAbstractClass
@@ -75,24 +76,24 @@ public abstract class TestBaseClass_Abstract : ITestBaseClass
 	internal static             int Property_Static_Internal            { get; set; }
 	private static              int Property_Static_Private             { get; set; }
 
-	// internal abstract        void Method_Abstract_Internal();            // cannot be overridden in a derived class due to accessibility issues
-	public abstract             void Method_Abstract_Public();
-	protected internal abstract void Method_Abstract_ProtectedInternal();
-	protected abstract          void Method_Abstract_Protected();
-	public                      void Method_Normal_Public()             { }
-	protected internal          void Method_Normal_ProtectedInternal()  { }
-	protected                   void Method_Normal_Protected()          { }
-	internal                    void Method_Normal_Internal()           { }
-	private                     void Method_Normal_Private()            { }
-	public virtual              void Method_Virtual_Public()            { }
-	protected internal virtual  void Method_Virtual_ProtectedInternal() { }
-	protected virtual           void Method_Virtual_Protected()         { }
-	internal virtual            void Method_Virtual_Internal()          { }
-	public static               void Method_Static_Public()             { }
-	protected internal static   void Method_Static_ProtectedInternal()  { }
-	protected static            void Method_Static_Protected()          { }
-	internal static             void Method_Static_Internal()           { }
-	private static              void Method_Static_Private()            { }
+	// internal abstract        int Method_Abstract_Internal(int x);             // cannot be overridden in a derived class due to accessibility issues
+	public abstract             int Method_Abstract_Public(int            x);
+	protected internal abstract int Method_Abstract_ProtectedInternal(int x);
+	protected abstract          int Method_Abstract_Protected(int         x);
+	public                      int Method_Normal_Public(int              x) => x;
+	protected internal          int Method_Normal_ProtectedInternal(int   x) => x;
+	protected                   int Method_Normal_Protected(int           x) => x;
+	internal                    int Method_Normal_Internal(int            x) => x;
+	private                     int Method_Normal_Private(int             x) => x;
+	public virtual              int Method_Virtual_Public(int             x) => x;
+	protected internal virtual  int Method_Virtual_ProtectedInternal(int  x) => x;
+	protected virtual           int Method_Virtual_Protected(int          x) => x;
+	internal virtual            int Method_Virtual_Internal(int           x) => x;
+	public static               int Method_Static_Public(int              x) => x;
+	protected internal static   int Method_Static_ProtectedInternal(int   x) => x;
+	protected static            int Method_Static_Protected(int           x) => x;
+	internal static             int Method_Static_Internal(int            x) => x;
+	private static              int Method_Static_Private(int             x) => x;
 
 	// -----------------------------------------------------------------------------------------------
 	// constructors with different visibilities

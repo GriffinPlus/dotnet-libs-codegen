@@ -11,7 +11,7 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// Common tests around the <see cref="ClassDefinition"/> class.
 /// The type to create derives from a base class that does not derive from any other class.
 /// </summary>
-public class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassDirect : ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TestBaseClass>
+public class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassDirect : ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TestBaseClass_Concrete>
 {
 	/// <summary>
 	/// Creates a new type definition instance to test.
@@ -24,6 +24,6 @@ public class ClassDefinitionTests_ConcreteBaseClass_WithBaseClassDirect : ClassD
 	/// <returns>The created type definition instance.</returns>
 	public override ClassDefinition CreateTypeDefinition(string name = null, TypeAttributes attributes = 0)
 	{
-		return new ClassDefinition(typeof(TestBaseClass), name, (ClassAttributes)attributes);
+		return new ClassDefinition(typeof(TestBaseClass_Concrete), name, (ClassAttributes)attributes);
 	}
 }
