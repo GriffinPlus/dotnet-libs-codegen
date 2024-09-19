@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -14,6 +15,11 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// <summary>
 /// A generated method.
 /// </summary>
+[DebuggerDisplay(
+	"{Visibility.ToString().ToLower(),nq} "+
+	"{Kind.ToString().ToLower(),nq} " +
+	"{nameof(Name),nq} "+
+	"({System.String.Join(\", \", System.Linq.Enumerable.Select(((System.Collections.Generic.IEnumerable<System.Type>)ParameterTypes), x => x.FullName)),nq})")]
 class GeneratedMethod : Member, IGeneratedMethodInternal
 {
 	private readonly IMethodImplementation        mImplementation;
