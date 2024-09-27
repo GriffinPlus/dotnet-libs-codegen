@@ -20,6 +20,9 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// </summary>
 public abstract class TypeDefinition
 {
+	internal const BindingFlags ExactBindingFlags             = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.ExactBinding;
+	internal const BindingFlags DeclaredOnlyExactBindingFlags = ExactBindingFlags | BindingFlags.DeclaredOnly;
+
 	private readonly Stack<TypeBuilder> mTypeBuilders;
 
 	/// <summary>
@@ -170,8 +173,7 @@ public abstract class TypeDefinition
 
 			// determine base class constructors and cache them
 			mBaseClassConstructors = [];
-			const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			foreach (ConstructorInfo constructorInfo in BaseClassType.GetConstructors(flags))
+			foreach (ConstructorInfo constructorInfo in BaseClassType.GetConstructors(DeclaredOnlyExactBindingFlags & ~BindingFlags.Static))
 			{
 				// skip constructor if it is private or internal
 				// (cannot be accessed by a derived type defined in another assembly)
@@ -223,12 +225,11 @@ public abstract class TypeDefinition
 	/// <returns>The inherited fields.</returns>
 	public IEnumerable<IInheritedField> GetInheritedFields(bool includeHidden)
 	{
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 		var inheritedFields = new HashSet<IInheritedField>();
 		Type typeToInspect = BaseClassType;
 		while (typeToInspect != null)
 		{
-			foreach (FieldInfo fieldInfo in typeToInspect.GetFields(flags))
+			foreach (FieldInfo fieldInfo in typeToInspect.GetFields(DeclaredOnlyExactBindingFlags))
 			{
 				// skip field if it is 'private' or 'internal'
 				// (cannot be accessed by a derived type defined in another assembly)
@@ -267,12 +268,11 @@ public abstract class TypeDefinition
 	/// <returns>The inherited events.</returns>
 	public IEnumerable<IInheritedEvent> GetInheritedEvents(bool includeHidden)
 	{
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 		var inheritedEvents = new HashSet<IInheritedEvent>();
 		Type typeToInspect = BaseClassType;
 		while (typeToInspect != null)
 		{
-			foreach (EventInfo eventInfo in typeToInspect.GetEvents(flags))
+			foreach (EventInfo eventInfo in typeToInspect.GetEvents(DeclaredOnlyExactBindingFlags))
 			{
 				// skip event if it is 'private' or 'internal'
 				// (cannot be accessed by a derived type defined in another assembly)
@@ -320,12 +320,11 @@ public abstract class TypeDefinition
 	/// <returns>The inherited properties.</returns>
 	public IEnumerable<IInheritedProperty> GetInheritedProperties(bool includeHidden)
 	{
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 		var inheritedProperties = new HashSet<IInheritedProperty>();
 		Type typeToInspect = BaseClassType;
 		while (typeToInspect != null)
 		{
-			foreach (PropertyInfo propertyInfo in typeToInspect.GetProperties(flags))
+			foreach (PropertyInfo propertyInfo in typeToInspect.GetProperties(DeclaredOnlyExactBindingFlags))
 			{
 				// skip accessors that are 'private' or 'internal'
 				// (cannot be accessed by a derived type defined in another assembly)
@@ -386,13 +385,12 @@ public abstract class TypeDefinition
 	/// <returns>The inherited methods.</returns>
 	public IEnumerable<IInheritedMethod> GetInheritedMethods(bool includeHidden)
 	{
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 		var inheritedMethods = new HashSet<IInheritedMethod>();
 
 		Type typeToInspect = BaseClassType;
 		while (typeToInspect != null)
 		{
-			foreach (MethodInfo methodInfo in typeToInspect.GetMethods(flags))
+			foreach (MethodInfo methodInfo in typeToInspect.GetMethods(DeclaredOnlyExactBindingFlags))
 			{
 				// skip method if it is 'private' or 'internal'
 				// (cannot be accessed by a derived type defined in another assembly)
@@ -1609,8 +1607,7 @@ public abstract class TypeDefinition
 				{
 					// the constructor does not have any special handling of the base class constructor call
 					// => call parameterless constructor
-					const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-					ConstructorInfo constructorInfo = TypeBuilder.BaseType.GetConstructor(bindingFlags, null, Type.EmptyTypes, null);
+					ConstructorInfo constructorInfo = TypeBuilder.BaseType.GetConstructor(DeclaredOnlyExactBindingFlags & ~BindingFlags.Static, null, Type.EmptyTypes, null);
 					if (constructorInfo == null)
 					{
 						string error = $"The base class ({TypeBuilder.BaseType.FullName}) does not have an accessible parameterless constructor.";

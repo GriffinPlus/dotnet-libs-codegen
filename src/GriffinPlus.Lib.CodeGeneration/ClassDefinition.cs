@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
 using System.Windows;
 
@@ -98,9 +99,8 @@ public sealed class ClassDefinition : TypeDefinition
 	{
 		var constructors = new List<IGeneratedConstructor>();
 
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 		Debug.Assert(TypeBuilder.BaseType != null, "TypeBuilder.BaseType != null");
-		ConstructorInfo[] constructorInfos = TypeBuilder.BaseType.GetConstructors(flags);
+		ConstructorInfo[] constructorInfos = TypeBuilder.BaseType.GetConstructors(DeclaredOnlyExactBindingFlags & ~BindingFlags.Static);
 		// ReSharper disable once LoopCanBeConvertedToQuery
 		foreach (ConstructorInfo constructorInfo in constructorInfos)
 		{
@@ -136,9 +136,8 @@ public sealed class ClassDefinition : TypeDefinition
 	{
 		// find base class constructor
 		Type[] parameterTypes = generatedConstructor.ParameterTypes.ToArray();
-		const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 		Debug.Assert(TypeBuilder.BaseType != null, "TypeBuilder.BaseType != null");
-		ConstructorInfo baseClassConstructor = TypeBuilder.BaseType.GetConstructor(flags, Type.DefaultBinder, parameterTypes, null);
+		ConstructorInfo baseClassConstructor = TypeBuilder.BaseType.GetConstructor(DeclaredOnlyExactBindingFlags & ~BindingFlags.Static, Type.DefaultBinder, parameterTypes, null);
 		Debug.Assert(baseClassConstructor != null, nameof(baseClassConstructor) + " != null");
 
 		// load arguments onto the evaluation stack

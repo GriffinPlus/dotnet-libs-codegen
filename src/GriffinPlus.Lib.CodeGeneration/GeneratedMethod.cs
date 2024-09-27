@@ -16,9 +16,9 @@ namespace GriffinPlus.Lib.CodeGeneration;
 /// A generated method.
 /// </summary>
 [DebuggerDisplay(
-	"{Visibility.ToString().ToLower(),nq} "+
+	"{Visibility.ToString().ToLower(),nq} " +
 	"{Kind.ToString().ToLower(),nq} " +
-	"{nameof(Name),nq} "+
+	"{nameof(Name),nq} " +
 	"({System.String.Join(\", \", System.Linq.Enumerable.Select(((System.Collections.Generic.IEnumerable<System.Type>)ParameterTypes), x => x.FullName)),nq})")]
 class GeneratedMethod : Member, IGeneratedMethodInternal
 {
