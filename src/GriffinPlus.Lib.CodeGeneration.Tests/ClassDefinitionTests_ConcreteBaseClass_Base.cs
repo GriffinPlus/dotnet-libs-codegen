@@ -37,7 +37,7 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 		CheckTypeAgainstDefinition(type, definition);
 
 		// try to get the generated constructors of our test base class
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding;
+		const BindingFlags bindingFlags = ExactDeclaredOnlyBindingFlags & ~BindingFlags.Static;
 		ConstructorInfo constructor1 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [], null);
 		ConstructorInfo constructor2 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_Public)], null);
 		ConstructorInfo constructor3 = type.GetConstructor(bindingFlags, Type.DefaultBinder, [typeof(ParameterType_ProtectedInternal)], null);
@@ -165,7 +165,7 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 
 	/// <summary>
 	/// Tests the <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
@@ -179,7 +179,7 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
 	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
 	[Theory]
-	[MemberData(nameof(AddEventTestData_WithImplementationStrategy_Standard))]
+	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
 	public void AddVirtualEvent_WithImplementationStrategy_Standard(
 		string     name,
 		Visibility visibility,
@@ -194,10 +194,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 		ClassDefinition definition = CreateTypeDefinition();
 
 		// create an instance of the implementation strategy
-		Type implementationType = typeof(EventImplementation_Standard);
 		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-			                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
+			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
+			                                      : new TestEventImplementation();
 
 		// get the AddEvent(...) method to test
 		MethodInfo addEventMethod = typeof(ClassDefinition)
@@ -228,8 +227,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Virtual,
 			addedEvent.Name,
+			EventKind.Virtual,
+			visibility,
 			eventHandlerType,
 			addEventRaiserMethod,
 			eventRaiserName,
@@ -298,7 +298,7 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 		// add an event raiser method to the type definition
 		// (should always just be: public void FireMyEvent();
 		const MethodKind kind = MethodKind.Normal;
-		string eventRaiserName = "FireMyEvent";
+		const string eventRaiserName = "FireMyEvent";
 		Type eventRaiserReturnType = typeof(void);
 		Type[] eventRaiserParameterTypes = [];
 		const Visibility eventRaiserVisibility = Visibility.Public;
@@ -324,8 +324,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_Base : TypeDefiniti
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Virtual,
 			addedEvent.Name,
+			EventKind.Virtual,
+			visibility,
 			eventHandlerType,
 			true,
 			eventRaiserName,

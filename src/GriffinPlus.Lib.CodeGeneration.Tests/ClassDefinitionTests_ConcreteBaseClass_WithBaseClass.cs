@@ -28,15 +28,14 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 	#region Test Data
 
 	/// <summary>
-	/// Test data for tests targeting <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/>
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// Test data for tests targeting <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method.
 	/// </summary>
 	public static IEnumerable<object[]> AddEventOverrideTestData
 	{
 		get
 		{
 			// get all events of the test base class
-			EventInfo[] events = typeof(TInheritedTestClass).GetEvents(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+			EventInfo[] events = typeof(TInheritedTestClass).GetEvents(ExactDeclaredOnlyBindingFlags);
 
 			foreach (EventInfo @event in events)
 			{
@@ -72,7 +71,7 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 
 	/// <summary>
 	/// Tests the <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	/// <param name="name">Name of the event to override.</param>
 	/// <param name="expectedVisibility">Expected visibility of the overridden event.</param>
@@ -100,8 +99,8 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 		const string eventRaiserName = "FireMyEvent";
 		const Visibility eventRaiserVisibility = Visibility.Public;
 		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? new EventImplementation_Standard(eventRaiserName, eventRaiserVisibility)
-			                                      : new EventImplementation_Standard();
+			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
+			                                      : new TestEventImplementation();
 
 		// get the inherited event to override by its name
 		IInheritedEvent eventToOverride = definition.InheritedEvents.SingleOrDefault(x => x.Name == name);
@@ -140,8 +139,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Override,
 			eventToOverride.Name,
+			EventKind.Override,
+			expectedVisibility,
 			eventToOverride.EventHandlerType,
 			addEventRaiserMethod,
 			eventRaiserName,
@@ -252,8 +252,9 @@ public abstract class ClassDefinitionTests_ConcreteBaseClass_WithBaseClass<TInhe
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Override,
 			eventToOverride.Name,
+			EventKind.Override,
+			expectedVisibility,
 			eventToOverride.EventHandlerType,
 			addEventRaiserMethod,
 			addEventRaiserMethod ? eventRaiserName : null,

@@ -1548,15 +1548,14 @@ public class ClassDefinitionTests_WpfSpecific
 		// check whether the expected static backing field (property name + "Property") has been generated
 		// dependency property is read-only => backing field should be of type Windows.DependencyPropertyKey
 		// dependency property is read/write => backing field should be of type Windows.DependencyProperty
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo backingField = createdType.GetField(dependencyPropertyDefinition.Name + "Property", bindingFlags);
+		FieldInfo backingField = createdType.GetField(dependencyPropertyDefinition.Name + "Property", ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(backingField);
 		object dependencyPropertyBackingFieldValue = backingField.GetValue(null);
 		Assert.NotNull(dependencyPropertyBackingFieldValue);
 
 		// get the accessor property of the dependency property
 		PropertyInfo accessorProperty = createdType
-			.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+			.GetProperties(ExactDeclaredOnlyBindingFlags)
 			.SingleOrDefault(property => property.Name == dependencyPropertyDefinition.Name);
 		Assert.NotNull(accessorProperty);
 		Assert.Equal(dependencyPropertyDefinition.Type, accessorProperty.PropertyType);

@@ -1049,8 +1049,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -1094,8 +1093,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -1143,8 +1141,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(instance);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(null);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -1190,8 +1187,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(instance);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(null);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -1385,8 +1381,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(initialValue, fieldValue);
@@ -1583,8 +1578,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(initialValue, fieldValue);
@@ -1780,8 +1774,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(instance);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(null);
 		Assert.Equal(initialValue, fieldValue);
@@ -1978,8 +1971,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(initialValue, fieldValue);
@@ -2027,8 +2019,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2074,8 +2065,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2125,8 +2115,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(instance);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(null);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2224,8 +2213,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2273,8 +2261,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2327,8 +2314,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		Assert.NotNull(instance);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(null);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2376,8 +2362,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// check whether the field has the expected initial value
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly;
-		FieldInfo field = type.GetField(addedField.Name, bindingFlags);
+		FieldInfo field = type.GetField(addedField.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(field);
 		object fieldValue = field.GetValue(instance);
 		Assert.Equal(expectedInitialValue, fieldValue);
@@ -2395,9 +2380,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// Test data for tests targeting <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/>,
 	/// <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> and
 	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> using
-	/// <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
-	public static IEnumerable<object[]> AddEventTestData_WithImplementationStrategy_Standard
+	public static IEnumerable<object[]> AddEventTestData_WithImplementationStrategy
 	{
 		get
 		{
@@ -2544,7 +2529,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	/// <summary>
 	/// Tests the <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
@@ -2558,8 +2543,8 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
 	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
 	[Theory]
-	[MemberData(nameof(AddEventTestData_WithImplementationStrategy_Standard))]
-	public void AddEvent_WithImplementationStrategy_Standard(
+	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
+	public void AddEvent_WithImplementationStrategy(
 		string     name,
 		Visibility visibility,
 		Type       eventHandlerType,
@@ -2573,10 +2558,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TDefinition definition = CreateTypeDefinition();
 
 		// create an instance of the implementation strategy
-		Type implementationType = typeof(EventImplementation_Standard);
 		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-			                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
+			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
+			                                      : new TestEventImplementation();
 
 		// get the AddEvent(...) method to test
 		MethodInfo addEventMethod = typeof(TypeDefinition)
@@ -2607,8 +2591,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Normal,
 			addedEvent.Name,
+			EventKind.Normal,
+			visibility,
 			eventHandlerType,
 			addEventRaiserMethod,
 			eventRaiserName,
@@ -2666,10 +2651,10 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		// add an event raiser method to the type definition
 		// (should always just be: public void FireMyEvent();
 		const MethodKind kind = MethodKind.Normal;
-		string eventRaiserName = "FireMyEvent";
+		const string eventRaiserName = "FireMyEvent";
 		Type eventRaiserReturnType = typeof(void);
 		Type[] eventRaiserParameterTypes = [];
-		var eventRaiserVisibility = Visibility.Public;
+		const Visibility eventRaiserVisibility = Visibility.Public;
 		definition.AddMethod(
 			kind,
 			eventRaiserName,
@@ -2692,8 +2677,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Normal,
 			addedEvent.Name,
+			EventKind.Normal,
+			visibility,
 			eventHandlerType,
 			true,
 			eventRaiserName,
@@ -2721,7 +2707,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
 	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
 	[Theory]
-	[MemberData(nameof(AddEventTestData_WithImplementationStrategy_Standard))]
+	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
 	public void AddStaticEvent_WithImplementationStrategy_Standard(
 		string     name,
 		Visibility visibility,
@@ -2736,10 +2722,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TDefinition definition = CreateTypeDefinition();
 
 		// create an instance of the implementation strategy
-		Type implementationType = typeof(EventImplementation_Standard);
 		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? (IEventImplementation)Activator.CreateInstance(implementationType, eventRaiserName, eventRaiserVisibility)
-			                                      : (IEventImplementation)Activator.CreateInstance(implementationType);
+			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
+			                                      : new TestEventImplementation();
 
 		// get the AddEvent(...) method to test
 		MethodInfo addEventMethod = typeof(TypeDefinition)
@@ -2770,8 +2755,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Static,
 			addedEvent.Name,
+			EventKind.Static,
+			visibility,
 			eventHandlerType,
 			addEventRaiserMethod,
 			eventRaiserName,
@@ -2856,8 +2842,9 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		TestEventImplementation_Standard(
 			definition,
 			instance,
-			EventKind.Static,
 			addedEvent.Name,
+			EventKind.Static,
+			visibility,
 			eventHandlerType,
 			true,
 			eventRaiserName,
@@ -3607,9 +3594,8 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		IReadOnlyList<object> testObjects,
 		int                   testDataHandle)
 	{
-		const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 		Type generatedType = instance.GetType();
-		PropertyInfo property = generatedType.GetProperty(generatedProperty.Name, bindingFlags);
+		PropertyInfo property = generatedType.GetProperty(generatedProperty.Name, ExactDeclaredOnlyBindingFlags);
 		Assert.NotNull(property);
 
 		// reset instance if the property is static to make getting/setting them below work as expected
