@@ -19,7 +19,6 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// </summary>
 public class TestEventImplementation : EventImplementation
 {
-	private          IGeneratedField  mBackingField;
 	private          IGeneratedMethod mEventRaiserMethod;
 	private readonly bool             mAddEventRaiserMethod;
 	private readonly string           mEventRaiserMethodName;
@@ -57,6 +56,11 @@ public class TestEventImplementation : EventImplementation
 	public override IGeneratedMethod EventRaiserMethod => mEventRaiserMethod;
 
 	/// <summary>
+	/// Gets the field backing the event.
+	/// </summary>
+	public IGeneratedField BackingField { get; private set; }
+
+	/// <summary>
 	/// Adds other fields, events, properties and methods to the <see cref="TypeDefinition"/>.
 	/// </summary>
 	/// <param name="typeDefinition">Definition of the type in creation.</param>
@@ -64,9 +68,9 @@ public class TestEventImplementation : EventImplementation
 	public override void Declare(TypeDefinition typeDefinition, IGeneratedEvent eventToImplement)
 	{
 		// declare the backing field storing event handlers
-		mBackingField = eventToImplement.Kind == EventKind.Static
-			                ? typeDefinition.AddStaticField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility)
-			                : typeDefinition.AddField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility);
+		BackingField = eventToImplement.Kind == EventKind.Static
+			               ? typeDefinition.AddStaticField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility)
+			               : typeDefinition.AddField(eventToImplement.EventHandlerType, null, eventToImplement.Visibility);
 
 		// abort if event raiser method should not be declared
 		if (!mAddEventRaiserMethod)
@@ -148,9 +152,9 @@ public class TestEventImplementation : EventImplementation
 	/// <c>false</c> to implement the 'remove' accessor method.
 	/// </param>
 	/// <param name="eventToImplement">Event to implement.</param>
-	private void ImplementAccessor(bool isAdd, IGeneratedEvent eventToImplement)
+	internal void ImplementAccessor(bool isAdd, IGeneratedEvent eventToImplement)
 	{
-		Type backingFieldType = mBackingField.FieldBuilder.FieldType;
+		Type backingFieldType = BackingField.FieldBuilder.FieldType;
 
 		// get the Delegate.Combine() method  when adding a handler and Delegate.Remove() when removing a handler
 		MethodInfo delegateMethod = typeof(Delegate).GetMethod(isAdd ? "Combine" : "Remove", [typeof(Delegate), typeof(Delegate)]);
@@ -168,7 +172,7 @@ public class TestEventImplementation : EventImplementation
 		Label retryLabel = msilGenerator.DefineLabel();
 		if (eventToImplement.Kind == EventKind.Static)
 		{
-			msilGenerator.Emit(OpCodes.Ldsfld, mBackingField.FieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldsfld, BackingField.FieldBuilder);
 			msilGenerator.Emit(OpCodes.Stloc_0);
 			msilGenerator.MarkLabel(retryLabel);
 			msilGenerator.Emit(OpCodes.Ldloc_0);
@@ -178,7 +182,7 @@ public class TestEventImplementation : EventImplementation
 			msilGenerator.EmitCall(OpCodes.Call, delegateMethod, null);
 			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
 			msilGenerator.Emit(OpCodes.Stloc_2);
-			msilGenerator.Emit(OpCodes.Ldsflda, mBackingField.FieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldsflda, BackingField.FieldBuilder);
 			msilGenerator.Emit(OpCodes.Ldloc_2);
 			msilGenerator.Emit(OpCodes.Ldloc_1);
 			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
@@ -191,7 +195,7 @@ public class TestEventImplementation : EventImplementation
 		else
 		{
 			msilGenerator.Emit(OpCodes.Ldarg_0);
-			msilGenerator.Emit(OpCodes.Ldfld, mBackingField.FieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldfld, BackingField.FieldBuilder);
 			msilGenerator.Emit(OpCodes.Stloc_0);
 			msilGenerator.MarkLabel(retryLabel);
 			msilGenerator.Emit(OpCodes.Ldloc_0);
@@ -202,7 +206,7 @@ public class TestEventImplementation : EventImplementation
 			msilGenerator.Emit(OpCodes.Castclass, backingFieldType);
 			msilGenerator.Emit(OpCodes.Stloc_2);
 			msilGenerator.Emit(OpCodes.Ldarg_0);
-			msilGenerator.Emit(OpCodes.Ldflda, mBackingField.FieldBuilder);
+			msilGenerator.Emit(OpCodes.Ldflda, BackingField.FieldBuilder);
 			msilGenerator.Emit(OpCodes.Ldloc_2);
 			msilGenerator.Emit(OpCodes.Ldloc_1);
 			msilGenerator.Emit(OpCodes.Call, interlockedCompareExchangeMethod);
@@ -231,12 +235,12 @@ public class TestEventImplementation : EventImplementation
 		{
 			FieldInfo eventArgsEmpty = typeof(EventArgs).GetField("Empty");
 			Debug.Assert(eventArgsEmpty != null);
-			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(mBackingField.FieldBuilder.FieldType);
+			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(BackingField.FieldBuilder.FieldType);
 			Label label = msilGenerator.DefineLabel();
 
 			if (eventToImplement.Kind == EventKind.Static)
 			{
-				msilGenerator.Emit(OpCodes.Ldsfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldsfld, BackingField.FieldBuilder);
 				msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Brfalse_S, label);
@@ -247,7 +251,7 @@ public class TestEventImplementation : EventImplementation
 			else
 			{
 				msilGenerator.Emit(OpCodes.Ldarg_0);
-				msilGenerator.Emit(OpCodes.Ldfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldfld, BackingField.FieldBuilder);
 				msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Brfalse_S, label);
@@ -262,7 +266,7 @@ public class TestEventImplementation : EventImplementation
 				msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
 			}
 
-			MethodInfo invokeMethod = mBackingField.FieldBuilder.FieldType.GetMethod("Invoke");
+			MethodInfo invokeMethod = BackingField.FieldBuilder.FieldType.GetMethod("Invoke");
 			Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
 			msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
 			msilGenerator.MarkLabel(label);
@@ -275,11 +279,11 @@ public class TestEventImplementation : EventImplementation
 		// (the event raiser will have the signature: void OnEvent(TEventArgs))
 		if (eventToImplement.EventHandlerType.IsGenericType && eventToImplement.EventHandlerType.GetGenericTypeDefinition() == typeof(EventHandler<>))
 		{
-			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(mBackingField.FieldBuilder.FieldType);
+			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(BackingField.FieldBuilder.FieldType);
 			Label label = msilGenerator.DefineLabel();
 			if (eventToImplement.Kind == EventKind.Static)
 			{
-				msilGenerator.Emit(OpCodes.Ldsfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldsfld, BackingField.FieldBuilder);
 				msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Brfalse_S, label);
@@ -290,7 +294,7 @@ public class TestEventImplementation : EventImplementation
 			else
 			{
 				msilGenerator.Emit(OpCodes.Ldarg_0);
-				msilGenerator.Emit(OpCodes.Ldfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldfld, BackingField.FieldBuilder);
 				msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 				msilGenerator.Emit(OpCodes.Brfalse_S, label);
@@ -305,7 +309,7 @@ public class TestEventImplementation : EventImplementation
 				msilGenerator.Emit(OpCodes.Ldarg_1); // load event arguments
 			}
 
-			MethodInfo invokeMethod = mBackingField.FieldBuilder.FieldType.GetMethod("Invoke");
+			MethodInfo invokeMethod = BackingField.FieldBuilder.FieldType.GetMethod("Invoke");
 			Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
 			msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
 			msilGenerator.MarkLabel(label);
@@ -319,17 +323,17 @@ public class TestEventImplementation : EventImplementation
 		// ReSharper disable once InvertIf
 		if (typeof(Delegate).IsAssignableFrom(eventToImplement.EventHandlerType))
 		{
-			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(mBackingField.FieldBuilder.FieldType);
+			LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(BackingField.FieldBuilder.FieldType);
 			Label label = msilGenerator.DefineLabel();
 
 			if (eventToImplement.Kind == EventKind.Static)
 			{
-				msilGenerator.Emit(OpCodes.Ldsfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldsfld, BackingField.FieldBuilder);
 			}
 			else
 			{
 				msilGenerator.Emit(OpCodes.Ldarg_0);
-				msilGenerator.Emit(OpCodes.Ldfld, mBackingField.FieldBuilder);
+				msilGenerator.Emit(OpCodes.Ldfld, BackingField.FieldBuilder);
 			}
 
 			msilGenerator.Emit(OpCodes.Stloc, handlerLocalBuilder);
@@ -337,9 +341,9 @@ public class TestEventImplementation : EventImplementation
 			msilGenerator.Emit(OpCodes.Brfalse_S, label);
 			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 			int argumentOffset = eventToImplement.Kind == EventKind.Static ? 0 : 1;
-			int count = EventRaiserMethod.ParameterTypes.Count();
+			int count = EventRaiserMethod.ParameterTypes.Count;
 			for (int i = 0; i < count; i++) CodeGenHelpers.EmitLoadArgument(msilGenerator, argumentOffset + i);
-			MethodInfo invokeMethod = mBackingField.FieldBuilder.FieldType.GetMethod("Invoke");
+			MethodInfo invokeMethod = BackingField.FieldBuilder.FieldType.GetMethod("Invoke");
 			Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
 			msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
 			msilGenerator.Emit(OpCodes.Ret);

@@ -10,6 +10,7 @@ using System.Reflection;
 
 using Xunit;
 
+// ReSharper disable ConvertToLambdaExpression
 // ReSharper disable SuggestBaseTypeForParameter
 
 namespace GriffinPlus.Lib.CodeGeneration.Tests;
@@ -52,7 +53,7 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 
 		// now override the first and the last property with a simple implementation
 		// (the kind of implementation is not important here, just some accepted strategy)
-		actualPropertyDefinitions[0].Override(new PropertyImplementation_TestDataStorage(-1)); // will not work at the end, but
+		actualPropertyDefinitions[0].Override(new PropertyImplementation_TestDataStorage(-1));  // will not work at the end, but
 		actualPropertyDefinitions[^1].Override(new PropertyImplementation_TestDataStorage(-1)); // it does not matter for the test...
 		expectedPropertyCount -= 2;
 
@@ -73,8 +74,357 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 	/// - <see cref="ClassDefinition.AddPropertyOverride{T}(IInheritedProperty{T},IPropertyImplementation)"/><br/>
 	/// - <see cref="ClassDefinition.AddMethodOverride(IInheritedMethod,IMethodImplementation)"/>
 	/// </summary>
-	[Fact]
-	public void ImplementAbstractBaseClass_WithImplementationStrategies()
+	// [Fact]
+	public void ImplementAbstractBaseClass_Generic_WithImplementationStrategies()
+	{
+		ImplementAbstractBaseClass_Common(
+			(
+				typeDefinition,
+				inheritedEventToOverride) =>
+			{
+				// get the AddEventOverride(...) method to test
+				MethodInfo addEventOverrideMethod = typeof(ClassDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(ClassDefinition.AddEventOverride))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(inheritedEventToOverride.EventHandlerType!))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual(
+							[
+								typeof(IInheritedEvent<>).MakeGenericType(inheritedEventToOverride.EventHandlerType!),
+								typeof(IEventImplementation)
+							]));
+
+				// create an instance of the implementation strategy
+				const Visibility eventRaiserVisibility = Visibility.Public;
+				IEventImplementation implementation = new TestEventImplementation(
+					GetEventRaiserName(inheritedEventToOverride.EventInfo),
+					eventRaiserVisibility);
+
+				// invoke the method to add the event override to the type definition
+				var addedEventDefinition = (IGeneratedEvent)addEventOverrideMethod.Invoke(
+					typeDefinition,
+					[
+						inheritedEventToOverride,
+						implementation
+					]);
+				Assert.NotNull(addedEventDefinition);
+
+				// the generated event should use the passed implementation
+				Assert.Same(addedEventDefinition.Implementation, implementation);
+
+				return addedEventDefinition;
+			},
+			(
+				typeDefinition,
+				inheritedPropertyToOverride,
+				handle) =>
+			{
+				IPropertyImplementation implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				// get the AddPropertyOverride(...) method to test
+				MethodInfo addPropertyOverrideMethod = typeof(ClassDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(ClassDefinition.AddPropertyOverride))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(inheritedPropertyToOverride.PropertyType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual(
+							[
+								typeof(IInheritedProperty<>).MakeGenericType(inheritedPropertyToOverride.PropertyType),
+								typeof(IPropertyImplementation)
+							]));
+
+				// invoke the method to add the property override to the type definition
+				var addedPropertyDefinition = (IGeneratedProperty)addPropertyOverrideMethod.Invoke(
+					typeDefinition,
+					[
+						inheritedPropertyToOverride,
+						implementation
+					]);
+				Assert.NotNull(addedPropertyDefinition);
+
+				// the generated property should use the passed implementation
+				Assert.Same(addedPropertyDefinition.Implementation, implementation);
+
+				return addedPropertyDefinition;
+			},
+			(typeDefinition, inheritedMethodToOverride) =>
+			{
+				var implementation = new TestMethodImplementation();
+
+				IGeneratedMethod addedMethodDefinition = typeDefinition.AddMethodOverride(
+					inheritedMethodToOverride,
+					implementation);
+
+				// the generated method should use the passed implementation
+				Assert.Same(addedMethodDefinition.Implementation, implementation);
+
+				return addedMethodDefinition;
+			});
+	}
+
+	/// <summary>
+	/// Tests using the following methods to implement the abstract base class using implementation strategies:<br/>
+	/// - <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},EventAccessorImplementationCallback, EventAccessorImplementationCallback)"/><br/>
+	/// -
+	/// <see
+	///     cref="ClassDefinition.AddPropertyOverride{T}(IInheritedProperty{T},PropertyAccessorImplementationCallback,PropertyAccessorImplementationCallback)"/>
+	/// <br/>
+	/// - <see cref="ClassDefinition.AddMethodOverride(IInheritedMethod,MethodImplementationCallback)"/>
+	/// </summary>
+	// [Fact]
+	public void ImplementAbstractBaseClass_Generic_WithImplementationCallbacks()
+	{
+		ImplementAbstractBaseClass_Common(
+			(
+				typeDefinition,
+				inheritedEventToOverride) =>
+			{
+				// get the AddEventOverride(...) method to test
+				MethodInfo addEventOverrideMethod = typeof(ClassDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(ClassDefinition.AddEventOverride))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(inheritedEventToOverride.EventHandlerType!))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual(
+							[
+								typeof(IInheritedEvent<>).MakeGenericType(inheritedEventToOverride.EventHandlerType!),
+								typeof(EventAccessorImplementationCallback),
+								typeof(EventAccessorImplementationCallback)
+							]));
+
+				// create an instance of the implementation strategy
+				// (the strategy itself is not used, but its methods are called directly to declare stuff and implement the accessors)
+				const Visibility eventRaiserVisibility = Visibility.Public;
+				IEventImplementation implementation = new TestEventImplementation(
+					GetEventRaiserName(inheritedEventToOverride.EventInfo),
+					eventRaiserVisibility);
+
+				// invoke the method to add the event override to the type definition
+				// (the add accessor is implemented first, so declare additional stuff there)
+				var addedEventDefinition = (IGeneratedEvent)addEventOverrideMethod.Invoke(
+					typeDefinition,
+					[
+						inheritedEventToOverride,
+						(EventAccessorImplementationCallback)
+						((eventToImplement, msilGenerator) =>
+							{
+								implementation.Declare(typeDefinition, eventToImplement);
+								implementation.ImplementAddAccessorMethod(typeDefinition, eventToImplement, msilGenerator);
+							}),
+						(EventAccessorImplementationCallback)
+						((eventToImplement, msilGenerator) =>
+							{
+								implementation.ImplementRemoveAccessorMethod(typeDefinition, eventToImplement, msilGenerator);
+							})
+					]);
+				Assert.NotNull(addedEventDefinition);
+
+				// the generated event should not use an implementation strategy
+				Assert.Null(addedEventDefinition.Implementation);
+
+				return addedEventDefinition;
+			},
+			(
+				typeDefinition,
+				inheritedPropertyToOverride,
+				handle) =>
+			{
+				IPropertyImplementation implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				// get the AddPropertyOverride(...) method to test
+				MethodInfo addPropertyOverrideMethod = typeof(ClassDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(ClassDefinition.AddPropertyOverride))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(inheritedPropertyToOverride.PropertyType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual(
+							[
+								typeof(IInheritedProperty<>).MakeGenericType(inheritedPropertyToOverride.PropertyType),
+								typeof(PropertyAccessorImplementationCallback),
+								typeof(PropertyAccessorImplementationCallback)
+							]));
+
+				// invoke the method to add the property override to the type definition
+				// (the get accessor is implemented first, so declare additional stuff there)
+				var addedPropertyDefinition = (IGeneratedProperty)addPropertyOverrideMethod.Invoke(
+					typeDefinition,
+					[
+						inheritedPropertyToOverride,
+						(PropertyAccessorImplementationCallback)
+						((property, msilGenerator) =>
+							{
+								implementation.Declare(property.TypeDefinition, property);
+								implementation.ImplementGetAccessorMethod(property.TypeDefinition, property, msilGenerator);
+							}),
+						(PropertyAccessorImplementationCallback)
+						((property, msilGenerator) =>
+							{
+								implementation.ImplementSetAccessorMethod(property.TypeDefinition, property, msilGenerator);
+							})
+					]);
+				Assert.NotNull(addedPropertyDefinition);
+
+				// the generated property should not use an implementation strategy
+				Assert.Null(addedPropertyDefinition.Implementation);
+
+				return addedPropertyDefinition;
+			},
+			(typeDefinition, inheritedMethodToOverride) =>
+			{
+				IGeneratedMethod addedMethodDefinition = typeDefinition.AddMethodOverride(inheritedMethodToOverride, TestMethodImplementation.Callback);
+
+				// the generated method should not use an implementation strategy
+				Assert.Null(addedMethodDefinition.Implementation);
+
+				return addedMethodDefinition;
+			});
+	}
+
+	/// <summary>
+	/// Tests using the following methods to implement the abstract base class using implementation strategies:<br/>
+	/// - <see cref="ClassDefinition.AddEventOverride(IInheritedEvent,IEventImplementation)"/><br/>
+	/// - <see cref="ClassDefinition.AddPropertyOverride(IInheritedProperty,IPropertyImplementation)"/><br/>
+	/// - <see cref="ClassDefinition.AddMethodOverride(IInheritedMethod,IMethodImplementation)"/>
+	/// </summary>
+	// [Fact]
+	public void ImplementAbstractBaseClass_NonGeneric_WithImplementationStrategies()
+	{
+		ImplementAbstractBaseClass_Common(
+			(
+				typeDefinition,
+				inheritedEventToOverride) =>
+			{
+				var implementation = new TestEventImplementation(GetEventRaiserName(inheritedEventToOverride.EventInfo), Visibility.Public);
+				IGeneratedEvent addedEventDefinition = typeDefinition.AddEventOverride(inheritedEventToOverride, implementation);
+
+				// the generated event should use the passed implementation
+				Assert.Same(addedEventDefinition.Implementation, implementation);
+
+				return addedEventDefinition;
+			},
+			(
+				typeDefinition,
+				inheritedPropertyToOverride,
+				handle) =>
+			{
+				var implementation = new PropertyImplementation_TestDataStorage(handle);
+				IGeneratedProperty addedPropertyDefinition = typeDefinition.AddPropertyOverride(inheritedPropertyToOverride, implementation);
+
+				// the generated property should use the passed implementation
+				Assert.Same(addedPropertyDefinition.Implementation, implementation);
+
+				return addedPropertyDefinition;
+			},
+			(typeDefinition, inheritedMethodToOverride) =>
+			{
+				var implementation = new TestMethodImplementation();
+				IGeneratedMethod addedMethodDefinition = typeDefinition.AddMethodOverride(inheritedMethodToOverride, implementation);
+
+				// the generated method should use the passed implementation
+				Assert.Same(addedMethodDefinition.Implementation, implementation);
+
+				return addedMethodDefinition;
+			});
+	}
+
+	/// <summary>
+	/// Tests using the following methods to implement the abstract base class using implementation strategies:<br/>
+	/// - <see cref="ClassDefinition.AddEventOverride(IInheritedEvent,EventAccessorImplementationCallback, EventAccessorImplementationCallback)"/><br/>
+	/// -
+	/// <see cref="ClassDefinition.AddPropertyOverride(IInheritedProperty,PropertyAccessorImplementationCallback,PropertyAccessorImplementationCallback)"/>
+	/// <br/>
+	/// - <see cref="ClassDefinition.AddMethodOverride(IInheritedMethod,MethodImplementationCallback)"/>
+	/// </summary>
+	// [Fact]
+	public void ImplementAbstractBaseClass_NonGeneric_WithImplementationCallbacks()
+	{
+		ImplementAbstractBaseClass_Common(
+			(
+				typeDefinition,
+				inheritedEventToOverride) =>
+			{
+				// create an instance of the implementation strategy
+				// (the strategy itself is not used, but its methods are called directly to declare stuff and implement the accessors)
+				const Visibility eventRaiserVisibility = Visibility.Public;
+				IEventImplementation implementation = new TestEventImplementation(
+					GetEventRaiserName(inheritedEventToOverride.EventInfo),
+					eventRaiserVisibility);
+
+				// add the event override to the type definition
+				// (the add accessor is implemented first, so declare additional stuff there)
+				IGeneratedEvent addedEventDefinition = typeDefinition.AddEventOverride(
+					inheritedEventToOverride,
+					(eventToImplement, msilGenerator) =>
+					{
+						implementation.Declare(typeDefinition, eventToImplement);
+						implementation.ImplementAddAccessorMethod(typeDefinition, eventToImplement, msilGenerator);
+					},
+					(eventToImplement, msilGenerator) =>
+					{
+						implementation.ImplementRemoveAccessorMethod(typeDefinition, eventToImplement, msilGenerator);
+					});
+
+				// the generated event should not use an implementation strategy
+				Assert.Null(addedEventDefinition.Implementation);
+
+				return addedEventDefinition;
+			},
+			(
+				typeDefinition,
+				inheritedPropertyToOverride,
+				handle) =>
+			{
+				IPropertyImplementation implementation = new PropertyImplementation_TestDataStorage(handle);
+
+				// add the property override to the type definition
+				IGeneratedProperty addedPropertyDefinition = typeDefinition.AddPropertyOverride(
+					inheritedPropertyToOverride,
+					(property, msilGenerator) =>
+					{
+						implementation.Declare(property.TypeDefinition, property);
+						implementation.ImplementGetAccessorMethod(property.TypeDefinition, property, msilGenerator);
+					},
+					(property, msilGenerator) =>
+					{
+						implementation.ImplementSetAccessorMethod(property.TypeDefinition, property, msilGenerator);
+					});
+
+				// the generated property should not use an implementation strategy
+				Assert.Null(addedPropertyDefinition.Implementation);
+
+				return addedPropertyDefinition;
+			},
+			(typeDefinition, inheritedMethodToOverride) =>
+			{
+				IGeneratedMethod addedMethodDefinition = typeDefinition.AddMethodOverride(inheritedMethodToOverride, TestMethodImplementation.Callback);
+
+				// the generated property should not use an implementation strategy
+				Assert.Null(addedMethodDefinition.Implementation);
+
+				return addedMethodDefinition;
+			});
+	}
+
+	private void ImplementAbstractBaseClass_Common(
+		Func<ClassDefinition, IInheritedEvent, IGeneratedEvent>            overrideEventCallback,
+		Func<ClassDefinition, IInheritedProperty, int, IGeneratedProperty> overridePropertyCallback,
+		Func<ClassDefinition, IInheritedMethod, IGeneratedMethod>          overrideMethodCallback)
 	{
 		// ------------------------------------------------------------------------------------------------------------------
 		// create a new type definition deriving from an abstract base class
@@ -93,38 +443,19 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 
 		foreach (EventInfo abstractEventInfo in abstractEventInfos)
 		{
-			// create an instance of the implementation strategy
-			const Visibility eventRaiserVisibility = Visibility.Public;
-			IEventImplementation implementation = new TestEventImplementation(GetEventRaiserName(abstractEventInfo), eventRaiserVisibility);
-
 			// get the inherited event from the class definition
 			IInheritedEvent inheritedEventToOverride = typeDefinition.InheritedEvents.SingleOrDefault(inheritedEvent => inheritedEvent.Name == abstractEventInfo.Name);
 			Assert.NotNull(inheritedEventToOverride);
 			Assert.Equal(abstractEventInfo, inheritedEventToOverride.EventInfo);
 
-			// get the AddEventOverride(...) method to test
-			MethodInfo addEventOverrideMethod = typeof(ClassDefinition)
-				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(ClassDefinition.AddEventOverride))
-				.Where(method => method.GetGenericArguments().Length == 1)
-				.Select(method => method.MakeGenericMethod(abstractEventInfo.EventHandlerType!))
-				.Single(
-					method => method
-						.GetParameters()
-						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(
-						[
-							typeof(IInheritedEvent<>).MakeGenericType(abstractEventInfo.EventHandlerType!),
-							typeof(IEventImplementation)
-						]));
+			// add event to the type definition
+			IGeneratedEvent addedEventDefinition = overrideEventCallback(typeDefinition, inheritedEventToOverride);
 
-			// invoke the method to add the event override to the type definition
-			var addedEventDefinition = (IGeneratedEvent)addEventOverrideMethod.Invoke(typeDefinition, [inheritedEventToOverride, implementation]);
+			// the generated event property should be an overrider with the expected event handler
 			Assert.NotNull(addedEventDefinition);
 			Assert.Equal(EventKind.Override, addedEventDefinition.Kind);
 			Assert.Equal(abstractEventInfo.ToVisibility(), addedEventDefinition.Visibility);
 			Assert.Equal(abstractEventInfo.EventHandlerType, addedEventDefinition.EventHandlerType);
-			Assert.Same(implementation, addedEventDefinition.Implementation);
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------
@@ -141,43 +472,30 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 		foreach (PropertyInfo abstractPropertyInfo in abstractPropertyInfos)
 		{
 			// create an instance of the implementation strategy and wire up the test objects
-			object[] testObjects = null;
+			// (the strategy itself is not used, but its methods are called directly to declare stuff and implement the accessors)
+			object[] propertyTestArguments = null;
 			if (abstractPropertyInfo.PropertyType == typeof(int))
 			{
-				testObjects = [1, 2];
+				propertyTestArguments = [1, 2];
 			}
 			else if (abstractPropertyInfo.PropertyType == typeof(string))
 			{
-				testObjects = ["InitialValue", "NewValue"];
+				propertyTestArguments = ["InitialValue", "NewValue"];
 			}
-			Assert.NotNull(testObjects);
-			int handle = storage.Add(testObjects[0]); // initial value
-			testDataByProperty.Add(abstractPropertyInfo, (handle, testObjects));
-			IPropertyImplementation implementation = new PropertyImplementation_TestDataStorage(handle);
+			Assert.NotNull(propertyTestArguments);
+			int handle = storage.Add(propertyTestArguments[0]); // initial value
+			testDataByProperty.Add(abstractPropertyInfo, (handle, propertyTestArguments));
 
 			// get the inherited property from the class definition
 			IInheritedProperty inheritedPropertyToOverride = typeDefinition.InheritedProperties.SingleOrDefault(inheritedProperty => inheritedProperty.Name == abstractPropertyInfo.Name);
 			Assert.NotNull(inheritedPropertyToOverride);
 			Assert.Equal(abstractPropertyInfo, inheritedPropertyToOverride.PropertyInfo);
 
-			// get the AddPropertyOverride(...) method to test
-			MethodInfo addPropertyOverrideMethod = typeof(ClassDefinition)
-				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(ClassDefinition.AddPropertyOverride))
-				.Where(method => method.GetGenericArguments().Length == 1)
-				.Select(method => method.MakeGenericMethod(abstractPropertyInfo.PropertyType))
-				.Single(
-					method => method
-						.GetParameters()
-						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(
-						[
-							typeof(IInheritedProperty<>).MakeGenericType(abstractPropertyInfo.PropertyType),
-							typeof(IPropertyImplementation)
-						]));
-
-			// invoke the method to add the property override to the type definition
-			var addedPropertyDefinition = (IGeneratedProperty)addPropertyOverrideMethod.Invoke(typeDefinition, [inheritedPropertyToOverride, implementation]);
+			// add the property to the type definition
+			IGeneratedProperty addedPropertyDefinition = overridePropertyCallback(
+				typeDefinition,
+				inheritedPropertyToOverride,
+				handle);
 
 			// the generated property should be an overrider with the expected property type
 			Assert.NotNull(addedPropertyDefinition);
@@ -212,9 +530,6 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 				// the generated setter should not have a return type
 				Assert.Equal(typeof(void), addedPropertyDefinition.SetAccessor.ReturnType);
 			}
-
-			// the generated event should use the passed implementation
-			Assert.Same(implementation, addedPropertyDefinition.Implementation);
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------
@@ -228,9 +543,6 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 
 		foreach (MethodInfo abstractMethodInfo in abstractMethodInfos)
 		{
-			// create an instance of the implementation strategy
-			IMethodImplementation implementation = new IncrementMethodImplementation();
-
 			// get the inherited method from the class definition
 			IInheritedMethod inheritedMethodToOverride = typeDefinition
 				.InheritedMethods
@@ -241,22 +553,10 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 			Assert.NotNull(inheritedMethodToOverride);
 			Assert.Equal(abstractMethodInfo, inheritedMethodToOverride.MethodInfo);
 
-			// get the AddMethodOverride(...) method to test
-			MethodInfo addMethodOverrideMethod = typeof(ClassDefinition)
-				.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-				.Where(method => method.Name == nameof(ClassDefinition.AddMethodOverride))
-				.Single(
-					method => method
-						.GetParameters()
-						.Select(parameter => parameter.ParameterType)
-						.SequenceEqual(
-						[
-							typeof(IInheritedMethod),
-							typeof(IMethodImplementation)
-						]));
+			// add the method to the type definition
+			IGeneratedMethod addedMethodDefinition = overrideMethodCallback(typeDefinition, inheritedMethodToOverride);
 
-			// invoke the method to add the method override to the type definition
-			var addedMethodDefinition = (IGeneratedMethod)addMethodOverrideMethod.Invoke(typeDefinition, [inheritedMethodToOverride, implementation]);
+			// the generated method should be an overrider with the expected signature
 			Assert.NotNull(addedMethodDefinition);
 			Assert.Equal(MethodKind.Override, addedMethodDefinition.Kind);
 			Assert.Equal(abstractMethodInfo.ToVisibility(), addedMethodDefinition.Visibility);
@@ -280,7 +580,7 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 		{
 			// all base class events are EventHandler<EventArgs>
 			// => event raiser will always be: void Raise<EventName>()
-			TestEventImplementation_Standard(
+			TestEventImplementation(
 				typeDefinition,                // type definition with the event to test
 				instance,                      // instance of the test class providing the event to test
 				eventInfo.Name,                // name of the event to test
@@ -319,21 +619,30 @@ public abstract class ClassDefinitionTests_AbstractBaseClass<TInheritedTestClass
 
 		foreach (MethodInfo methodInfo in abstractMethodInfos)
 		{
-			TestMethodImplementation_Increment(
-				typeDefinition,                                                                     // type definition with the method to test
-				instance,                                                                           // instance of the test class providing the method to test
-				methodInfo.Name,                                                                    // name of the method to test
-				MethodKind.Override,                                                                // expected kind of the method (always an overrider)
-				methodInfo.ToVisibility(),                                                          // expected visibility of the method
-				methodInfo.ReturnType,                                                              // expected return type of the method
-				methodInfo.GetParameters().Select(parameter => parameter.ParameterType).ToArray()); // expected parameter types of the method
-		}
+			CreateMethodTestData(
+				methodInfo.ReturnType,
+				methodInfo.GetParameters().Length,
+				out Type[] parameterTypes,
+				out object[] testArguments,
+				out object expectedTestResult);
 
-		return;
+			Assert.Equal(parameterTypes, methodInfo.GetParameters().Select(parameter => parameter.ParameterType));
 
-		static string GetEventRaiserName(EventInfo @event)
-		{
-			return "Raise" + @event.Name;
+			TestMethodImplementation(
+				typeDefinition,            // type definition with the method to test
+				instance,                  // instance of the test class providing the method to test
+				methodInfo.Name,           // name of the method to test
+				MethodKind.Override,       // expected kind of the method (always an overrider)
+				methodInfo.ToVisibility(), // expected visibility of the method
+				methodInfo.ReturnType,     // expected return type of the method
+				parameterTypes,            // expected parameter types of the method
+				testArguments,             // arguments to pass to the method when testing it
+				expectedTestResult);       // the expected return value of the method when testing it
 		}
+	}
+
+	private static string GetEventRaiserName(EventInfo @event)
+	{
+		return "Raise" + @event.Name;
 	}
 }

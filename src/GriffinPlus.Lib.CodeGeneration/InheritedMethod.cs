@@ -60,6 +60,11 @@ class InheritedMethod : Member, IInheritedMethod
 	public Visibility Visibility { get; }
 
 	/// <summary>
+	/// Gets the attributes of the method.
+	/// </summary>
+	public MethodAttributes Attributes => MethodInfo.Attributes;
+
+	/// <summary>
 	/// Gets the <see cref="System.Reflection.MethodInfo"/> associated with the method.
 	/// </summary>
 	public MethodInfo MethodInfo { get; }

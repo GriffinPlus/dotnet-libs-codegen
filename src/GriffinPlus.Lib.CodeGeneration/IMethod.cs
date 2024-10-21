@@ -40,6 +40,11 @@ public interface IMethod
 	Visibility Visibility { get; }
 
 	/// <summary>
+	/// Gets the attributes of the method.
+	/// </summary>
+	MethodAttributes Attributes { get; }
+
+	/// <summary>
 	/// Gets the <see cref="System.Reflection.MethodInfo"/> associated with the method.
 	/// </summary>
 	MethodInfo MethodInfo { get; }

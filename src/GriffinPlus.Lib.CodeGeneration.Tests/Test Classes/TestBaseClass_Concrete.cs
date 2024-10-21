@@ -38,24 +38,24 @@ public class TestBaseClass_Concrete : ITestBaseClass
 	internal           int Field_Internal;
 	private            int Field_Private;
 
-	// public abstract event             EventHandler<EventArgs> Event_Abstract_Public;
-	// protected internal abstract event EventHandler<EventArgs> Event_Abstract_ProtectedInternal;
-	// protected abstract event          EventHandler<EventArgs> Event_Abstract_Protected;
-	// internal abstract event           EventHandler<EventArgs> Event_Abstract_Internal;
-	public event                     EventHandler<EventArgs> Event_Normal_Public;
-	protected internal event         EventHandler<EventArgs> Event_Normal_ProtectedInternal;
-	protected event                  EventHandler<EventArgs> Event_Normal_Protected;
-	internal event                   EventHandler<EventArgs> Event_Normal_Internal;
-	private event                    EventHandler<EventArgs> Event_Normal_Private;
-	public virtual event             EventHandler<EventArgs> Event_Virtual_Public;
-	protected internal virtual event EventHandler<EventArgs> Event_Virtual_ProtectedInternal;
-	protected virtual event          EventHandler<EventArgs> Event_Virtual_Protected;
-	internal virtual event           EventHandler<EventArgs> Event_Virtual_Internal;
-	public static event              EventHandler<EventArgs> Event_Static_Public;
-	protected internal static event  EventHandler<EventArgs> Event_Static_ProtectedInternal;
-	protected static event           EventHandler<EventArgs> Event_Static_Protected;
-	internal static event            EventHandler<EventArgs> Event_Static_Internal;
-	private static event             EventHandler<EventArgs> Event_Static_Private;
+	// public abstract event             EventHandler Event_Abstract_Public;
+	// protected internal abstract event EventHandler Event_Abstract_ProtectedInternal;
+	// protected abstract event          EventHandler Event_Abstract_Protected;
+	// internal abstract event           EventHandler Event_Abstract_Internal;
+	public event                     EventHandler Event_Normal_Public;
+	protected internal event         EventHandler Event_Normal_ProtectedInternal;
+	protected event                  EventHandler Event_Normal_Protected;
+	internal event                   EventHandler Event_Normal_Internal;
+	private event                    EventHandler Event_Normal_Private;
+	public virtual event             EventHandler Event_Virtual_Public;
+	protected internal virtual event EventHandler Event_Virtual_ProtectedInternal;
+	protected virtual event          EventHandler Event_Virtual_Protected;
+	internal virtual event           EventHandler Event_Virtual_Internal;
+	public static event              EventHandler Event_Static_Public;
+	protected internal static event  EventHandler Event_Static_ProtectedInternal;
+	protected static event           EventHandler Event_Static_Protected;
+	internal static event            EventHandler Event_Static_Internal;
+	private static event             EventHandler Event_Static_Private;
 
 	// public abstract             int Property_Abstract_Public            { get; set; }
 	// protected internal abstract int Property_Abstract_ProtectedInternal { get; set; }

@@ -5,14 +5,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
 using Xunit;
 
-// ReSharper disable ConvertToLocalFunction
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
@@ -35,25 +33,6 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// </param>
 	/// <returns>The created type definition instance.</returns>
 	public abstract TDefinition CreateTypeDefinition(string name = null, TypeAttributes attributes = 0);
-
-	#region Common Test Data
-
-	/// <summary>
-	/// All supported visibilities.
-	/// </summary>
-	internal static IEnumerable<Visibility> Visibilities
-	{
-		get
-		{
-			yield return Visibility.Public;
-			yield return Visibility.Protected;
-			yield return Visibility.ProtectedInternal;
-			yield return Visibility.Internal;
-			yield return Visibility.Private;
-		}
-	}
-
-	#endregion
 
 	#region Construction
 
@@ -84,7 +63,10 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// Name of the type (as specified to the constructor, may be <c>null</c> to generate a random name).
 	/// </param>
 	/// <param name="baseType">The type to create derives from.</param>
-	protected static void CheckDefinitionAfterConstruction(TypeDefinition definition, string typeName, Type baseType)
+	protected static void CheckDefinitionAfterConstruction(
+		TypeDefinition definition,
+		string         typeName,
+		Type           baseType)
 	{
 		// the type definition should have an initialized type builder backing the definition
 		Assert.NotNull(definition.TypeBuilder);
@@ -1199,154 +1181,220 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddFieldT_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue)
+	public void AddFieldT_WithInitialValue_Boolean(
+		string     name,
+		Visibility visibility,
+		bool       initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddFieldT_WithInitialValue_Char(string name, Visibility visibility, char initialValue)
+	public void AddFieldT_WithInitialValue_Char(
+		string     name,
+		Visibility visibility,
+		char       initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddFieldT_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue)
+	public void AddFieldT_WithInitialValue_SByte(
+		string     name,
+		Visibility visibility,
+		sbyte      initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddFieldT_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue)
+	public void AddFieldT_WithInitialValue_Byte(
+		string     name,
+		Visibility visibility,
+		byte       initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddFieldT_WithInitialValue_Int16(string name, Visibility visibility, short initialValue)
+	public void AddFieldT_WithInitialValue_Int16(
+		string     name,
+		Visibility visibility,
+		short      initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddFieldT_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue)
+	public void AddFieldT_WithInitialValue_UInt16(
+		string     name,
+		Visibility visibility,
+		ushort     initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddFieldT_WithInitialValue_Int32(string name, Visibility visibility, int initialValue)
+	public void AddFieldT_WithInitialValue_Int32(
+		string     name,
+		Visibility visibility,
+		int        initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddFieldT_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue)
+	public void AddFieldT_WithInitialValue_UInt32(
+		string     name,
+		Visibility visibility,
+		uint       initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddFieldT_WithInitialValue_Int64(string name, Visibility visibility, long initialValue)
+	public void AddFieldT_WithInitialValue_Int64(
+		string     name,
+		Visibility visibility,
+		long       initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddFieldT_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue)
+	public void AddFieldT_WithInitialValue_UInt64(
+		string     name,
+		Visibility visibility,
+		ulong      initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddFieldT_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumS8 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_Byte(
+		string     name,
+		Visibility visibility,
+		TestEnumS8 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddFieldT_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumU8 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_SByte(
+		string     name,
+		Visibility visibility,
+		TestEnumU8 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddFieldT_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_Int16(
+		string      name,
+		Visibility  visibility,
+		TestEnumS16 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddFieldT_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_UInt16(
+		string      name,
+		Visibility  visibility,
+		TestEnumU16 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddFieldT_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_Int32(
+		string      name,
+		Visibility  visibility,
+		TestEnumS32 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddFieldT_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_UInt32(
+		string      name,
+		Visibility  visibility,
+		TestEnumU32 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddFieldT_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_Int64(
+		string      name,
+		Visibility  visibility,
+		TestEnumS64 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddFieldT_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue)
+	public void AddFieldT_WithInitialValue_Enum_UInt64(
+		string      name,
+		Visibility  visibility,
+		TestEnumU64 initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddFieldT_WithInitialValue_Single(string name, Visibility visibility, float initialValue)
+	public void AddFieldT_WithInitialValue_Single(
+		string     name,
+		Visibility visibility,
+		float      initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddFieldT_WithInitialValue_Double(string name, Visibility visibility, double initialValue)
+	public void AddFieldT_WithInitialValue_Double(
+		string     name,
+		Visibility visibility,
+		double     initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddFieldT_WithInitialValue_String(string name, Visibility visibility, string initialValue)
+	public void AddFieldT_WithInitialValue_String(
+		string     name,
+		Visibility visibility,
+		string     initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddFieldT_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue)
+	public void AddFieldT_WithInitialValue_DateTime(
+		string     name,
+		Visibility visibility,
+		DateTime   initialValue)
 	{
 		AddFieldT_WithInitialValue(name, visibility, initialValue);
 	}
@@ -1393,154 +1441,220 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddField_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue)
+	public void AddField_WithInitialValue_Boolean(
+		string     name,
+		Visibility visibility,
+		bool       initialValue)
 	{
 		AddField_WithInitialValue(typeof(bool), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddField_WithInitialValue_Char(string name, Visibility visibility, char initialValue)
+	public void AddField_WithInitialValue_Char(
+		string     name,
+		Visibility visibility,
+		char       initialValue)
 	{
 		AddField_WithInitialValue(typeof(char), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddField_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue)
+	public void AddField_WithInitialValue_SByte(
+		string     name,
+		Visibility visibility,
+		sbyte      initialValue)
 	{
 		AddField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddField_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue)
+	public void AddField_WithInitialValue_Byte(
+		string     name,
+		Visibility visibility,
+		byte       initialValue)
 	{
 		AddField_WithInitialValue(typeof(byte), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddField_WithInitialValue_Int16(string name, Visibility visibility, short initialValue)
+	public void AddField_WithInitialValue_Int16(
+		string     name,
+		Visibility visibility,
+		short      initialValue)
 	{
 		AddField_WithInitialValue(typeof(short), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddField_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue)
+	public void AddField_WithInitialValue_UInt16(
+		string     name,
+		Visibility visibility,
+		ushort     initialValue)
 	{
 		AddField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddField_WithInitialValue_Int32(string name, Visibility visibility, int initialValue)
+	public void AddField_WithInitialValue_Int32(
+		string     name,
+		Visibility visibility,
+		int        initialValue)
 	{
 		AddField_WithInitialValue(typeof(int), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddField_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue)
+	public void AddField_WithInitialValue_UInt32(
+		string     name,
+		Visibility visibility,
+		uint       initialValue)
 	{
 		AddField_WithInitialValue(typeof(uint), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddField_WithInitialValue_Int64(string name, Visibility visibility, long initialValue)
+	public void AddField_WithInitialValue_Int64(
+		string     name,
+		Visibility visibility,
+		long       initialValue)
 	{
 		AddField_WithInitialValue(typeof(long), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddField_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue)
+	public void AddField_WithInitialValue_UInt64(
+		string     name,
+		Visibility visibility,
+		ulong      initialValue)
 	{
 		AddField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddField_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumS8 initialValue)
+	public void AddField_WithInitialValue_Enum_Byte(
+		string     name,
+		Visibility visibility,
+		TestEnumS8 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddField_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumU8 initialValue)
+	public void AddField_WithInitialValue_Enum_SByte(
+		string     name,
+		Visibility visibility,
+		TestEnumU8 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddField_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue)
+	public void AddField_WithInitialValue_Enum_Int16(
+		string      name,
+		Visibility  visibility,
+		TestEnumS16 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddField_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue)
+	public void AddField_WithInitialValue_Enum_UInt16(
+		string      name,
+		Visibility  visibility,
+		TestEnumU16 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddField_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue)
+	public void AddField_WithInitialValue_Enum_Int32(
+		string      name,
+		Visibility  visibility,
+		TestEnumS32 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddField_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue)
+	public void AddField_WithInitialValue_Enum_UInt32(
+		string      name,
+		Visibility  visibility,
+		TestEnumU32 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddField_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue)
+	public void AddField_WithInitialValue_Enum_Int64(
+		string      name,
+		Visibility  visibility,
+		TestEnumS64 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddField_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue)
+	public void AddField_WithInitialValue_Enum_UInt64(
+		string      name,
+		Visibility  visibility,
+		TestEnumU64 initialValue)
 	{
 		AddField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddField_WithInitialValue_Single(string name, Visibility visibility, float initialValue)
+	public void AddField_WithInitialValue_Single(
+		string     name,
+		Visibility visibility,
+		float      initialValue)
 	{
 		AddField_WithInitialValue(typeof(float), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddField_WithInitialValue_Double(string name, Visibility visibility, double initialValue)
+	public void AddField_WithInitialValue_Double(
+		string     name,
+		Visibility visibility,
+		double     initialValue)
 	{
 		AddField_WithInitialValue(typeof(double), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddField_WithInitialValue_String(string name, Visibility visibility, string initialValue)
+	public void AddField_WithInitialValue_String(
+		string     name,
+		Visibility visibility,
+		string     initialValue)
 	{
 		AddField_WithInitialValue(typeof(string), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddField_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue)
+	public void AddField_WithInitialValue_DateTime(
+		string     name,
+		Visibility visibility,
+		DateTime   initialValue)
 	{
 		AddField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
 	}
@@ -1590,154 +1704,220 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddStaticFieldT_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue)
+	public void AddStaticFieldT_WithInitialValue_Boolean(
+		string     name,
+		Visibility visibility,
+		bool       initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddStaticFieldT_WithInitialValue_Char(string name, Visibility visibility, char initialValue)
+	public void AddStaticFieldT_WithInitialValue_Char(
+		string     name,
+		Visibility visibility,
+		char       initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddStaticFieldT_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue)
+	public void AddStaticFieldT_WithInitialValue_SByte(
+		string     name,
+		Visibility visibility,
+		sbyte      initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddStaticFieldT_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue)
+	public void AddStaticFieldT_WithInitialValue_Byte(
+		string     name,
+		Visibility visibility,
+		byte       initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddStaticFieldT_WithInitialValue_Int16(string name, Visibility visibility, short initialValue)
+	public void AddStaticFieldT_WithInitialValue_Int16(
+		string     name,
+		Visibility visibility,
+		short      initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddStaticFieldT_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue)
+	public void AddStaticFieldT_WithInitialValue_UInt16(
+		string     name,
+		Visibility visibility,
+		ushort     initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddStaticFieldT_WithInitialValue_Int32(string name, Visibility visibility, int initialValue)
+	public void AddStaticFieldT_WithInitialValue_Int32(
+		string     name,
+		Visibility visibility,
+		int        initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddStaticFieldT_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue)
+	public void AddStaticFieldT_WithInitialValue_UInt32(
+		string     name,
+		Visibility visibility,
+		uint       initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddStaticFieldT_WithInitialValue_Int64(string name, Visibility visibility, long initialValue)
+	public void AddStaticFieldT_WithInitialValue_Int64(
+		string     name,
+		Visibility visibility,
+		long       initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddStaticFieldT_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue)
+	public void AddStaticFieldT_WithInitialValue_UInt64(
+		string     name,
+		Visibility visibility,
+		ulong      initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddStaticFieldT_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumS8 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_SByte(
+		string     name,
+		Visibility visibility,
+		TestEnumS8 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumU8 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_Byte(
+		string     name,
+		Visibility visibility,
+		TestEnumU8 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_Int16(
+		string      name,
+		Visibility  visibility,
+		TestEnumS16 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_UInt16(
+		string      name,
+		Visibility  visibility,
+		TestEnumU16 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_Int32(
+		string      name,
+		Visibility  visibility,
+		TestEnumS32 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_UInt32(
+		string      name,
+		Visibility  visibility,
+		TestEnumU32 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_Int64(
+		string      name,
+		Visibility  visibility,
+		TestEnumS64 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue)
+	public void AddStaticFieldT_WithInitialValue_Enum_UInt64(
+		string      name,
+		Visibility  visibility,
+		TestEnumU64 initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddStaticFieldT_WithInitialValue_Single(string name, Visibility visibility, float initialValue)
+	public void AddStaticFieldT_WithInitialValue_Single(
+		string     name,
+		Visibility visibility,
+		float      initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddStaticFieldT_WithInitialValue_Double(string name, Visibility visibility, double initialValue)
+	public void AddStaticFieldT_WithInitialValue_Double(
+		string     name,
+		Visibility visibility,
+		double     initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddStaticFieldT_WithInitialValue_String(string name, Visibility visibility, string initialValue)
+	public void AddStaticFieldT_WithInitialValue_String(
+		string     name,
+		Visibility visibility,
+		string     initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddStaticFieldT_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue)
+	public void AddStaticFieldT_WithInitialValue_DateTime(
+		string     name,
+		Visibility visibility,
+		DateTime   initialValue)
 	{
 		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
 	}
@@ -1786,154 +1966,220 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddStaticField_WithInitialValue_Boolean(string name, Visibility visibility, bool initialValue)
+	public void AddStaticField_WithInitialValue_Boolean(
+		string     name,
+		Visibility visibility,
+		bool       initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(bool), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddStaticField_WithInitialValue_Char(string name, Visibility visibility, char initialValue)
+	public void AddStaticField_WithInitialValue_Char(
+		string     name,
+		Visibility visibility,
+		char       initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(char), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddStaticField_WithInitialValue_SByte(string name, Visibility visibility, sbyte initialValue)
+	public void AddStaticField_WithInitialValue_SByte(
+		string     name,
+		Visibility visibility,
+		sbyte      initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddStaticField_WithInitialValue_Byte(string name, Visibility visibility, byte initialValue)
+	public void AddStaticField_WithInitialValue_Byte(
+		string     name,
+		Visibility visibility,
+		byte       initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(byte), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddStaticField_WithInitialValue_Int16(string name, Visibility visibility, short initialValue)
+	public void AddStaticField_WithInitialValue_Int16(
+		string     name,
+		Visibility visibility,
+		short      initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(short), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddStaticField_WithInitialValue_UInt16(string name, Visibility visibility, ushort initialValue)
+	public void AddStaticField_WithInitialValue_UInt16(
+		string     name,
+		Visibility visibility,
+		ushort     initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddStaticField_WithInitialValue_Int32(string name, Visibility visibility, int initialValue)
+	public void AddStaticField_WithInitialValue_Int32(
+		string     name,
+		Visibility visibility,
+		int        initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(int), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddStaticField_WithInitialValue_UInt32(string name, Visibility visibility, uint initialValue)
+	public void AddStaticField_WithInitialValue_UInt32(
+		string     name,
+		Visibility visibility,
+		uint       initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(uint), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddStaticField_WithInitialValue_Int64(string name, Visibility visibility, long initialValue)
+	public void AddStaticField_WithInitialValue_Int64(
+		string     name,
+		Visibility visibility,
+		long       initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(long), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddStaticField_WithInitialValue_UInt64(string name, Visibility visibility, ulong initialValue)
+	public void AddStaticField_WithInitialValue_UInt64(
+		string     name,
+		Visibility visibility,
+		ulong      initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddStaticField_WithInitialValue_Enum_Byte(string name, Visibility visibility, TestEnumS8 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_Byte(
+		string     name,
+		Visibility visibility,
+		TestEnumS8 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddStaticField_WithInitialValue_Enum_SByte(string name, Visibility visibility, TestEnumU8 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_SByte(
+		string     name,
+		Visibility visibility,
+		TestEnumU8 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddStaticField_WithInitialValue_Enum_Int16(string name, Visibility visibility, TestEnumS16 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_Int16(
+		string      name,
+		Visibility  visibility,
+		TestEnumS16 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddStaticField_WithInitialValue_Enum_UInt16(string name, Visibility visibility, TestEnumU16 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_UInt16(
+		string      name,
+		Visibility  visibility,
+		TestEnumU16 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddStaticField_WithInitialValue_Enum_Int32(string name, Visibility visibility, TestEnumS32 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_Int32(
+		string      name,
+		Visibility  visibility,
+		TestEnumS32 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddStaticField_WithInitialValue_Enum_UInt32(string name, Visibility visibility, TestEnumU32 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_UInt32(
+		string      name,
+		Visibility  visibility,
+		TestEnumU32 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddStaticField_WithInitialValue_Enum_Int64(string name, Visibility visibility, TestEnumS64 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_Int64(
+		string      name,
+		Visibility  visibility,
+		TestEnumS64 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddStaticField_WithInitialValue_Enum_UInt64(string name, Visibility visibility, TestEnumU64 initialValue)
+	public void AddStaticField_WithInitialValue_Enum_UInt64(
+		string      name,
+		Visibility  visibility,
+		TestEnumU64 initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddStaticField_WithInitialValue_Single(string name, Visibility visibility, float initialValue)
+	public void AddStaticField_WithInitialValue_Single(
+		string     name,
+		Visibility visibility,
+		float      initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(float), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddStaticField_WithInitialValue_Double(string name, Visibility visibility, double initialValue)
+	public void AddStaticField_WithInitialValue_Double(
+		string     name,
+		Visibility visibility,
+		double     initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(double), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddStaticField_WithInitialValue_String(string name, Visibility visibility, string initialValue)
+	public void AddStaticField_WithInitialValue_String(
+		string     name,
+		Visibility visibility,
+		string     initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(string), name, visibility, initialValue);
 	}
 
 	[Theory]
 	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddStaticField_WithInitialValue_DateTime(string name, Visibility visibility, DateTime initialValue)
+	public void AddStaticField_WithInitialValue_DateTime(
+		string     name,
+		Visibility visibility,
+		DateTime   initialValue)
 	{
 		AddStaticField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
 	}
@@ -2377,132 +2623,143 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	#region Test Data
 
 	/// <summary>
-	/// Test data for tests targeting <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/>,
-	/// <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/> and
-	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},IEventImplementation)"/> using
-	/// <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
+	/// Names to test with when adding events to the type definition.
+	/// </summary>
+	public static IEnumerable<string> EventNames
+	{
+		get
+		{
+			yield return "Event";
+			yield return null;
+		}
+	}
+
+	/// <summary>
+	/// Test data for tests targeting the following methods:<br/>
+	/// - <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/><br/>
+	/// - <see cref="TypeDefinition.AddEvent(Type,string,Visibility,IEventImplementation)"/><br/>
+	/// - <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation)"/><br/>
+	/// - <see cref="TypeDefinition.AddStaticEvent(Type,string,Visibility,IEventImplementation)"/><br/>
+	/// - <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,IEventImplementation)"/><br/>
+	/// - <see cref="ClassDefinition.AddVirtualEvent(Type,string,Visibility,IEventImplementation)"/><br/>
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	public static IEnumerable<object[]> AddEventTestData_WithImplementationStrategy
 	{
 		get
 		{
-			foreach (string name in new[] { "Event", null })
-			foreach (Visibility visibility in Visibilities)
-			foreach (bool addRaiser in new[] { false, true })
+			// ------------------------------------------------------------------------------------
+			// different event names
+			// (do not add an event raiser)
+			// ------------------------------------------------------------------------------------
+
+			foreach (string name in EventNames)
 			{
-				// cycle through event raiser visibilities only if adding a raiser method,
-				// use public visibility only if not adding a raiser method (no effect)
-				IEnumerable<Visibility> eventRaiserVisibilities = addRaiser ? Visibilities : [Visibility.Public];
-
-				foreach (Visibility eventRaiserVisibility in eventRaiserVisibilities)
-				{
-					// System.EventHandler
-					// (event raiser should be like: void OnEvent())
-					yield return
-					[
-						name,                              // name of the event
-						visibility,                        // visibility of the event
-						typeof(EventHandler),              // event handler type
-						addRaiser,                         // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,          // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,             // visibility of the event raiser method
-						addRaiser ? typeof(void) : null,   // expected return type of the generated event raiser method
-						addRaiser ? Type.EmptyTypes : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.EventHandler<EventArgs>
-					// (event raiser should be like: void OnEvent())
-					yield return
-					[
-						name,                              // name of the event
-						visibility,                        // visibility of the event
-						typeof(EventHandler<EventArgs>),   // event handler type
-						addRaiser,                         // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,          // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,             // visibility of the event raiser method
-						addRaiser ? typeof(void) : null,   // expected return type of the generated event raiser method
-						addRaiser ? Type.EmptyTypes : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.EventHandler<SpecializedEventArgs>
-					// (event raiser should be like: void OnEvent(SpecializedEventArgs e))
-					yield return
-					[
-						name,                                                     // name of the event
-						visibility,                                               // visibility of the event
-						typeof(EventHandler<SpecializedEventArgs>),               // event handler type
-						addRaiser,                                                // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,                                 // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,                                    // visibility of the event raiser method
-						addRaiser ? typeof(void) : null,                          // expected return type of the generated event raiser method
-						addRaiser ? new[] { typeof(SpecializedEventArgs) } : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.Action
-					// (event raiser should be like: void OnEvent())
-					yield return
-					[
-						name,                              // name of the event
-						visibility,                        // visibility of the event
-						typeof(Action),                    // event handler type
-						addRaiser,                         // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,          // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,             // visibility of the event raiser method
-						addRaiser ? typeof(void) : null,   // expected return type of the generated event raiser method
-						addRaiser ? Type.EmptyTypes : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.Action<int>
-					// (event raiser should be like: void OnEvent(int i))
-					yield return
-					[
-						name,                                    // name of the event
-						visibility,                              // visibility of the event
-						typeof(Action<int>),                     // event handler type
-						addRaiser,                               // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,                // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,                   // visibility of the event raiser method
-						addRaiser ? typeof(void) : null,         // expected return type of the generated event raiser method
-						addRaiser ? new[] { typeof(int) } : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.Func<int>
-					// (event raiser should be like: int OnEvent())
-					yield return
-					[
-						name,                              // name of the event
-						visibility,                        // visibility of the event
-						typeof(Func<long>),                // event handler type
-						addRaiser,                         // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,          // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,             // visibility of the event raiser method
-						addRaiser ? typeof(long) : null,   // expected return type of the generated event raiser method
-						addRaiser ? Type.EmptyTypes : null // expected parameter types of the generated event raiser method
-					];
-
-					// System.Func<int,long>
-					// (event raiser should be like: long OnEvent(int i))
-					yield return
-					[
-						name,                                    // name of the event
-						visibility,                              // visibility of the event
-						typeof(Func<int, long>),                 // event handler type
-						addRaiser,                               // determines whether to add an event raiser method
-						addRaiser ? "XYZ" : null,                // name of the event raiser (null to create a random name)
-						eventRaiserVisibility,                   // visibility of the event raiser method
-						addRaiser ? typeof(long) : null,         // expected return type of the generated event raiser method
-						addRaiser ? new[] { typeof(int) } : null // expected parameter types of the generated event raiser method
-					];
-				}
+				// System.EventHandler
+				yield return
+				[
+					name,                 // name of the event
+					Visibility.Public,    // visibility of the event
+					typeof(EventHandler), // event handler type
+					false,                // determines whether to add an event raiser method
+					null,                 // name of the event raiser (null to create a random name)
+					Visibility.Public,    // visibility of the event raiser method
+					null,                 // expected return type of the generated event raiser method
+					null                  // expected parameter types of the generated event raiser method
+				];
 			}
+
+			// ------------------------------------------------------------------------------------
+			// different visibilities
+			// (do not add an event raiser)
+			// ------------------------------------------------------------------------------------
+
+			foreach (Visibility visibility in Visibilities)
+			{
+				// skip 'public' as covered above
+				if (visibility == Visibility.Public)
+					continue;
+
+				// System.EventHandler
+				yield return
+				[
+					null,                 // name of the event (null to use a random name)
+					visibility,           // visibility of the event
+					typeof(EventHandler), // event handler type
+					false,                // determines whether to add an event raiser method
+					null,                 // name of the event raiser (null to create a random name)
+					Visibility.Public,    // visibility of the event raiser method
+					null,                 // expected return type of the generated event raiser method
+					null                  // expected parameter types of the generated event raiser method
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// add event raiser method or not
+			// ------------------------------------------------------------------------------------
+
+			//// covered above...
+			//// --------------------------------------------------------------------------
+			//// System.EventHandler
+			//yield return
+			//[
+			//	null,                 // name of the event
+			//	Visibility.Public,    // visibility of the event
+			//	typeof(EventHandler), // event handler type
+			//	false,                // determines whether to add an event raiser method
+			//	null,                 // name of the event raiser (null to create a random name)
+			//	Visibility.Public,    // visibility of the event raiser method
+			//	null,                 // expected return type of the generated event raiser method
+			//	null                  // expected parameter types of the generated event raiser method
+			//];
+			//// --------------------------------------------------------------------------
+
+			// System.EventHandler
+			// (create event raiser with different visibilities)
+			foreach (Visibility visibility in Visibilities)
+			{
+				// skip 'public' as this case is handled above
+				if (visibility == Visibility.Public)
+					continue;
+
+				yield return
+				[
+					null,                 // name of the event
+					Visibility.Public,    // visibility of the event
+					typeof(EventHandler), // event handler type
+					true,                 // determines whether to add an event raiser method
+					null,                 // name of the event raiser (null to create a random name)
+					visibility,           // visibility of the event raiser method
+					typeof(void),         // expected return type of the generated event raiser method
+					Type.EmptyTypes       // expected parameter types of the generated event raiser method
+				];
+			}
+
+			// System.EventHandler
+			// (create event raiser with a specific name)
+			yield return
+			[
+				null,                 // name of the event
+				Visibility.Public,    // visibility of the event
+				typeof(EventHandler), // event handler type
+				true,                 // determines whether to add an event raiser method
+				"XYZ",                // name of the event raiser (null to create a random name)
+				Visibility.Public,    // visibility of the event raiser method
+				typeof(void),         // expected return type of the generated event raiser method
+				Type.EmptyTypes       // expected parameter types of the generated event raiser method
+			];
 		}
 	}
 
 	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>,
-	/// <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/> and
-	/// <see cref="ClassDefinition.AddEventOverride{T}(IInheritedEvent{T},EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>.
+	/// Test data for tests targeting the following methods:<br/>
+	/// - <see cref="TypeDefinition.AddEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// - <see cref="TypeDefinition.AddEvent(Type,string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// - <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// - <see cref="TypeDefinition.AddStaticEvent(Type,string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// - <see cref="ClassDefinition.AddVirtualEvent{T}(string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// - <see cref="ClassDefinition.AddVirtualEvent(Type,string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/><br/>
+	/// using parts of <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	public static IEnumerable<object[]> AddEventTestData_WithImplementationCallbacks
 	{
@@ -2512,12 +2769,13 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			foreach (Visibility visibility in Visibilities)
 			{
 				// always:
-				// event type: System.EventHandler<TEventArgs>
+				// event type: System.EventHandler
 				// event raiser: void OnEvent())
 				yield return
 				[
-					name,      // name of the event
-					visibility // visibility of the event
+					name,                // name of the event
+					visibility,          // visibility of the event
+					typeof(EventHandler) // event handler type
 				];
 			}
 		}
@@ -2525,7 +2783,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion
 
-	#region AddEvent<T>(string name, Visibility visibility, IEventImplementation{T} implementation)
+	#region AddEvent<T>(string name, Visibility visibility, IEventImplementation implementation)
 
 	/// <summary>
 	/// Tests the <see cref="TypeDefinition.AddEvent{T}(string,Visibility,IEventImplementation)"/> method
@@ -2534,8 +2792,72 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
 	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-	/// <param name="addEventRaiserMethod">
-	/// <c>true</c> to add the event raiser method;<br/>
+	/// <param name="letStrategyAddEventRaiserMethod">
+	/// <c>true</c> to let the strategy add the event raiser method;<br/>
+	/// otherwise <c>false</c>.
+	/// </param>
+	/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
+	/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
+	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
+	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
+	public void AddEventT_WithImplementationStrategy(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType,
+		bool       letStrategyAddEventRaiserMethod,
+		string     eventRaiserName,
+		Visibility eventRaiserVisibility,
+		Type       expectedEventRaiserReturnType,
+		Type[]     expectedEventRaiserParameterTypes)
+	{
+		TestAddEvent_WithImplementationStrategy(
+			name: name,
+			kind: EventKind.Normal,
+			visibility: visibility,
+			letStrategyAddEventRaiserMethod: letStrategyAddEventRaiserMethod,
+			eventRaiserName: eventRaiserName,
+			eventRaiserVisibility: eventRaiserVisibility,
+			eventHandlerType: eventHandlerType,
+			expectedEventRaiserReturnType: expectedEventRaiserReturnType,
+			expectedEventRaiserParameterTypes: expectedEventRaiserParameterTypes,
+			addEventCallback: (definition, implementation) =>
+			{
+				// get the AddEvent(...) method to test
+				MethodInfo addEventMethod = typeof(TypeDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(eventHandlerType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
+
+				// add the event to the type definition
+				var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
+				Assert.NotNull(addedEvent);
+				Assert.Same(implementation, addedEvent.Implementation);
+
+				return addedEvent;
+			});
+	}
+
+	#endregion
+
+	#region AddEvent(Type type, string name, Visibility visibility, IEventImplementation implementation)
+
+	/// <summary>
+	/// Tests the <see cref="TypeDefinition.AddEvent(Type,string,Visibility,IEventImplementation)"/> method
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
+	/// <param name="letStrategyAddEventRaiserMethod">
+	/// <c>true</c> to let the strategy add the event raiser method;<br/>
 	/// otherwise <c>false</c>.
 	/// </param>
 	/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
@@ -2548,57 +2870,30 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		string     name,
 		Visibility visibility,
 		Type       eventHandlerType,
-		bool       addEventRaiserMethod,
+		bool       letStrategyAddEventRaiserMethod,
 		string     eventRaiserName,
 		Visibility eventRaiserVisibility,
 		Type       expectedEventRaiserReturnType,
 		Type[]     expectedEventRaiserParameterTypes)
 	{
-		// create a new type definition
-		TDefinition definition = CreateTypeDefinition();
+		TestAddEvent_WithImplementationStrategy(
+			name: name,
+			kind: EventKind.Normal,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			letStrategyAddEventRaiserMethod: letStrategyAddEventRaiserMethod,
+			eventRaiserName: eventRaiserName,
+			eventRaiserVisibility: eventRaiserVisibility,
+			expectedEventRaiserReturnType: expectedEventRaiserReturnType,
+			expectedEventRaiserParameterTypes: expectedEventRaiserParameterTypes,
+			addEventCallback: (definition, implementation) =>
+			{
+				IGeneratedEvent addedEvent = definition.AddEvent(eventHandlerType, name, visibility, implementation);
+				Assert.NotNull(addedEvent);
+				Assert.Same(implementation, addedEvent.Implementation);
 
-		// create an instance of the implementation strategy
-		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
-			                                      : new TestEventImplementation();
-
-		// get the AddEvent(...) method to test
-		MethodInfo addEventMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(eventHandlerType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
-
-		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
-		Assert.NotNull(addedEvent);
-		Assert.Equal(EventKind.Normal, addedEvent.Kind);
-		Assert.Equal(visibility, addedEvent.Visibility);
-		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Same(implementation, addedEvent.Implementation);
-
-		// create the defined type, check the result against the definition and create an instance of that type
-		Type type = definition.CreateType();
-		CheckTypeAgainstDefinition(type, definition);
-		object instance = Activator.CreateInstance(type);
-
-		// test the implementation of the event
-		TestEventImplementation_Standard(
-			definition,
-			instance,
-			addedEvent.Name,
-			EventKind.Normal,
-			visibility,
-			eventHandlerType,
-			addEventRaiserMethod,
-			eventRaiserName,
-			expectedEventRaiserReturnType,
-			expectedEventRaiserParameterTypes);
+				return addedEvent;
+			});
 	}
 
 	#endregion
@@ -2611,95 +2906,110 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
 	[Theory]
 	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
-	public void AddEvent_WithImplementationCallbacks(string name, Visibility visibility)
+	public void AddEventT_WithImplementationCallbacks(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType)
 	{
-		// create a new type definition
-		TDefinition definition = CreateTypeDefinition();
+		TestAddEvent_WithImplementationCallbacks(
+			name: name,
+			kind: EventKind.Normal,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			addEventCallback: (definition, implementation) =>
+			{
+				// prepare callback to add the 'add' accessor and the 'remove' accessor
+				// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+				void ImplementAddAccessorCallback(IGeneratedEvent    @event, ILGenerator msilGenerator) => implementation.ImplementAddAccessorMethod(definition, @event, msilGenerator);
+				void ImplementRemoveAccessorCallback(IGeneratedEvent @event, ILGenerator msilGenerator) => implementation.ImplementRemoveAccessorMethod(definition, @event, msilGenerator);
 
-		// add a backing field for the event's multicast delegate
-		// (always of type EventHandler<EventArgs>, no need to test other types as this affects raising the event only)
-		Type eventHandlerType = typeof(EventHandler<EventArgs>);
-		IGeneratedField backingField = definition.AddField(eventHandlerType, name: null, Visibility.Public);
+				// get the AddEvent<T>(...) method to test
+				MethodInfo addEventMethod = typeof(TypeDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(eventHandlerType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
 
-		// prepare callback to add the 'add' accessor and the 'remove' accessor
-		// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
-		EventAccessorImplementationCallback implementAddAccessorCallback = (@event,    msilGenerator) => ImplementEventAccessor(@event, true, backingField.FieldBuilder, msilGenerator);
-		EventAccessorImplementationCallback implementRemoveAccessorCallback = (@event, msilGenerator) => ImplementEventAccessor(@event, false, backingField.FieldBuilder, msilGenerator);
+				// invoke the method to add the event to the type definition
+				var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
+					definition,
+					[
+						name,
+						visibility,
+						(EventAccessorImplementationCallback)ImplementAddAccessorCallback,
+						(EventAccessorImplementationCallback)ImplementRemoveAccessorCallback
+					]);
 
-		// get the AddEvent<T>(...) method to test
-		MethodInfo addEventMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddEvent))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(eventHandlerType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
-
-		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementAddAccessorCallback, implementRemoveAccessorCallback]);
-		Assert.NotNull(addedEvent);
-		Assert.Equal(EventKind.Normal, addedEvent.Kind);
-		Assert.Equal(visibility, addedEvent.Visibility);
-		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Null(addedEvent.Implementation);
-
-		// add an event raiser method to the type definition
-		// (should always just be: public void FireMyEvent();
-		const MethodKind kind = MethodKind.Normal;
-		const string eventRaiserName = "FireMyEvent";
-		Type eventRaiserReturnType = typeof(void);
-		Type[] eventRaiserParameterTypes = [];
-		const Visibility eventRaiserVisibility = Visibility.Public;
-		definition.AddMethod(
-			kind,
-			eventRaiserName,
-			eventRaiserReturnType,
-			eventRaiserParameterTypes,
-			eventRaiserVisibility,
-			(method, msilGenerator) => ImplementEventRaiserMethod(
-				method,
-				backingField.FieldBuilder,
-				addedEvent,
-				msilGenerator));
-
-		// create the defined type, check the result against the definition and create an instance of that type
-		Type type = definition.CreateType();
-		CheckTypeAgainstDefinition(type, definition);
-		object instance = Activator.CreateInstance(type);
-
-		// test the implementation of the event
-		// (the implemented event should behave the same as a standard event implementation, use the same test code...)
-		TestEventImplementation_Standard(
-			definition,
-			instance,
-			addedEvent.Name,
-			EventKind.Normal,
-			visibility,
-			eventHandlerType,
-			true,
-			eventRaiserName,
-			eventRaiserReturnType,
-			eventRaiserParameterTypes);
+				Assert.NotNull(addedEvent);
+				return addedEvent;
+			});
 	}
 
 	#endregion
 
-	#region AddStaticEvent<T>(string name, Visibility visibility, IEventImplementation<T> implementation)
+	#region AddEvent(Type type, string name, Visibility visibility, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback)
 
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation)"/> method
-	/// using <see cref="EventImplementation_Standard"/> to implement add/remove accessors and the event raiser method.
+	/// Tests the <see cref="TypeDefinition.AddEvent(Type,string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>
+	/// method
+	/// using a callback to implement add/remove accessors and the event raiser method.
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
 	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
-	/// <param name="addEventRaiserMethod">
-	/// <c>true</c> to add the event raiser method;<br/>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
+	public void AddEvent_WithImplementationCallbacks(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType)
+	{
+		TestAddEvent_WithImplementationCallbacks(
+			name: name,
+			kind: EventKind.Normal,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			addEventCallback: (definition, implementation) =>
+			{
+				// prepare callback to add the 'add' accessor and the 'remove' accessor
+				// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+				void ImplementAddAccessorCallback(IGeneratedEvent    @event, ILGenerator msilGenerator) => implementation.ImplementAddAccessorMethod(definition, @event, msilGenerator);
+				void ImplementRemoveAccessorCallback(IGeneratedEvent @event, ILGenerator msilGenerator) => implementation.ImplementRemoveAccessorMethod(definition, @event, msilGenerator);
+
+				// the event to the type definition
+				IGeneratedEvent addedEvent = definition.AddEvent(
+					eventHandlerType,
+					name,
+					visibility,
+					ImplementAddAccessorCallback,
+					ImplementRemoveAccessorCallback);
+
+				Assert.NotNull(addedEvent);
+				return addedEvent;
+			});
+	}
+
+	#endregion
+
+	#region AddStaticEvent<T>(string name, Visibility visibility, IEventImplementation implementation)
+
+	/// <summary>
+	/// Tests the <see cref="TypeDefinition.AddStaticEvent{T}(string,Visibility,IEventImplementation)"/> method
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
+	/// <param name="letStrategyAddEventRaiserMethod">
+	/// <c>true</c> to let the strategy add the event raiser method;<br/>
 	/// otherwise <c>false</c>.
 	/// </param>
 	/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
@@ -2708,61 +3018,98 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
 	[Theory]
 	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
-	public void AddStaticEvent_WithImplementationStrategy_Standard(
+	public void AddStaticEventT_WithImplementationStrategy_Standard(
 		string     name,
 		Visibility visibility,
 		Type       eventHandlerType,
-		bool       addEventRaiserMethod,
+		bool       letStrategyAddEventRaiserMethod,
 		string     eventRaiserName,
 		Visibility eventRaiserVisibility,
 		Type       expectedEventRaiserReturnType,
 		Type[]     expectedEventRaiserParameterTypes)
 	{
-		// create a new type definition
-		TDefinition definition = CreateTypeDefinition();
+		TestAddEvent_WithImplementationStrategy(
+			name: name,
+			kind: EventKind.Static,
+			visibility: visibility,
+			letStrategyAddEventRaiserMethod: letStrategyAddEventRaiserMethod,
+			eventRaiserName: eventRaiserName,
+			eventRaiserVisibility: eventRaiserVisibility,
+			eventHandlerType: eventHandlerType,
+			expectedEventRaiserReturnType: expectedEventRaiserReturnType,
+			expectedEventRaiserParameterTypes: expectedEventRaiserParameterTypes,
+			addEventCallback: (definition, implementation) =>
+			{
+				// get the AddEvent(...) method to test
+				MethodInfo addEventMethod = typeof(TypeDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(eventHandlerType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
 
-		// create an instance of the implementation strategy
-		IEventImplementation implementation = addEventRaiserMethod
-			                                      ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
-			                                      : new TestEventImplementation();
+				// add the event to the type definition
+				var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
+				Assert.NotNull(addedEvent);
+				Assert.Same(implementation, addedEvent.Implementation);
 
-		// get the AddEvent(...) method to test
-		MethodInfo addEventMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(eventHandlerType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(Visibility), typeof(IEventImplementation)]));
+				return addedEvent;
+			});
+	}
 
-		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementation]);
-		Assert.NotNull(addedEvent);
-		Assert.Equal(EventKind.Static, addedEvent.Kind);
-		Assert.Equal(visibility, addedEvent.Visibility);
-		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Same(implementation, addedEvent.Implementation);
+	#endregion
 
-		// create the defined type, check the result against the definition and create an instance of that type
-		Type type = definition.CreateType();
-		CheckTypeAgainstDefinition(type, definition);
-		object instance = Activator.CreateInstance(type);
+	#region AddStaticEvent(Type type, string name, Visibility visibility, IEventImplementation implementation)
 
-		// test the implementation of the event
-		TestEventImplementation_Standard(
-			definition,
-			instance,
-			addedEvent.Name,
-			EventKind.Static,
-			visibility,
-			eventHandlerType,
-			addEventRaiserMethod,
-			eventRaiserName,
-			expectedEventRaiserReturnType,
-			expectedEventRaiserParameterTypes);
+	/// <summary>
+	/// Tests the <see cref="TypeDefinition.AddStaticEvent(Type,string,Visibility,IEventImplementation)"/> method
+	/// using <see cref="TestEventImplementation"/> to implement add/remove accessors and the event raiser method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
+	/// <param name="letStrategyAddEventRaiserMethod">
+	/// <c>true</c> to let the strategy add the event raiser method;<br/>
+	/// otherwise <c>false</c>.
+	/// </param>
+	/// <param name="eventRaiserName">Name of the event raiser (<c>null</c> to generate a name automatically).</param>
+	/// <param name="eventRaiserVisibility">Visibility of the event raiser method.</param>
+	/// <param name="expectedEventRaiserReturnType">The expected return type of the generated event raiser method.</param>
+	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the generated event raiser method.</param>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationStrategy))]
+	public void AddStaticEvent_WithImplementationStrategy(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType,
+		bool       letStrategyAddEventRaiserMethod,
+		string     eventRaiserName,
+		Visibility eventRaiserVisibility,
+		Type       expectedEventRaiserReturnType,
+		Type[]     expectedEventRaiserParameterTypes)
+	{
+		TestAddEvent_WithImplementationStrategy(
+			name: name,
+			kind: EventKind.Static,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			letStrategyAddEventRaiserMethod: letStrategyAddEventRaiserMethod,
+			eventRaiserName: eventRaiserName,
+			eventRaiserVisibility: eventRaiserVisibility,
+			expectedEventRaiserReturnType: expectedEventRaiserReturnType,
+			expectedEventRaiserParameterTypes: expectedEventRaiserParameterTypes,
+			addEventCallback: (definition, implementation) =>
+			{
+				IGeneratedEvent addedEvent = definition.AddStaticEvent(eventHandlerType, name, visibility, implementation);
+				Assert.NotNull(addedEvent);
+				Assert.Same(implementation, addedEvent.Implementation);
+
+				return addedEvent;
+			});
 	}
 
 	#endregion
@@ -2776,61 +3123,154 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// </summary>
 	/// <param name="name">Name of the event to add.</param>
 	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
 	[Theory]
 	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
-	public void AddStaticEvent_WithImplementationCallbacks(string name, Visibility visibility)
+	public void AddStaticEventT_WithImplementationCallbacks(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType)
+	{
+		TestAddEvent_WithImplementationCallbacks(
+			name: name,
+			kind: EventKind.Static,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			addEventCallback: (definition, implementation) =>
+			{
+				// prepare callback to add the 'add' accessor and the 'remove' accessor
+				// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+				void ImplementAddAccessorCallback(IGeneratedEvent    @event, ILGenerator msilGenerator) => implementation.ImplementAddAccessorMethod(definition, @event, msilGenerator);
+				void ImplementRemoveAccessorCallback(IGeneratedEvent @event, ILGenerator msilGenerator) => implementation.ImplementRemoveAccessorMethod(definition, @event, msilGenerator);
+
+				// get the AddEvent<T>(...) method to test
+				MethodInfo addEventMethod = typeof(TypeDefinition)
+					.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+					.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
+					.Where(method => method.GetGenericArguments().Length == 1)
+					.Select(method => method.MakeGenericMethod(eventHandlerType))
+					.Single(
+						method => method
+							.GetParameters()
+							.Select(parameter => parameter.ParameterType)
+							.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
+
+				// invoke the method to add the event to the type definition
+				var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(
+					definition,
+					[
+						name,
+						visibility,
+						(EventAccessorImplementationCallback)ImplementAddAccessorCallback,
+						(EventAccessorImplementationCallback)ImplementRemoveAccessorCallback
+					]);
+
+				Assert.NotNull(addedEvent);
+				return addedEvent;
+			});
+	}
+
+	#endregion
+
+	#region AddStaticEvent(Type type, string name, Visibility visibility, EventAccessorImplementationCallback addAccessorImplementationCallback, EventAccessorImplementationCallback removeAccessorImplementationCallback)
+
+	/// <summary>
+	/// Tests the <see cref="TypeDefinition.AddStaticEvent(Type,string,Visibility,EventAccessorImplementationCallback,EventAccessorImplementationCallback)"/>
+	/// method
+	/// using a callback to implement add/remove accessors and the event raiser method.
+	/// </summary>
+	/// <param name="name">Name of the event to add.</param>
+	/// <param name="visibility">Visibility of the event to add.</param>
+	/// <param name="eventHandlerType">Type of the event handler associated with the event.</param>
+	[Theory]
+	[MemberData(nameof(AddEventTestData_WithImplementationCallbacks))]
+	public void AddStaticEvent_WithImplementationCallbacks(
+		string     name,
+		Visibility visibility,
+		Type       eventHandlerType)
+	{
+		TestAddEvent_WithImplementationCallbacks(
+			name: name,
+			kind: EventKind.Static,
+			eventHandlerType: eventHandlerType,
+			visibility: visibility,
+			addEventCallback: (definition, implementation) =>
+			{
+				// prepare callback to add the 'add' accessor and the 'remove' accessor
+				// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
+				void ImplementAddAccessorCallback(IGeneratedEvent    @event, ILGenerator msilGenerator) => implementation.ImplementAddAccessorMethod(definition, @event, msilGenerator);
+				void ImplementRemoveAccessorCallback(IGeneratedEvent @event, ILGenerator msilGenerator) => implementation.ImplementRemoveAccessorMethod(definition, @event, msilGenerator);
+
+				// the event to the type definition
+				IGeneratedEvent addedEvent = definition.AddStaticEvent(
+					eventHandlerType,
+					name,
+					visibility,
+					ImplementAddAccessorCallback,
+					ImplementRemoveAccessorCallback);
+
+				Assert.NotNull(addedEvent);
+				return addedEvent;
+			});
+	}
+
+	#endregion
+
+	#region Common Test Code
+
+	internal void TestAddEvent_WithImplementationStrategy(
+		string                                                   name,
+		EventKind                                                kind,
+		Type                                                     eventHandlerType,
+		Visibility                                               visibility,
+		bool                                                     letStrategyAddEventRaiserMethod,
+		string                                                   eventRaiserName,
+		Visibility                                               eventRaiserVisibility,
+		Type                                                     expectedEventRaiserReturnType,
+		Type[]                                                   expectedEventRaiserParameterTypes,
+		Func<TDefinition, IEventImplementation, IGeneratedEvent> addEventCallback)
 	{
 		// create a new type definition
 		TDefinition definition = CreateTypeDefinition();
 
-		// add a backing field for the event's multicast delegate
-		// (always of type EventHandler<EventArgs>, no need to test other types as this affects raising the event only)
-		Type eventHandlerType = typeof(EventHandler<EventArgs>);
-		IGeneratedField backingField = definition.AddStaticField(eventHandlerType, name: null, Visibility.Public);
+		// create an instance of the implementation strategy
+		TestEventImplementation implementation = letStrategyAddEventRaiserMethod
+			                                         ? new TestEventImplementation(eventRaiserName, eventRaiserVisibility)
+			                                         : new TestEventImplementation();
 
-		// prepare callback to add the 'add' accessor and the 'remove' accessor
-		// (the callbacks implement the standard event behavior to allow re-using test code for the 'standard' event implementation strategy)
-		EventAccessorImplementationCallback implementAddAccessorCallback = (@event,    msilGenerator) => ImplementEventAccessor(@event, true, backingField.FieldBuilder, msilGenerator);
-		EventAccessorImplementationCallback implementRemoveAccessorCallback = (@event, msilGenerator) => ImplementEventAccessor(@event, false, backingField.FieldBuilder, msilGenerator);
-
-		// get the AddStaticEvent<T>(...) method to test
-		MethodInfo addEventMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticEvent))
-			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(eventHandlerType))
-			.Single(
-				method => method
-					.GetParameters()
-					.Select(parameter => parameter.ParameterType)
-					.SequenceEqual([typeof(string), typeof(Visibility), typeof(EventAccessorImplementationCallback), typeof(EventAccessorImplementationCallback)]));
-
-		// invoke the method to add the event to the type definition
-		var addedEvent = (IGeneratedEvent)addEventMethod.Invoke(definition, [name, visibility, implementAddAccessorCallback, implementRemoveAccessorCallback]);
+		// add the event
+		IGeneratedEvent addedEvent = addEventCallback(definition, implementation);
+		string actualName = AssertEventName(name, addedEvent.Name);
 		Assert.NotNull(addedEvent);
-		Assert.Equal(EventKind.Static, addedEvent.Kind);
+		Assert.Equal(kind, addedEvent.Kind);
 		Assert.Equal(visibility, addedEvent.Visibility);
 		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
-		Assert.Null(addedEvent.Implementation);
+		Assert.Same(implementation, addedEvent.Implementation);
 
-		// add an event raiser method to the type definition
-		// (should always just be: void FireMyEvent();
-		const MethodKind kind = MethodKind.Static;
-		const string eventRaiserName = "FireMyEvent";
-		Type eventRaiserReturnType = typeof(void);
-		Type[] eventRaiserParameterTypes = [];
-		const Visibility eventRaiserVisibility = Visibility.Public;
-		definition.AddMethod(
-			kind,
-			eventRaiserName,
-			eventRaiserReturnType,
-			eventRaiserParameterTypes,
-			eventRaiserVisibility,
-			(method, msilGenerator) => ImplementEventRaiserMethod(
-				method,
-				backingField.FieldBuilder,
-				addedEvent,
-				msilGenerator));
+		// add an event raiser method, if the strategy did not add one
+		if (!letStrategyAddEventRaiserMethod)
+		{
+			Assert.Null(expectedEventRaiserReturnType);
+			Assert.Null(expectedEventRaiserParameterTypes);
+			eventRaiserName ??= "FireMyEvent";
+			expectedEventRaiserReturnType = typeof(void);
+			expectedEventRaiserParameterTypes = Type.EmptyTypes;
+			definition.AddMethod(
+				kind == EventKind.Static ? MethodKind.Static : MethodKind.Normal,
+				eventRaiserName,
+				expectedEventRaiserReturnType,
+				expectedEventRaiserParameterTypes,
+				eventRaiserVisibility,
+				(_, msilGenerator) => implementation.ImplementRaiserMethod(
+					definition,
+					addedEvent,
+					msilGenerator));
+		}
+
+		// determine the event raiser method
+		string expectedEventRaiserName = eventRaiserName ?? "On" + actualName;
+		IGeneratedMethod eventRaiserMethod = definition.GeneratedMethods.SingleOrDefault(method => method.Name == expectedEventRaiserName);
+		Assert.NotNull(eventRaiserMethod);
 
 		// create the defined type, check the result against the definition and create an instance of that type
 		Type type = definition.CreateType();
@@ -2838,16 +3278,76 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		object instance = Activator.CreateInstance(type);
 
 		// test the implementation of the event
-		// (the implemented event should behave the same as a standard event implementation, use the same test code...)
-		TestEventImplementation_Standard(
+		TestEventImplementation(
 			definition,
 			instance,
-			addedEvent.Name,
-			EventKind.Static,
+			actualName,
+			kind,
 			visibility,
 			eventHandlerType,
 			true,
+			expectedEventRaiserName,
+			expectedEventRaiserReturnType,
+			expectedEventRaiserParameterTypes);
+	}
+
+	internal void TestAddEvent_WithImplementationCallbacks(
+		string                                                      name,
+		EventKind                                                   kind,
+		Type                                                        eventHandlerType,
+		Visibility                                                  visibility,
+		Func<TDefinition, TestEventImplementation, IGeneratedEvent> addEventCallback)
+	{
+		// create a new type definition
+		TDefinition definition = CreateTypeDefinition();
+
+		// create an instance of the implementation strategy
+		// (it is not used as a whole, but parts of it => eliminates duplicate test code)
+		var implementation = new TestEventImplementation();
+
+		// add the event
+		IGeneratedEvent addedEvent = addEventCallback(definition, implementation);
+		string actualName = AssertEventName(name, addedEvent.Name);
+		Assert.NotNull(addedEvent);
+		Assert.Equal(kind, addedEvent.Kind);
+		Assert.Equal(visibility, addedEvent.Visibility);
+		Assert.Equal(eventHandlerType, addedEvent.EventHandlerType);
+		Assert.Null(addedEvent.Implementation);
+
+		// declare backing field
+		implementation.Declare(definition, addedEvent);
+
+		// add an event raiser method
+		// (should always just be: public void FireMyEvent();
+		Type eventRaiserReturnType = typeof(void);
+		Type[] eventRaiserParameterTypes = Type.EmptyTypes;
+		string eventRaiserName = "FireMyEvent";
+		IGeneratedMethod eventRaiserMethod = definition.AddMethod(
+			kind == EventKind.Static ? MethodKind.Static : MethodKind.Normal,
 			eventRaiserName,
+			eventRaiserReturnType,
+			eventRaiserParameterTypes,
+			Visibility.Public,
+			(_, msilGenerator) => implementation.ImplementRaiserMethod(definition, addedEvent, msilGenerator));
+
+		// determine the actual name of the event raiser method
+		string actualEventRaiserName = AssertMethodName(eventRaiserName, eventRaiserMethod.Name);
+
+		// create the defined type, check the result against the definition and create an instance of that type
+		Type type = definition.CreateType();
+		CheckTypeAgainstDefinition(type, definition);
+		object instance = Activator.CreateInstance(type);
+
+		// test the implementation of the event
+		TestEventImplementation(
+			definition,
+			instance,
+			actualName,
+			kind,
+			visibility,
+			eventHandlerType,
+			true,
+			actualEventRaiserName,
 			eventRaiserReturnType,
 			eventRaiserParameterTypes);
 	}
@@ -2863,7 +3363,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	/// <summary>
 	/// Names to test with when adding properties to the type definition.
 	/// </summary>
-	private static IEnumerable<string> PropertyNames
+	protected static IEnumerable<string> PropertyNames
 	{
 		get
 		{
@@ -2873,22 +3373,62 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	}
 
 	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddProperty{T}(string)"/>,
-	/// <see cref="TypeDefinition.AddProperty(Type,string)"/>,
-	/// <see cref="TypeDefinition.AddStaticProperty{T}(string)"/> and
-	/// <see cref="TypeDefinition.AddStaticProperty(Type,string)"/>.
+	/// Test data for tests targeting adding new properties.
 	/// </summary>
 	public static IEnumerable<object[]> AddPropertyTestData
 	{
 		get
 		{
+			// ------------------------------------------------------------------------------------
+			// different method names
+			// ------------------------------------------------------------------------------------
 			foreach (string name in PropertyNames)
+			{
+				yield return
+				[
+					name,                    // name
+					typeof(int),             // property type
+					Visibility.Public,       // visibility
+					new object[] { 1, 2, 3 } // test objects
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different visibilities
+			// ------------------------------------------------------------------------------------
+
 			foreach (Visibility visibility in Visibilities)
 			{
-				yield return [name, typeof(int), visibility, new object[] { 1, 2, 3 }];          // value type
-				yield return [name, typeof(string), visibility, new object[] { "A", "B", "C" }]; // reference type
+				yield return
+				[
+					null,                       // name (random)
+					typeof(long),               // property type (type does not matter, but 'long' would cause a duplicate test case)
+					visibility,                 // visibility
+					new object[] { 1L, 2L, 3L } // test objects
+				];
 			}
+
+			// ------------------------------------------------------------------------------------
+			// different property types
+			// ------------------------------------------------------------------------------------
+
+			// value (covered above)
+			//yield return
+			//[
+			//	null,                       // name (random)
+			//	typeof(int),                // property type
+			//	Visibility.Public,          // visibility
+			//  new object[] { 1L, 2L, 3L } // test objects
+			//];
+
+			// reference
+			yield return
+			[
+				null,                          // name (random)
+				typeof(string),                // property type
+				Visibility.Public,             // visibility
+				new object[] { "A", "B", "C" } // test objects
+			];
 		}
 	}
 
@@ -3487,10 +4027,10 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 		}
 		else
 		{
-			addedProperty_getSet.AddGetAccessor(accessorVisibility, (p,  g) => EmitGetAccessorWithTestDataStorageCallback(p, handle, g));
-			addedProperty_getSet.AddSetAccessor(accessorVisibility, (p,  g) => EmitSetAccessorWithTestDataStorageCallback(p, handle, g));
-			addedProperty_getOnly.AddGetAccessor(accessorVisibility, (p, g) => EmitGetAccessorWithTestDataStorageCallback(p, handle, g));
-			addedProperty_setOnly.AddSetAccessor(accessorVisibility, (p, g) => EmitSetAccessorWithTestDataStorageCallback(p, handle, g));
+			addedProperty_getSet.AddGetAccessor(accessorVisibility, (p,  g) => EmitPropertyGetAccessorWithTestDataStorageCallback(p, handle, g));
+			addedProperty_getSet.AddSetAccessor(accessorVisibility, (p,  g) => EmitPropertySetAccessorWithTestDataStorageCallback(p, handle, g));
+			addedProperty_getOnly.AddGetAccessor(accessorVisibility, (p, g) => EmitPropertyGetAccessorWithTestDataStorageCallback(p, handle, g));
+			addedProperty_setOnly.AddSetAccessor(accessorVisibility, (p, g) => EmitPropertySetAccessorWithTestDataStorageCallback(p, handle, g));
 		}
 
 		// check whether the accessor methods in the generated property have been set accordingly
@@ -3516,39 +4056,6 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			TestPropertyImplementation(addedProperty_setOnly, instance, testObjects, handle);
 			TestPropertyImplementation(addedProperty_none, instance, testObjects, handle);
 		}
-	}
-
-	/// <summary>
-	/// Emits MSIL code for a 'get' accessor method that returns the value of a test data object from the <see cref="TestDataStorage"/>.
-	/// </summary>
-	/// <param name="property">Property to implement the accessor for.</param>
-	/// <param name="handle">Handle to the test data object.</param>
-	/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'get' accessor method.</param>
-	private static void EmitGetAccessorWithTestDataStorageCallback(IProperty property, int handle, ILGenerator msilGenerator)
-	{
-		MethodInfo testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
-		Debug.Assert(testDataStorage_get != null, nameof(testDataStorage_get) + " != null");
-		msilGenerator.Emit(OpCodes.Ldc_I4, handle);
-		msilGenerator.Emit(OpCodes.Call, testDataStorage_get);
-		msilGenerator.Emit(OpCodes.Unbox_Any, property.PropertyType);
-		msilGenerator.Emit(OpCodes.Ret);
-	}
-
-	/// <summary>
-	/// Emits MSIL code for a 'set' accessor method that changes the value of a test data object in the <see cref="TestDataStorage"/>.
-	/// </summary>
-	/// <param name="property">Property to implement the accessor for.</param>
-	/// <param name="handle">Handle to the test data object.</param>
-	/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'set' accessor method.</param>
-	private static void EmitSetAccessorWithTestDataStorageCallback(IProperty property, int handle, ILGenerator msilGenerator)
-	{
-		msilGenerator.Emit(OpCodes.Ldc_I4, handle);
-		msilGenerator.Emit(property.Kind == PropertyKind.Static ? OpCodes.Ldarg_0 : OpCodes.Ldarg_1);
-		if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
-		MethodInfo testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
-		Debug.Assert(testDataStorage_set != null, nameof(testDataStorage_set) + " != null");
-		msilGenerator.Emit(OpCodes.Call, testDataStorage_set);
-		msilGenerator.Emit(OpCodes.Ret);
 	}
 
 	/// <summary>
@@ -3636,74 +4143,521 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#endregion // Adding Properties
 
-	#region Adding Methods (TODO)
+	#region Adding Methods
+
+	/// <summary>
+	/// Names to test with when adding methods to the type definition.
+	/// </summary>
+	public static IEnumerable<string> MethodNames
+	{
+		get
+		{
+			yield return "Method";
+			yield return null;
+		}
+	}
+
+	/// <summary>
+	/// Method kinds to test with when adding methods to the type definition.
+	/// </summary>
+	public static IEnumerable<MethodKind> MethodKinds => Enum.GetValues(typeof(MethodKind)).Cast<MethodKind>();
+
+	/// <summary>
+	/// Test data for tests targeting adding new methods.
+	/// </summary>
+	public static IEnumerable<object[]> AddMethodTestData
+	{
+		get
+		{
+			// ------------------------------------------------------------------------------------
+			// different method names
+			// ------------------------------------------------------------------------------------
+			foreach (string name in MethodNames)
+			{
+				Type type = typeof(int);
+
+				CreateMethodTestData(
+					type,
+					2,
+					out Type[] parameterTypes,
+					out object[] testArguments,
+					out object expectedTestResult);
+
+				yield return
+				[
+					name,              // name
+					type,              // return type
+					parameterTypes,    // parameter types
+					Visibility.Public, // visibility
+					testArguments,     // test arguments
+					expectedTestResult // expected test result
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different visibilities
+			// ------------------------------------------------------------------------------------
+
+			foreach (Visibility visibility in Visibilities)
+			{
+				Type type = typeof(long);
+
+				CreateMethodTestData(
+					type,
+					2,
+					out Type[] parameterTypes,
+					out object[] testArguments,
+					out object expectedTestResult);
+
+				yield return
+				[
+					null,              // name
+					type,              // return type
+					parameterTypes,    // parameter types
+					visibility,        // visibility
+					testArguments,     // test arguments
+					expectedTestResult // expected test result
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different types
+			// ------------------------------------------------------------------------------------
+
+			// value (covered above)
+			//{
+			//	Type type = typeof(int);
+
+			//	CreateMethodTestData(
+			//		type,
+			//		2,
+			//		out Type[] parameterTypes,
+			//		out object[] testArguments,
+			//		out object expectedTestResult);
+
+			//	yield return
+			//	[
+			//		null,              // name
+			//		type,              // return type
+			//		parameterTypes,    // parameter types
+			//		Visibility.Public, // visibility
+			//		testArguments,     // test arguments
+			//		expectedTestResult // expected test result
+			//	];
+			//}
+
+			// reference
+			{
+				Type type = typeof(string);
+
+				CreateMethodTestData(
+					type,
+					2,
+					out Type[] parameterTypes,
+					out object[] testArguments,
+					out object expectedTestResult);
+
+				yield return
+				[
+					null,              // name
+					type,              // return type
+					parameterTypes,    // parameter types
+					Visibility.Public, // visibility
+					testArguments,     // test arguments
+					expectedTestResult // expected test result
+				];
+			}
+		}
+	}
+
+	/// <summary>
+	/// Test data for tests targeting adding new methods.
+	/// </summary>
+	public static IEnumerable<object[]> AddMethodWithKindTestData
+	{
+		get
+		{
+			// use existing test data to test adding 'normal' methods
+			foreach (object[] data in AddMethodTestData)
+			{
+				yield return
+				[
+					MethodKind.Normal, // method kind
+					data[0],           // name
+					data[1],           // return type
+					data[2],           // parameter types
+					data[3],           // visibility
+					data[4],           // test arguments
+					data[5]            // expected test result
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different method kinds
+			// (skip adding normal methods (covered above))
+			// ------------------------------------------------------------------------------------
+
+			foreach (MethodKind kind in MethodKinds.Where(x => x != MethodKind.Normal && x != MethodKind.Override))
+			{
+				Type type = typeof(int);
+
+				CreateMethodTestData(
+					type,
+					2,
+					out Type[] parameterTypes,
+					out object[] testArguments,
+					out object expectedTestResult);
+
+				yield return
+				[
+					kind,              // method kind
+					null,              // name
+					type,              // return type
+					parameterTypes,    // parameter types
+					Visibility.Public, // visibility
+					testArguments,     // test arguments
+					expectedTestResult // expected test result
+				];
+			}
+		}
+	}
 
 	#region AddMethod(MethodKind kind, string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
 
-	[Fact]
-	public void AddMethod_WithImplementationStrategy()
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddMethod(MethodKind,string,Type,Type[],Visibility,IMethodImplementation,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="kind">Kind of the method to add.</param>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodWithKindTestData))]
+	public void AddMethod_WithKind_WithImplementationStrategy(
+		MethodKind kind,
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
 	{
-		TDefinition definition = CreateTypeDefinition();
-		//definition.AddMethod(kind, name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
+		// create a new type definition
+		TypeDefinition definition = kind != MethodKind.Abstract
+			                            ? CreateTypeDefinition(null)
+			                            : CreateTypeDefinition(null, TypeAttributes.Abstract);
+
+		// test the method
+		TestAddMethod(
+			definition,
+			kind,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				var implementation = new TestMethodImplementation();
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					kind,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					kind != MethodKind.Abstract ? implementation : null);
+
+				if (kind != MethodKind.Abstract)
+				{
+					Assert.Same(implementation, addedMethodDefinition.Implementation);
+				}
+				else
+				{
+					Assert.Null(addedMethodDefinition.Implementation);
+				}
+
+				return addedMethodDefinition;
+			});
 	}
 
 	#endregion
 
 	#region AddMethod(MethodKind kind, string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
 
-	[Fact]
-	public void AddMethod_WithImplementationCallback()
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddMethod(MethodKind,string,Type,Type[],Visibility,MethodImplementationCallback,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="kind">Kind of the method to add.</param>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodWithKindTestData))]
+	public void AddMethod_WithKind_WithImplementationCallback(
+		MethodKind kind,
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
 	{
-		TDefinition definition = CreateTypeDefinition();
-		//definition.AddMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
+		// create a new type definition
+		TypeDefinition definition = kind != MethodKind.Abstract
+			                            ? CreateTypeDefinition(null)
+			                            : CreateTypeDefinition(null, TypeAttributes.Abstract);
+
+		// test the method
+		TestAddMethod(
+			definition,
+			kind,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					kind,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					kind != MethodKind.Abstract ? TestMethodImplementation.Callback : null);
+				Assert.Null(addedMethodDefinition.Implementation);
+				return addedMethodDefinition;
+			});
 	}
 
 	#endregion
 
-	//#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
+	#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
 
-	//[Fact]
-	//public void AddMethod_WithImplementationStrategy()
-	//{
-	//	TDefinition definition = CreateTypeDefinition();
-	//	// definition.AddMethod(name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
-	//}
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddMethod(string,Type,Type[],Visibility,IMethodImplementation,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodTestData))]
+	public void AddMethod_WithImplementationStrategy(
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
+	{
+		// create a new type definition
+		TypeDefinition definition = CreateTypeDefinition(null);
 
-	//#endregion
+		// test the method
+		TestAddMethod(
+			definition,
+			MethodKind.Normal,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				var implementation = new TestMethodImplementation();
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					MethodKind.Normal,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					implementation);
 
-	//#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+				Assert.Same(implementation, addedMethodDefinition.Implementation);
+				return addedMethodDefinition;
+			});
+	}
 
-	//[Fact]
-	//public void AddMethod_WithImplementationCallback()
-	//{
-	//	TDefinition definition = CreateTypeDefinition();
-	//	// definition.AddMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
-	//}
+	#endregion
 
-	//#endregion
+	#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
 
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddMethod(string,Type,Type[],Visibility,MethodImplementationCallback,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodTestData))]
+	public void AddMethod_WithImplementationCallback(
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
+	{
+		// create a new type definition
+		TypeDefinition definition = CreateTypeDefinition(null);
 
-	//#region AddStaticMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
+		// test the method
+		TestAddMethod(
+			definition,
+			MethodKind.Normal,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				var implementation = new TestMethodImplementation();
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					MethodKind.Normal,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					TestMethodImplementation.Callback);
 
-	//[Fact]
-	//public void AddStaticMethod_WithImplementationStrategy()
-	//{
-	//	TDefinition definition = CreateTypeDefinition();
-	//	// definition.AddStaticMethod(name, returnType, parameterTypes, visibility, implementation, additionalMethodAttributes);
-	//}
+				Assert.Null(addedMethodDefinition.Implementation);
+				return addedMethodDefinition;
+			});
+	}
 
-	//#endregion
+	#endregion
 
-	//#region AddStaticMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+	#region AddStaticMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, IMethodImplementation implementation, MethodAttributes additionalMethodAttributes = 0)
 
-	//[Fact]
-	//public void AddStaticMethod_WithImplementationCallback()
-	//{
-	//	TDefinition definition = CreateTypeDefinition();
-	//	// definition.AddStaticMethod(name, returnType, parameterTypes, visibility, implementationCallback, additionalMethodAttributes);
-	//}
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddStaticMethod(string,Type,Type[],Visibility,IMethodImplementation,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodTestData))]
+	public void AddStaticMethod_WithImplementationStrategy(
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
+	{
+		// create a new type definition
+		TypeDefinition definition = CreateTypeDefinition(null);
 
-	//#endregion
+		// test the method
+		TestAddMethod(
+			definition,
+			MethodKind.Static,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				var implementation = new TestMethodImplementation();
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					MethodKind.Static,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					implementation);
+
+				Assert.Same(implementation, addedMethodDefinition.Implementation);
+				return addedMethodDefinition;
+			});
+	}
+
+	#endregion
+
+	#region AddMethod(string name, Type returnType, Type[] parameterTypes, Visibility visibility, MethodImplementationCallback implementationCallback, MethodAttributes additionalMethodAttributes = 0)
+
+	/// <summary>
+	/// Tests the
+	/// <see cref="TypeDefinition.AddStaticMethod(string,Type,Type[],Visibility,MethodImplementationCallback,MethodAttributes)"/>
+	/// method.
+	/// </summary>
+	/// <param name="name">Name of the method to add.</param>
+	/// <param name="returnType">Return type of the method to add.</param>
+	/// <param name="parameterTypes">Types of parameters of the method to add.</param>
+	/// <param name="visibility">Visibility of the method to add.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	[Theory]
+	[MemberData(nameof(AddMethodTestData))]
+	public void AddStaticMethod_WithImplementationCallback(
+		string     name,
+		Type       returnType,
+		Type[]     parameterTypes,
+		Visibility visibility,
+		object[]   testArguments,
+		object     expectedTestResult)
+	{
+		// create a new type definition
+		TypeDefinition definition = CreateTypeDefinition(null);
+
+		// test the method
+		TestAddMethod(
+			definition,
+			MethodKind.Static,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			testArguments,
+			expectedTestResult,
+			() =>
+			{
+				IGeneratedMethod addedMethodDefinition = definition.AddMethod(
+					MethodKind.Static,
+					name,
+					returnType,
+					parameterTypes,
+					visibility,
+					TestMethodImplementation.Callback);
+
+				Assert.Null(addedMethodDefinition.Implementation);
+				return addedMethodDefinition;
+			});
+	}
+
+	#endregion
 
 	#endregion // Adding Methods
 }

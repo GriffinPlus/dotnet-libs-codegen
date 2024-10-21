@@ -35,20 +35,20 @@ public class TestBaseClass_Concrete_BaseClassMembersHidden_Concrete : TestBaseCl
 	internal new           int Field_Internal;
 	private                int Field_Private; // new not needed, private members are not hidden as not visible to derived classes
 
-	public new event                     EventHandler<EventArgs> Event_Normal_Public;
-	protected internal new event         EventHandler<EventArgs> Event_Normal_ProtectedInternal;
-	protected new event                  EventHandler<EventArgs> Event_Normal_Protected;
-	internal new event                   EventHandler<EventArgs> Event_Normal_Internal;
-	private event                        EventHandler<EventArgs> Event_Normal_Private; // new not needed, private events are not hidden as not visible to derived classes
-	public new virtual event             EventHandler<EventArgs> Event_Virtual_Public;
-	protected internal new virtual event EventHandler<EventArgs> Event_Virtual_ProtectedInternal;
-	protected new virtual event          EventHandler<EventArgs> Event_Virtual_Protected;
-	internal new virtual event           EventHandler<EventArgs> Event_Virtual_Internal;
-	public new static event              EventHandler<EventArgs> Event_Static_Public;
-	protected internal new static event  EventHandler<EventArgs> Event_Static_ProtectedInternal;
-	protected new static event           EventHandler<EventArgs> Event_Static_Protected;
-	internal new static event            EventHandler<EventArgs> Event_Static_Internal;
-	private static event                 EventHandler<EventArgs> Event_Static_Private; // new not needed, private events are not hidden as not visible to derived classes
+	public new event                     EventHandler Event_Normal_Public;
+	protected internal new event         EventHandler Event_Normal_ProtectedInternal;
+	protected new event                  EventHandler Event_Normal_Protected;
+	internal new event                   EventHandler Event_Normal_Internal;
+	private event                        EventHandler Event_Normal_Private; // new not needed, private events are not hidden as not visible to derived classes
+	public new virtual event             EventHandler Event_Virtual_Public;
+	protected internal new virtual event EventHandler Event_Virtual_ProtectedInternal;
+	protected new virtual event          EventHandler Event_Virtual_Protected;
+	internal new virtual event           EventHandler Event_Virtual_Internal;
+	public new static event              EventHandler Event_Static_Public;
+	protected internal new static event  EventHandler Event_Static_ProtectedInternal;
+	protected new static event           EventHandler Event_Static_Protected;
+	internal new static event            EventHandler Event_Static_Internal;
+	private static event                 EventHandler Event_Static_Private; // new not needed, private events are not hidden as not visible to derived classes
 
 	public new                     int Property_Normal_Public             { get; set; }
 	protected internal new         int Property_Normal_ProtectedInternal  { get; set; }

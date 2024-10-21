@@ -17,11 +17,12 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// </summary>
 readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 {
-	public string     Name           { get; }
-	public MethodKind Kind           { get; }
-	public Visibility Visibility     { get; }
-	public Type       ReturnType     { get; }
-	public Type[]     ParameterTypes { get; }
+	public string           Name           { get; }
+	public MethodKind       Kind           { get; }
+	public Visibility       Visibility     { get; }
+	public Type             ReturnType     { get; }
+	public Type[]           ParameterTypes { get; }
+	public MethodAttributes Attributes     { get; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="MethodComparisonWrapper"/> struct
@@ -37,6 +38,7 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 			Visibility = info.ToVisibility();
 			ReturnType = info.ReturnType;
 			ParameterTypes = info.GetParameters().Select(x => x.ParameterType).ToArray();
+			Attributes = info.Attributes;
 		}
 		else
 		{
@@ -45,6 +47,7 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 			Visibility = Visibility.Public;
 			ReturnType = typeof(void);
 			ParameterTypes = Type.EmptyTypes;
+			Attributes = 0;
 		}
 	}
 
@@ -62,6 +65,7 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 			Visibility = method.Visibility;
 			ReturnType = method.ReturnType;
 			ParameterTypes = method.ParameterTypes.ToArray();
+			Attributes = method.Attributes;
 		}
 		else
 		{
@@ -70,6 +74,7 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 			Visibility = Visibility.Public;
 			ReturnType = typeof(void);
 			ParameterTypes = Type.EmptyTypes;
+			Attributes = 0;
 		}
 	}
 
@@ -86,7 +91,10 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 		if (Name != other.Name) return false;
 		if (Kind != other.Kind) return false;
 		if (Visibility != other.Visibility) return false;
-		return ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
+		if (ReturnType != other.ReturnType) return false;
+		if (!ParameterTypes.SequenceEqual(other.ParameterTypes)) return false;
+		if (Attributes != other.Attributes) return false;
+		return true;
 	}
 
 	/// <summary>
@@ -115,11 +123,11 @@ readonly struct MethodComparisonWrapper : IEquatable<MethodComparisonWrapper>
 			hashCode = (hashCode * 397) ^ Kind.GetHashCode();
 			hashCode = (hashCode * 397) ^ Visibility.GetHashCode();
 			hashCode = (hashCode * 397) ^ (ReturnType != null ? ReturnType.GetHashCode() : 0);
-
-			return ParameterTypes
-				.Aggregate(
-					hashCode,
-					(current, type) => (current * 397) ^ (type != null ? type.GetHashCode() : 0));
+			hashCode = ParameterTypes.Aggregate(
+				hashCode,
+				(current, type) => (current * 397) ^ (type != null ? type.GetHashCode() : 0));
+			hashCode = (hashCode * 397) ^ Attributes.GetHashCode();
+			return hashCode;
 		}
 	}
 }

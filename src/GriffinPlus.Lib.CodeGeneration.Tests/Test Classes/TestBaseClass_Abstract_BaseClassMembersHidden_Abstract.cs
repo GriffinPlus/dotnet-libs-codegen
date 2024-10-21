@@ -35,24 +35,24 @@ public abstract class TestBaseClass_Abstract_BaseClassMembersHidden_Abstract : T
 	internal new           int Field_Internal;
 	private                int Field_Private; // new not needed, private members are not hidden as not visible to derived classes
 
-	// public new abstract event             EventHandler<EventArgs> Event_Abstract_Public;            // not allowed, would hide abstract event of base class
-	// protected internal new abstract event EventHandler<EventArgs> Event_Abstract_ProtectedInternal; // not allowed, would hide abstract event of base class
-	// protected new abstract event          EventHandler<EventArgs> Event_Abstract_Protected;         // not allowed, would hide abstract event of base class
-	// internal new abstract event           EventHandler<EventArgs> Event_Abstract_Internal;          // cannot be overridden in a derived class due to accessibility issues
-	public new event                     EventHandler<EventArgs> Event_Normal_Public;
-	protected internal new event         EventHandler<EventArgs> Event_Normal_ProtectedInternal;
-	protected new event                  EventHandler<EventArgs> Event_Normal_Protected;
-	internal new event                   EventHandler<EventArgs> Event_Normal_Internal;
-	private event                        EventHandler<EventArgs> Event_Normal_Private; // new not needed, private events are not hidden as not visible to derived classes
-	public new virtual event             EventHandler<EventArgs> Event_Virtual_Public;
-	protected internal new virtual event EventHandler<EventArgs> Event_Virtual_ProtectedInternal;
-	protected new virtual event          EventHandler<EventArgs> Event_Virtual_Protected;
-	internal new virtual event           EventHandler<EventArgs> Event_Virtual_Internal;
-	public new static event              EventHandler<EventArgs> Event_Static_Public;
-	protected internal new static event  EventHandler<EventArgs> Event_Static_ProtectedInternal;
-	protected new static event           EventHandler<EventArgs> Event_Static_Protected;
-	internal new static event            EventHandler<EventArgs> Event_Static_Internal;
-	private static event                 EventHandler<EventArgs> Event_Static_Private; // new not needed, private events are not hidden as not visible to derived classes
+	// public new abstract event             EventHandler Event_Abstract_Public;            // not allowed, would hide abstract event of base class
+	// protected internal new abstract event EventHandler Event_Abstract_ProtectedInternal; // not allowed, would hide abstract event of base class
+	// protected new abstract event          EventHandler Event_Abstract_Protected;         // not allowed, would hide abstract event of base class
+	// internal new abstract event           EventHandler Event_Abstract_Internal;          // cannot be overridden in a derived class due to accessibility issues
+	public new event                     EventHandler Event_Normal_Public;
+	protected internal new event         EventHandler Event_Normal_ProtectedInternal;
+	protected new event                  EventHandler Event_Normal_Protected;
+	internal new event                   EventHandler Event_Normal_Internal;
+	private event                        EventHandler Event_Normal_Private; // new not needed, private events are not hidden as not visible to derived classes
+	public new virtual event             EventHandler Event_Virtual_Public;
+	protected internal new virtual event EventHandler Event_Virtual_ProtectedInternal;
+	protected new virtual event          EventHandler Event_Virtual_Protected;
+	internal new virtual event           EventHandler Event_Virtual_Internal;
+	public new static event              EventHandler Event_Static_Public;
+	protected internal new static event  EventHandler Event_Static_ProtectedInternal;
+	protected new static event           EventHandler Event_Static_Protected;
+	internal new static event            EventHandler Event_Static_Internal;
+	private static event                 EventHandler Event_Static_Private; // new not needed, private events are not hidden as not visible to derived classes
 
 	// public new abstract             int Property_Abstract_Public            { get; set; } // not allowed, would hide abstract property of base class
 	// protected internal new abstract int Property_Abstract_ProtectedInternal { get; set; } // not allowed, would hide abstract property of base class

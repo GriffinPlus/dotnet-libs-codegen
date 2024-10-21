@@ -22,14 +22,14 @@ namespace GriffinPlus.Lib.CodeGeneration.Tests;
 /// </summary>
 public class TestBaseClass_Abstract_WithOverrides_Concrete : TestBaseClass_Abstract
 {
-	// internal override event        EventHandler<EventArgs> Event_Abstract_Internal;          // cannot be overridden in deriving class due to accessibility issues
-	public override event             EventHandler<EventArgs> Event_Abstract_Public;
-	protected internal override event EventHandler<EventArgs> Event_Abstract_ProtectedInternal;
-	protected override event          EventHandler<EventArgs> Event_Abstract_Protected;
-	public override event             EventHandler<EventArgs> Event_Virtual_Public;
-	protected internal override event EventHandler<EventArgs> Event_Virtual_ProtectedInternal;
-	protected override event          EventHandler<EventArgs> Event_Virtual_Protected;
-	internal override event           EventHandler<EventArgs> Event_Virtual_Internal;
+	// internal override event        EventHandler Event_Abstract_Internal;          // cannot be overridden in deriving class due to accessibility issues
+	public override event             EventHandler Event_Abstract_Public;
+	protected internal override event EventHandler Event_Abstract_ProtectedInternal;
+	protected override event          EventHandler Event_Abstract_Protected;
+	public override event             EventHandler Event_Virtual_Public;
+	protected internal override event EventHandler Event_Virtual_ProtectedInternal;
+	protected override event          EventHandler Event_Virtual_Protected;
+	internal override event           EventHandler Event_Virtual_Internal;
 
 	// internal override        int Property_Abstract_Internal          { get; set; } // cannot be overridden in deriving class due to accessibility issues
 	public override             int Property_Abstract_Public            { get; set; }

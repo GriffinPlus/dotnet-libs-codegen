@@ -30,9 +30,13 @@ public sealed class StructDefinition : TypeDefinition
 	/// <param name="module">Module definition to associate the class definition with.</param>
 	/// <param name="name">Name of the struct to create (<c>null</c> to create a random name).</param>
 	/// <param name="attributes">Attributes of the type.</param>
-	internal StructDefinition(ModuleDefinition module, string name = null, StructAttributes attributes = StructAttributes.None) : base(
-		module: module,
-		isValueType: true,
-		name: name,
-		attributes: (TypeAttributes)attributes) { }
+	internal StructDefinition(
+		ModuleDefinition module,
+		string           name       = null,
+		StructAttributes attributes = StructAttributes.None) :
+		base(
+			module: module,
+			isValueType: true,
+			name: name,
+			attributes: (TypeAttributes)attributes) { }
 }

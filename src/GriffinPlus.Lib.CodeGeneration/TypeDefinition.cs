@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 // ReSharper disable SuggestBaseTypeForParameter
 
@@ -551,8 +552,14 @@ public abstract class TypeDefinition
 	/// <returns>The added field.</returns>
 	public IGeneratedField<T> AddField<T>(string name, Visibility visibility)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, false, name, visibility);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			false,
+			name,
+			visibility);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -565,9 +572,12 @@ public abstract class TypeDefinition
 	/// <param name="visibility">Visibility of the field.</param>
 	/// <returns>The added field.</returns>
 	/// <exception cref="ArgumentNullException">The specified <paramref name="type"/> is <c>null</c>.</exception>
-	public IGeneratedField AddField(Type type, string name, Visibility visibility)
+	public IGeneratedField AddField(
+		Type       type,
+		string     name,
+		Visibility visibility)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -579,7 +589,14 @@ public abstract class TypeDefinition
 				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility)],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			false,
+			name,
+			visibility
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -593,10 +610,20 @@ public abstract class TypeDefinition
 	/// <param name="visibility">Visibility of the field.</param>
 	/// <param name="initialValue">Initial value of the field.</param>
 	/// <returns>The added field.</returns>
-	public IGeneratedField<T> AddField<T>(string name, Visibility visibility, T initialValue)
+	public IGeneratedField<T> AddField<T>(
+		string     name,
+		Visibility visibility,
+		T          initialValue)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, false, name, visibility, initialValue);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			false,
+			name,
+			visibility,
+			initialValue);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -621,7 +648,7 @@ public abstract class TypeDefinition
 		Visibility visibility,
 		object     initialValue)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -636,10 +663,24 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					type
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, initialValue]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			false,
+			name,
+			visibility,
+			initialValue
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -657,10 +698,20 @@ public abstract class TypeDefinition
 	/// </param>
 	/// <returns>The added field.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-	public IGeneratedField<T> AddField<T>(string name, Visibility visibility, FieldInitializer initializer)
+	public IGeneratedField<T> AddField<T>(
+		string           name,
+		Visibility       visibility,
+		FieldInitializer initializer)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, false, name, visibility, initializer);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			false,
+			name,
+			visibility,
+			initializer);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -685,7 +736,7 @@ public abstract class TypeDefinition
 		Visibility       visibility,
 		FieldInitializer initializer)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -694,10 +745,24 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer)],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					typeof(FieldInitializer)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, initializer]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			false,
+			name,
+			visibility,
+			initializer
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -712,10 +777,20 @@ public abstract class TypeDefinition
 	/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
 	/// <returns>The added field.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
-	public IGeneratedField<T> AddField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
+	public IGeneratedField<T> AddField<T>(
+		string                  name,
+		Visibility              visibility,
+		ProvideValueCallback<T> provideInitialValueCallback)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, false, name, visibility, provideInitialValueCallback);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			false,
+			name,
+			visibility,
+			provideInitialValueCallback);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -737,7 +812,7 @@ public abstract class TypeDefinition
 		Visibility           visibility,
 		ProvideValueCallback provideInitialValueCallback)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -746,10 +821,24 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					typeof(ProvideValueCallback)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, false, name, visibility, provideInitialValueCallback]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			false,
+			name,
+			visibility,
+			provideInitialValueCallback
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -764,8 +853,14 @@ public abstract class TypeDefinition
 	/// <returns>The added field.</returns>
 	public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, true, name, visibility);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			true,
+			name,
+			visibility);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -777,9 +872,12 @@ public abstract class TypeDefinition
 	/// <param name="name">Name of the field to add (<c>null</c> to create a random name).</param>
 	/// <param name="visibility">Visibility of the field.</param>
 	/// <returns>The added field.</returns>
-	public IGeneratedField AddStaticField(Type type, string name, Visibility visibility)
+	public IGeneratedField AddStaticField(
+		Type       type,
+		string     name,
+		Visibility visibility)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -788,10 +886,22 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility)],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			true,
+			name,
+			visibility
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -805,10 +915,20 @@ public abstract class TypeDefinition
 	/// <param name="visibility">Visibility of the field.</param>
 	/// <param name="initialValue">Initial value of the field.</param>
 	/// <returns>The added field.</returns>
-	public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, T initialValue)
+	public IGeneratedField<T> AddStaticField<T>(
+		string     name,
+		Visibility visibility,
+		T          initialValue)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, true, name, visibility, initialValue);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			true,
+			name,
+			visibility,
+			initialValue);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -833,7 +953,7 @@ public abstract class TypeDefinition
 		Visibility visibility,
 		object     initialValue)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -848,10 +968,24 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), type],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					type
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, initialValue]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			true,
+			name,
+			visibility,
+			initialValue
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -869,10 +1003,20 @@ public abstract class TypeDefinition
 	/// </param>
 	/// <returns>The added field.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="initializer"/> is <c>null</c>.</exception>
-	public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, FieldInitializer initializer)
+	public IGeneratedField<T> AddStaticField<T>(
+		string           name,
+		Visibility       visibility,
+		FieldInitializer initializer)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, true, name, visibility, initializer);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			true,
+			name,
+			visibility,
+			initializer);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -897,7 +1041,7 @@ public abstract class TypeDefinition
 		Visibility       visibility,
 		FieldInitializer initializer)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
@@ -906,10 +1050,24 @@ public abstract class TypeDefinition
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(FieldInitializer)],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					typeof(FieldInitializer)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, initializer]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			true,
+			name,
+			visibility,
+			initializer
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -924,10 +1082,20 @@ public abstract class TypeDefinition
 	/// <param name="provideInitialValueCallback">Factory callback providing the initial value of the field.</param>
 	/// <returns>The added field.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="provideInitialValueCallback"/> is <c>null</c>.</exception>
-	public IGeneratedField<T> AddStaticField<T>(string name, Visibility visibility, ProvideValueCallback<T> provideInitialValueCallback)
+	public IGeneratedField<T> AddStaticField<T>(
+		string                  name,
+		Visibility              visibility,
+		ProvideValueCallback<T> provideInitialValueCallback)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var field = new GeneratedField<T>(this, true, name, visibility, provideInitialValueCallback);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var field = new GeneratedField<T>(
+			this,
+			true,
+			name,
+			visibility,
+			provideInitialValueCallback);
+
 		GeneratedFieldsInternal.Add(field);
 		return field;
 	}
@@ -949,17 +1117,31 @@ public abstract class TypeDefinition
 		Visibility           visibility,
 		ProvideValueCallback provideInitialValueCallback)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		ConstructorInfo constructor = typeof(GeneratedField<>)
 			.MakeGenericType(type)
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(bool), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)],
+				[
+					typeof(TypeDefinition),
+					typeof(bool),
+					typeof(string),
+					typeof(Visibility),
+					typeof(ProvideValueCallback)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var field = (IGeneratedFieldInternal)constructor.Invoke([this, true, name, visibility, provideInitialValueCallback]);
+
+		var field = (IGeneratedFieldInternal)constructor.Invoke(
+		[
+			this,
+			true,
+			name,
+			visibility,
+			provideInitialValueCallback
+		]);
 
 		GeneratedFieldsInternal.Add(field);
 		return field;
@@ -980,17 +1162,42 @@ public abstract class TypeDefinition
 	/// </param>
 	/// <returns>The added event.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedEvent<T> AddEvent<T>(string name, Visibility visibility, IEventImplementation implementation) where T : Delegate
+	public IGeneratedEvent<T> AddEvent<T>(
+		string               name,
+		Visibility           visibility,
+		IEventImplementation implementation) where T : Delegate
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
+		return AddEventInternal<T>(
 			EventKind.Normal,
 			name,
 			visibility,
 			implementation);
-		GeneratedEventsInternal.Add(generatedEvent);
-		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new instance event to the type definition.
+	/// </summary>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="implementation">
+	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
+	/// </param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	public IGeneratedEvent AddEvent(
+		Type                 type,
+		string               name,
+		Visibility           visibility,
+		IEventImplementation implementation)
+	{
+		return AddEventInternal(
+			EventKind.Normal,
+			type,
+			name,
+			visibility,
+			implementation);
 	}
 
 	/// <summary>
@@ -1011,23 +1218,48 @@ public abstract class TypeDefinition
 		EventAccessorImplementationCallback addAccessorImplementationCallback,
 		EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
+		return AddEventInternal<T>(
 			EventKind.Normal,
 			name,
 			visibility,
 			addAccessorImplementationCallback,
 			removeAccessorImplementationCallback);
-		GeneratedEventsInternal.Add(generatedEvent);
-		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new instance event to the type definition.
+	/// </summary>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
+	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	public IGeneratedEvent AddEvent(
+		Type                                type,
+		string                              name,
+		Visibility                          visibility,
+		EventAccessorImplementationCallback addAccessorImplementationCallback,
+		EventAccessorImplementationCallback removeAccessorImplementationCallback)
+	{
+		return AddEventInternal(
+			EventKind.Normal,
+			type,
+			name,
+			visibility,
+			addAccessorImplementationCallback,
+			removeAccessorImplementationCallback);
 	}
 
 	/// <summary>
 	/// Adds a new static event to the type definition.
 	/// </summary>
 	/// <typeparam name="T">Type of the event to add.</typeparam>
-	/// <param name="eventName">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
 	/// <param name="visibility">Visibility of the event.</param>
 	/// <param name="implementation">
 	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
@@ -1035,19 +1267,41 @@ public abstract class TypeDefinition
 	/// <returns>The added event.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
 	public IGeneratedEvent<T> AddStaticEvent<T>(
-		string               eventName,
+		string               name,
 		Visibility           visibility,
 		IEventImplementation implementation) where T : Delegate
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(eventName);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
+		return AddEventInternal<T>(
 			EventKind.Static,
-			eventName,
+			name,
 			visibility,
 			implementation);
-		GeneratedEventsInternal.Add(generatedEvent);
-		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new static event to the type definition.
+	/// </summary>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="implementation">
+	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
+	/// </param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	public IGeneratedEvent AddStaticEvent(
+		Type                 type,
+		string               name,
+		Visibility           visibility,
+		IEventImplementation implementation)
+	{
+		return AddEventInternal(
+			EventKind.Static,
+			type,
+			name,
+			visibility,
+			implementation);
 	}
 
 	/// <summary>
@@ -1068,14 +1322,224 @@ public abstract class TypeDefinition
 		EventAccessorImplementationCallback addAccessorImplementationCallback,
 		EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var generatedEvent = new GeneratedEvent<T>(
-			this,
+		return AddEventInternal<T>(
 			EventKind.Static,
 			name,
 			visibility,
 			addAccessorImplementationCallback,
 			removeAccessorImplementationCallback);
+	}
+
+	/// <summary>
+	/// Adds a new static event to the type definition.
+	/// </summary>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
+	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="type"/> , <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is
+	/// <c>null</c>.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	public IGeneratedEvent AddStaticEvent(
+		Type                                type,
+		string                              name,
+		Visibility                          visibility,
+		EventAccessorImplementationCallback addAccessorImplementationCallback,
+		EventAccessorImplementationCallback removeAccessorImplementationCallback)
+	{
+		return AddEventInternal(
+			EventKind.Static,
+			type,
+			name,
+			visibility,
+			addAccessorImplementationCallback,
+			removeAccessorImplementationCallback);
+	}
+
+	/// <summary>
+	/// Adds a new event of the specified kind to the type definition.
+	/// </summary>
+	/// <typeparam name="T">Type of the event to add.</typeparam>
+	/// <param name="kind">Kind of the event to add.</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="implementation">
+	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
+	/// </param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+	protected IGeneratedEvent<T> AddEventInternal<T>(
+		EventKind            kind,
+		string               name,
+		Visibility           visibility,
+		IEventImplementation implementation) where T : Delegate
+	{
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var generatedEvent = new GeneratedEvent<T>(
+			this,
+			kind,
+			name,
+			visibility,
+			implementation);
+
+		GeneratedEventsInternal.Add(generatedEvent);
+		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new event of the specified kind to the type definition.
+	/// </summary>
+	/// <param name="kind">Kind of the event to add.</param>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="implementation">
+	/// Implementation strategy that implements the add/remove accessor methods and the event raiser method, if added.
+	/// </param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	protected IGeneratedEvent AddEventInternal(
+		EventKind            kind,
+		Type                 type,
+		string               name,
+		Visibility           visibility,
+		IEventImplementation implementation)
+	{
+		if (type == null) throw new ArgumentNullException(nameof(type));
+		if (!typeof(Delegate).IsAssignableFrom(type)) throw new ArgumentException("The specified event type is not a delegate.", nameof(type));
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		ConstructorInfo constructor = typeof(GeneratedEvent<>)
+			.MakeGenericType(type)
+			.GetConstructor(
+				BindingFlags.NonPublic | BindingFlags.Instance,
+				Type.DefaultBinder,
+				[
+					typeof(TypeDefinition),
+					typeof(EventKind),
+					typeof(string),
+					typeof(Visibility),
+					typeof(IEventImplementation)
+				],
+				null);
+		Debug.Assert(constructor != null, nameof(constructor) + " != null");
+
+		var generatedEvent = (IGeneratedEvent)constructor.Invoke(
+		[
+			this,
+			kind,
+			name,
+			visibility,
+			implementation
+		]);
+
+		GeneratedEventsInternal.Add(generatedEvent);
+		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new event of the specified kind to the type definition.
+	/// </summary>
+	/// <typeparam name="T">Type of the event to add.</typeparam>
+	/// <param name="kind">Kind of the event to add.</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
+	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is <c>null</c>.
+	/// </exception>
+	protected IGeneratedEvent<T> AddEventInternal<T>(
+		EventKind                           kind,
+		string                              name,
+		Visibility                          visibility,
+		EventAccessorImplementationCallback addAccessorImplementationCallback,
+		EventAccessorImplementationCallback removeAccessorImplementationCallback) where T : Delegate
+	{
+		if (addAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(addAccessorImplementationCallback));
+		if (removeAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(removeAccessorImplementationCallback));
+
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var generatedEvent = new GeneratedEvent<T>(
+			this,
+			kind,
+			name,
+			visibility,
+			addAccessorImplementationCallback,
+			removeAccessorImplementationCallback);
+
+		GeneratedEventsInternal.Add(generatedEvent);
+		return generatedEvent;
+	}
+
+	/// <summary>
+	/// Adds a new event of the specified kind to the type definition.
+	/// </summary>
+	/// <param name="kind">Kind of the event to add.</param>
+	/// <param name="type">Type of the event to add (must be a delegate).</param>
+	/// <param name="name">Name of the event to add (<c>null</c> to create a random name).</param>
+	/// <param name="visibility">Visibility of the event.</param>
+	/// <param name="addAccessorImplementationCallback">A callback that implements the add accessor method of the event.</param>
+	/// <param name="removeAccessorImplementationCallback">A callback that implements the remove accessor method of the event.</param>
+	/// <returns>The added event.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="type"/> , <paramref name="addAccessorImplementationCallback"/> or <paramref name="removeAccessorImplementationCallback"/> is
+	/// <c>null</c>.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="type"/> is not a delegate.</exception>
+	protected IGeneratedEvent AddEventInternal(
+		EventKind                           kind,
+		Type                                type,
+		string                              name,
+		Visibility                          visibility,
+		EventAccessorImplementationCallback addAccessorImplementationCallback,
+		EventAccessorImplementationCallback removeAccessorImplementationCallback)
+	{
+		if (type == null) throw new ArgumentNullException(nameof(type));
+		if (!typeof(Delegate).IsAssignableFrom(type)) throw new ArgumentException("The specified event type is not a delegate.", nameof(type));
+		if (addAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(addAccessorImplementationCallback));
+		if (removeAccessorImplementationCallback == null) throw new ArgumentNullException(nameof(removeAccessorImplementationCallback));
+
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		ConstructorInfo constructor = typeof(GeneratedEvent<>)
+			.MakeGenericType(type)
+			.GetConstructor(
+				BindingFlags.NonPublic | BindingFlags.Instance,
+				Type.DefaultBinder,
+				[
+					typeof(TypeDefinition),
+					typeof(EventKind),
+					typeof(string),
+					typeof(Visibility),
+					typeof(EventAccessorImplementationCallback),
+					typeof(EventAccessorImplementationCallback)
+				],
+				null);
+		Debug.Assert(constructor != null, nameof(constructor) + " != null");
+
+		var generatedEvent = (IGeneratedEvent)constructor.Invoke(
+		[
+			this,
+			kind,
+			name,
+			visibility,
+			addAccessorImplementationCallback,
+			removeAccessorImplementationCallback
+		]);
+
 		GeneratedEventsInternal.Add(generatedEvent);
 		return generatedEvent;
 	}
@@ -1095,8 +1559,13 @@ public abstract class TypeDefinition
 	/// <returns>The added property.</returns>
 	public IGeneratedProperty<T> AddProperty<T>(string name)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var property = new GeneratedProperty<T>(
+			this,
+			PropertyKind.Normal,
+			name);
+
 		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
@@ -1111,20 +1580,34 @@ public abstract class TypeDefinition
 	/// <param name="type">Type of the property to add.</param>
 	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 	/// <returns>The added property.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="type"/>> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
 	public IGeneratedProperty AddProperty(Type type, string name)
 	{
 		if (type == null) throw new ArgumentNullException(nameof(type));
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string)],
+				[
+					typeof(TypeDefinition),
+					typeof(PropertyKind),
+					typeof(string)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Normal, name]);
+
+		var property = (IGeneratedProperty)constructor.Invoke(
+		[
+			this,
+			PropertyKind.Normal,
+			name
+		]);
 
 		GeneratedPropertiesInternal.Add(property);
 		return property;
@@ -1138,11 +1621,20 @@ public abstract class TypeDefinition
 	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 	/// <returns>The added property.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
 	public IGeneratedProperty<T> AddProperty<T>(string name, IPropertyImplementation implementation)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
-		var property = new GeneratedProperty<T>(this, PropertyKind.Normal, name, implementation);
+		var property = new GeneratedProperty<T>(
+			this,
+			PropertyKind.Normal,
+			name,
+			implementation);
+
 		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
@@ -1155,21 +1647,40 @@ public abstract class TypeDefinition
 	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 	/// <returns>The added property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty AddProperty(Type type, string name, IPropertyImplementation implementation)
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
+	public IGeneratedProperty AddProperty(
+		Type                    type,
+		string                  name,
+		IPropertyImplementation implementation)
 	{
 		if (type == null) throw new ArgumentNullException(nameof(type));
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation)],
+				[
+					typeof(TypeDefinition),
+					typeof(PropertyKind),
+					typeof(string),
+					typeof(IPropertyImplementation)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Normal, name, implementation]);
+
+		var property = (IGeneratedProperty)constructor.Invoke(
+		[
+			this,
+			PropertyKind.Normal,
+			name,
+			implementation
+		]);
 
 		GeneratedPropertiesInternal.Add(property);
 		return property;
@@ -1184,11 +1695,18 @@ public abstract class TypeDefinition
 	/// </summary>
 	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 	/// <returns>The added property.</returns>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
 	public IGeneratedProperty<T> AddStaticProperty<T>(string name)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
-		var property = new GeneratedProperty<T>(this, PropertyKind.Static, name);
+		var property = new GeneratedProperty<T>(
+			this,
+			PropertyKind.Static,
+			name);
+
 		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
@@ -1203,20 +1721,34 @@ public abstract class TypeDefinition
 	/// <param name="type">Type of the property to add.</param>
 	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 	/// <returns>The added property.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
 	public IGeneratedProperty AddStaticProperty(Type type, string name)
 	{
 		if (type == null) throw new ArgumentNullException(nameof(type));
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string)],
+				[
+					typeof(TypeDefinition),
+					typeof(PropertyKind),
+					typeof(string)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Static, name]);
+
+		var property = (IGeneratedProperty)constructor.Invoke(
+		[
+			this,
+			PropertyKind.Static,
+			name
+		]);
 
 		GeneratedPropertiesInternal.Add(property);
 		return property;
@@ -1230,10 +1762,20 @@ public abstract class TypeDefinition
 	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 	/// <returns>The added property.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
 	public IGeneratedProperty<T> AddStaticProperty<T>(string name, IPropertyImplementation implementation)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var property = new GeneratedProperty<T>(this, PropertyKind.Static, name, implementation);
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var property = new GeneratedProperty<T>(
+			this,
+			PropertyKind.Static,
+			name,
+			implementation);
+
 		GeneratedPropertiesInternal.Add(property);
 		return property;
 	}
@@ -1246,21 +1788,40 @@ public abstract class TypeDefinition
 	/// <param name="name">Name of the property to add (<c>null</c> to create a random name).</param>
 	/// <param name="implementation">Implementation strategy that implements the 'get'/'set' accessors of the property.</param>
 	/// <returns>The added property.</returns>
-	/// <exception cref="ArgumentNullException"><paramref name="implementation"/> is <c>null</c>.</exception>
-	public IGeneratedProperty AddStaticProperty(Type type, string name, IPropertyImplementation implementation)
+	/// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="implementation"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="name"/>> has already been used to declare a field, event, property or method.
+	/// </exception>
+	public IGeneratedProperty AddStaticProperty(
+		Type                    type,
+		string                  name,
+		IPropertyImplementation implementation)
 	{
 		if (type == null) throw new ArgumentNullException(nameof(type));
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		ConstructorInfo constructor = typeof(GeneratedProperty<>)
 			.MakeGenericType(type)
 			.GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				Type.DefaultBinder,
-				[typeof(TypeDefinition), typeof(PropertyKind), typeof(string), typeof(IPropertyImplementation)],
+				[
+					typeof(TypeDefinition),
+					typeof(PropertyKind),
+					typeof(string),
+					typeof(IPropertyImplementation)
+				],
 				null);
 		Debug.Assert(constructor != null, nameof(constructor) + " != null");
-		var property = (IGeneratedProperty)constructor.Invoke([this, PropertyKind.Static, name, implementation]);
+
+		var property = (IGeneratedProperty)constructor.Invoke(
+		[
+			this,
+			PropertyKind.Static,
+			name,
+			implementation
+		]);
 
 		GeneratedPropertiesInternal.Add(property);
 		return property;
@@ -1296,8 +1857,18 @@ public abstract class TypeDefinition
 		IMethodImplementation implementation,
 		MethodAttributes      additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var method = new GeneratedMethod(
+			this,
+			MethodKind.Normal,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementation);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1328,8 +1899,18 @@ public abstract class TypeDefinition
 		MethodImplementationCallback implementationCallback,
 		MethodAttributes             additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Normal, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var method = new GeneratedMethod(
+			this,
+			MethodKind.Normal,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementationCallback);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1360,8 +1941,18 @@ public abstract class TypeDefinition
 		IMethodImplementation implementation,
 		MethodAttributes      additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var method = new GeneratedMethod(
+			this,
+			MethodKind.Static,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementation);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1392,8 +1983,18 @@ public abstract class TypeDefinition
 		MethodImplementationCallback implementationCallback,
 		MethodAttributes             additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
-		var method = new GeneratedMethod(this, MethodKind.Static, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
+
+		var method = new GeneratedMethod(
+			this,
+			MethodKind.Static,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementationCallback);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1434,7 +2035,7 @@ public abstract class TypeDefinition
 		IMethodImplementation implementation,
 		MethodAttributes      additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		// ensure that a valid property kind was specified
 		switch (kind)
@@ -1455,7 +2056,16 @@ public abstract class TypeDefinition
 		}
 
 		// create method
-		var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementation);
+		var method = new GeneratedMethod(
+			this,
+			kind,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementation);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1496,7 +2106,7 @@ public abstract class TypeDefinition
 		MethodImplementationCallback implementationCallback,
 		MethodAttributes             additionalMethodAttributes = 0)
 	{
-		EnsureThatIdentifierHasNotBeenUsedYet(name);
+		EnsureThatIdentifierHasNotBeenUsedYet(name, nameof(name));
 
 		// ensure that a valid property kind was specified
 		switch (kind)
@@ -1517,7 +2127,16 @@ public abstract class TypeDefinition
 		}
 
 		// create method
-		var method = new GeneratedMethod(this, kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes, implementationCallback);
+		var method = new GeneratedMethod(
+			this,
+			kind,
+			name,
+			returnType,
+			parameterTypes,
+			visibility,
+			additionalMethodAttributes,
+			implementationCallback);
+
 		GeneratedMethodsInternal.Add(method);
 		return method;
 	}
@@ -1539,15 +2158,21 @@ public abstract class TypeDefinition
 		AddConstructors();
 
 		// implement methods (includes event accessor methods and property accessor methods)
-		foreach (IGeneratedMethodInternal generatedMethod in GeneratedMethodsInternal) generatedMethod.Implement();
+		// ------------------------------------------------------------------------------------------------------------
+		// Warning:
+		// If not separated cleanly, implementations can declare additional methods that are appended to the collection)
+		// => Do not use a foreach loop here, which will blow up as the collection is modified while looping
+		// ------------------------------------------------------------------------------------------------------------
+		// ReSharper disable once ForCanBeConvertedToForeach
+		for (int i = 0; i < GeneratedMethodsInternal.Count; i++) GeneratedMethodsInternal[i].Implement();
 
 		// create the defined type
 		Type createdType = null;
 		while (mTypeBuilders.Count > 0)
 		{
 			TypeBuilder builder = mTypeBuilders.Pop();
-			if (createdType == null) createdType = builder.CreateTypeInfo().AsType();
-			else builder.CreateTypeInfo().AsType();
+			if (createdType == null) createdType = builder.CreateTypeInfo()!.AsType();
+			else builder.CreateTypeInfo()!.AsType();
 		}
 
 		CodeGenExternalStorage.Add(createdType, [.. ExternalObjects]);
@@ -1728,32 +2353,36 @@ public abstract class TypeDefinition
 	}
 
 	/// <summary>
-	/// Ensures that the specified identifier (field, property, method) has not been used, yet.
+	/// Ensures that the specified identifier (name of a field, property, method) has not been used, yet.
 	/// </summary>
-	/// <param name="identifier">Name of the identifier to check.</param>
-	/// <exception cref="CodeGenException">The identifier with the specified name has already been declared.</exception>
-	internal void EnsureThatIdentifierHasNotBeenUsedYet(string identifier)
+	/// <param name="identifier">Identifier to check.</param>
+	/// <param name="originalArgumentName">Original name of the argument that is checked.</param>
+	/// <exception cref="ArgumentException">The specified identifier has already been used to declare a field, event, property or method.</exception>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)] // removes this method from the call stack
+	internal void EnsureThatIdentifierHasNotBeenUsedYet(string identifier, string originalArgumentName)
 	{
+		Debug.Assert(originalArgumentName != null);
+
 		if (identifier == null) return; // null means that a unique name is chosen => no conflict...
 
 		if (GeneratedFieldsInternal.Any(field => field.Name == identifier))
 		{
-			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a field.");
+			throw new ArgumentException($"The identifier ({identifier}) has already been used to declare a field.", originalArgumentName);
 		}
 
 		if (GeneratedEventsInternal.Any(@event => @event.Name == identifier))
 		{
-			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare an event.");
+			throw new ArgumentException($"The identifier ({identifier}) has already been used to declare an event.", originalArgumentName);
 		}
 
 		if (GeneratedPropertiesInternal.Any(property => property.Name == identifier))
 		{
-			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a property.");
+			throw new ArgumentException($"The identifier ({identifier}) has already been used to declare a property.", originalArgumentName);
 		}
 
 		if (GeneratedMethodsInternal.Any(method => method.Name == identifier))
 		{
-			throw new CodeGenException($"The specified identifier ({identifier}) has already been used to declare a method.");
+			throw new ArgumentException($"The identifier ({identifier}) has already been used to declare a method.", originalArgumentName);
 		}
 	}
 
@@ -1761,11 +2390,12 @@ public abstract class TypeDefinition
 	/// Ensures that the defined type derives from the specified type.
 	/// </summary>
 	/// <param name="type">Type the defined types is expected to derive from.</param>
-	internal void EnsureThatTypeDerivesFrom(Type type)
+	/// <exception cref="InvalidOperationException">The defined type does not derive from the specified type.</exception>
+	internal void EnsureThatDefinedTypeDerivesFrom(Type type)
 	{
 		if (!type.IsAssignableFrom(TypeBuilder))
 		{
-			throw new CodeGenException($"The defined type ({TypeBuilder.FullName}) does not derive from '{type.FullName}'.");
+			throw new InvalidOperationException($"The defined type ({TypeBuilder.FullName}) does not derive from '{type.FullName}'.");
 		}
 	}
 

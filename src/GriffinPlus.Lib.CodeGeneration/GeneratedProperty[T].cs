@@ -191,9 +191,15 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 		// check parameters
 		if (inheritedProperty == null) throw new ArgumentNullException(nameof(inheritedProperty));
 
-
 		Name = inheritedProperty.Name;
 		Kind = PropertyKind.Override;
+
+		// create a property builder for the property
+		PropertyBuilder = TypeDefinition.TypeBuilder.DefineProperty(
+			Name,
+			PropertyAttributes.None,
+			PropertyType,
+			Type.EmptyTypes);
 
 		if (inheritedProperty.GetAccessor != null)
 		{
@@ -202,6 +208,8 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 			GetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.GetAccessor,
 				(_, msilGenerator) => getAccessorImplementationCallback(this, msilGenerator));
+
+			PropertyBuilder.SetGetMethod(GetAccessor.MethodBuilder);
 		}
 
 		if (inheritedProperty.SetAccessor != null)
@@ -211,6 +219,8 @@ class GeneratedProperty<T> : Member, IGeneratedProperty<T>
 			SetAccessor = classDefinition.AddMethodOverride(
 				inheritedProperty.SetAccessor,
 				(_, msilGenerator) => setAccessorImplementationCallback(this, msilGenerator));
+
+			PropertyBuilder.SetSetMethod(SetAccessor.MethodBuilder);
 		}
 
 		Freeze();

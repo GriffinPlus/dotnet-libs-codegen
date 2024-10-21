@@ -163,7 +163,10 @@ class GeneratedField<T> : Member, IGeneratedField<T>, IGeneratedFieldInternal
 	/// <param name="name">Name of the field (<c>null</c> to create a random name).</param>
 	/// <param name="visibility">Visibility of the field.</param>
 	/// <exception cref="ArgumentException"><paramref name="name"/> is not a valid language independent identifier.</exception>
-	private void Initialize(bool isStatic, string name, Visibility visibility)
+	private void Initialize(
+		bool       isStatic,
+		string     name,
+		Visibility visibility)
 	{
 		IsStatic = isStatic;
 		Visibility = visibility;

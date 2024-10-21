@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if NET461 || NET48 || (NET5_0 || NET6_0 || NET7_0 || NET8_0) && WINDOWS
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,25 +25,6 @@ using static Helpers;
 /// </summary>
 public class ClassDefinitionTests_WpfSpecific
 {
-	#region Common Test Data
-
-	/// <summary>
-	/// All supported visibilities.
-	/// </summary>
-	private static IEnumerable<Visibility> Visibilities
-	{
-		get
-		{
-			yield return Visibility.Public;
-			yield return Visibility.Protected;
-			yield return Visibility.ProtectedInternal;
-			yield return Visibility.Internal;
-			yield return Visibility.Private;
-		}
-	}
-
-	#endregion
-
 	#region Adding Dependency Properties
 
 	#region Test Data
@@ -557,7 +539,7 @@ public class ClassDefinitionTests_WpfSpecific
 					.SequenceEqual([typeof(string), typeof(bool)]));
 
 		var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly]));
-		var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
+		var exception = Assert.IsType<InvalidOperationException>(targetInvocationException.InnerException);
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 	}
 
@@ -641,7 +623,7 @@ public class ClassDefinitionTests_WpfSpecific
 		const bool isReadOnly = false;
 
 		var definition = new ClassDefinition(null, ClassAttributes.None);
-		var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly));
+		var exception = Assert.Throws<InvalidOperationException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly));
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 	}
 
@@ -764,7 +746,7 @@ public class ClassDefinitionTests_WpfSpecific
 					.SequenceEqual([typeof(string), typeof(bool), propertyType]));
 
 		var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, initialValue]));
-		var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
+		var exception = Assert.IsType<InvalidOperationException>(targetInvocationException.InnerException);
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 	}
 
@@ -849,7 +831,7 @@ public class ClassDefinitionTests_WpfSpecific
 		const int initialValue = 0;
 
 		var definition = new ClassDefinition(null, ClassAttributes.None);
-		var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, initialValue));
+		var exception = Assert.Throws<InvalidOperationException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, initialValue));
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 	}
 
@@ -997,7 +979,7 @@ public class ClassDefinitionTests_WpfSpecific
 					.SequenceEqual([typeof(string), typeof(bool), typeof(DependencyPropertyInitializer)]));
 
 		var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (DependencyPropertyInitializer)Initializer]));
-		var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
+		var exception = Assert.IsType<InvalidOperationException>(targetInvocationException.InnerException);
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		return;
 
@@ -1120,7 +1102,7 @@ public class ClassDefinitionTests_WpfSpecific
 		const bool isReadOnly = false;
 
 		var definition = new ClassDefinition(null, ClassAttributes.None);
-		var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, Initializer));
+		var exception = Assert.Throws<InvalidOperationException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, Initializer));
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		return;
 
@@ -1268,7 +1250,7 @@ public class ClassDefinitionTests_WpfSpecific
 					.SequenceEqual([typeof(string), typeof(bool), typeof(ProvideValueCallback<>).MakeGenericType(propertyType)]));
 
 		var targetInvocationException = Assert.Throws<TargetInvocationException>(() => addDependencyPropertyMethod.Invoke(definition, [name, isReadOnly, (ProvideValueCallback<int>)ProvideInitialValueCallback]));
-		var exception = Assert.IsType<CodeGenException>(targetInvocationException.InnerException);
+		var exception = Assert.IsType<InvalidOperationException>(targetInvocationException.InnerException);
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		return;
 
@@ -1387,7 +1369,7 @@ public class ClassDefinitionTests_WpfSpecific
 		const bool isReadOnly = false;
 
 		var definition = new ClassDefinition(null, ClassAttributes.None);
-		var exception = Assert.Throws<CodeGenException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, ProvideInitialValueCallback));
+		var exception = Assert.Throws<InvalidOperationException>(() => definition.AddDependencyProperty(propertyType, name, isReadOnly, ProvideInitialValueCallback));
 		Assert.Equal($"The defined type ({definition.TypeName}) does not derive from '{typeof(DependencyObject).FullName}'.", exception.Message);
 		return;
 

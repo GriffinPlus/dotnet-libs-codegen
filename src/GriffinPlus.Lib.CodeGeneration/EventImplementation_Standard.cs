@@ -337,7 +337,7 @@ public class EventImplementation_Standard : EventImplementation
 			msilGenerator.Emit(OpCodes.Brfalse_S, label);
 			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 			int argumentOffset = eventToImplement.Kind == EventKind.Static ? 0 : 1;
-			int count = EventRaiserMethod.ParameterTypes.Count();
+			int count = EventRaiserMethod.ParameterTypes.Count;
 			for (int i = 0; i < count; i++) CodeGenHelpers.EmitLoadArgument(msilGenerator, argumentOffset + i);
 			MethodInfo invokeMethod = mBackingField.FieldBuilder.FieldType.GetMethod("Invoke");
 			Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");

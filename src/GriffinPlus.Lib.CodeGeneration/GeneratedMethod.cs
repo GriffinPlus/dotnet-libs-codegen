@@ -22,9 +22,9 @@ namespace GriffinPlus.Lib.CodeGeneration;
 	"({System.String.Join(\", \", System.Linq.Enumerable.Select(((System.Collections.Generic.IEnumerable<System.Type>)ParameterTypes), x => x.FullName)),nq})")]
 class GeneratedMethod : Member, IGeneratedMethodInternal
 {
-	private readonly IMethodImplementation        mImplementation;
 	private readonly MethodImplementationCallback mImplementationCallback;
 	private          Type[]                       mParameterTypes;
+	private          MethodAttributes             mAdditionalMethodAttributes;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GeneratedMethod"/> class.
@@ -65,7 +65,7 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	{
 		if (kind == MethodKind.Abstract && implementation != null) throw new ArgumentException($"Method kind is '{kind}', an implementation strategy must not be specified.");
 		if (kind != MethodKind.Abstract && implementation == null) throw new ArgumentNullException(nameof(implementation));
-		mImplementation = implementation;
+		Implementation = implementation;
 		Initialize(kind, name, returnType, parameterTypes, visibility, additionalMethodAttributes);
 	}
 
@@ -150,6 +150,9 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 		mParameterTypes = new Type[parameterTypes.Length];
 		Array.Copy(parameterTypes, mParameterTypes, parameterTypes.Length);
 
+		// store additional method attributes, before they get mixed up with attributes for kind and visibility
+		mAdditionalMethodAttributes = additionalMethodAttributes;
+
 		// create the method builder
 		MethodBuilder = TypeDefinition.TypeBuilder.DefineMethod(
 			name,
@@ -168,10 +171,13 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="typeDefinition"/>, <paramref name="method"/> or <paramref name="implementation"/> is <c>null</c>.
 	/// </exception>
-	internal GeneratedMethod(TypeDefinition typeDefinition, IInheritedMethod method, IMethodImplementation implementation) :
+	internal GeneratedMethod(
+		TypeDefinition        typeDefinition,
+		IInheritedMethod      method,
+		IMethodImplementation implementation) :
 		base(typeDefinition)
 	{
-		mImplementation = implementation ?? throw new ArgumentNullException(nameof(implementation));
+		Implementation = implementation ?? throw new ArgumentNullException(nameof(implementation));
 		Initialize(method);
 	}
 
@@ -184,7 +190,10 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="typeDefinition"/>, <paramref name="method"/> or <paramref name="implementationCallback"/> is <c>null</c>.
 	/// </exception>
-	internal GeneratedMethod(TypeDefinition typeDefinition, IInheritedMethod method, MethodImplementationCallback implementationCallback) :
+	internal GeneratedMethod(
+		TypeDefinition               typeDefinition,
+		IInheritedMethod             method,
+		MethodImplementationCallback implementationCallback) :
 		base(typeDefinition)
 	{
 		mImplementationCallback = implementationCallback ?? throw new ArgumentNullException(nameof(implementationCallback));
@@ -202,6 +211,9 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 
 		// keep parameter types separately from the method builder as MethodBuilder.GetParameters() does not work as expected
 		mParameterTypes = method.ParameterTypes.ToArray();
+
+		// store additional method attributes, before they get mixed up with attributes for kind and visibility
+		mAdditionalMethodAttributes = 0;
 
 		// create the method builder
 		MethodBuilder = TypeDefinition.TypeBuilder.DefineMethod(
@@ -238,6 +250,16 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	public Visibility Visibility => MethodBuilder.ToVisibility();
 
 	/// <summary>
+	/// Gets the additional attributes of the method.
+	/// </summary>
+	public MethodAttributes AdditionalAttributes => mAdditionalMethodAttributes;
+
+	/// <summary>
+	/// Gets the attributes of the method.
+	/// </summary>
+	public MethodAttributes Attributes => MethodBuilder.Attributes;
+
+	/// <summary>
 	/// Gets the <see cref="System.Reflection.MethodInfo"/> associated with the method.
 	/// </summary>
 	MethodInfo IMethod.MethodInfo => MethodBuilder;
@@ -248,11 +270,17 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	public MethodBuilder MethodBuilder { get; private set; }
 
 	/// <summary>
+	/// Gets the implementation strategy used to implement the method
+	/// (<c>null</c>, if implementation callbacks are used).
+	/// </summary>
+	public IMethodImplementation Implementation { get; }
+
+	/// <summary>
 	/// Adds other fields, events, properties and methods to the definition of the type in creation.
 	/// </summary>
 	void IGeneratedMethodInternal.DeclareImplementationSpecificMembers()
 	{
-		mImplementation?.Declare(TypeDefinition, this);
+		Implementation?.Declare(TypeDefinition, this);
 	}
 
 	/// <summary>
@@ -260,7 +288,7 @@ class GeneratedMethod : Member, IGeneratedMethodInternal
 	/// </summary>
 	void IGeneratedMethodInternal.Implement()
 	{
-		mImplementation?.Implement(TypeDefinition, this, MethodBuilder.GetILGenerator());
+		Implementation?.Implement(TypeDefinition, this, MethodBuilder.GetILGenerator());
 		mImplementationCallback?.Invoke(this, MethodBuilder.GetILGenerator());
 	}
 }

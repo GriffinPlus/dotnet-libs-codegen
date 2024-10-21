@@ -801,7 +801,10 @@ public static class CodeGenHelpers
 	/// <c>true</c> to box value types;<br/>
 	/// <c>false</c> to keep value types.
 	/// </param>
-	public static void EmitLoadDefaultValue(ILGenerator msilGenerator, Type type, bool box)
+	public static void EmitLoadDefaultValue(
+		ILGenerator msilGenerator,
+		Type        type,
+		bool        box)
 	{
 		if (type.IsValueType)
 		{
@@ -833,7 +836,7 @@ public static class CodeGenHelpers
 				LocalBuilder builder = msilGenerator.DeclareLocal(type);
 				msilGenerator.Emit(OpCodes.Ldloca, builder);
 				msilGenerator.Emit(OpCodes.Initobj, type);
-				msilGenerator.Emit(OpCodes.Ldloc_0);
+				msilGenerator.Emit(OpCodes.Ldloc, builder);
 			}
 			else
 			{
@@ -841,7 +844,7 @@ public static class CodeGenHelpers
 				LocalBuilder builder = msilGenerator.DeclareLocal(type);
 				msilGenerator.Emit(OpCodes.Ldloca, builder);
 				msilGenerator.Emit(OpCodes.Initobj, type);
-				msilGenerator.Emit(OpCodes.Ldloc_0);
+				msilGenerator.Emit(OpCodes.Ldloc, builder);
 			}
 
 			if (box) msilGenerator.Emit(OpCodes.Box, type);

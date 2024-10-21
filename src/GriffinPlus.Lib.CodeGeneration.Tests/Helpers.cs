@@ -26,6 +26,21 @@ public static class Helpers
 	public const BindingFlags ExactDeclaredOnlyBindingFlags = ExactBindingFlags | BindingFlags.DeclaredOnly;
 
 	/// <summary>
+	/// All supported visibilities.
+	/// </summary>
+	public static IEnumerable<Visibility> Visibilities
+	{
+		get
+		{
+			yield return Visibility.Public;
+			yield return Visibility.Protected;
+			yield return Visibility.ProtectedInternal;
+			yield return Visibility.Internal;
+			yield return Visibility.Private;
+		}
+	}
+
+	/// <summary>
 	/// Gets constructors of the specified type that can be accessed by a type deriving from that type.
 	/// </summary>
 	/// <param name="type">Type to inspect.</param>
@@ -408,7 +423,28 @@ public static class Helpers
 	#region Helpers concerning Events
 
 	/// <summary>
-	/// Tests an event that has been implemented using the <see cref="TestEventImplementation"/> implementation strategy.
+	/// Asserts that the specified event name generated the correct actual event name.
+	/// </summary>
+	/// <param name="name">Name of the event (<c>null</c> to generate a random name).</param>
+	/// <param name="actualName">The actual event name.</param>
+	/// <returns><paramref name="actualName"/> if it complies with expected <paramref name="name"/>.</returns>
+	public static string AssertEventName(string name, string actualName)
+	{
+		if (name != null)
+		{
+			// name has been specified explicitly
+			Assert.Equal(name, actualName);
+			return actualName;
+		}
+
+		// name has not been specified explicitly
+		// => random name is expected to be used
+		Assert.Matches("^Event_[0-9a-f]{32}$", actualName);
+		return actualName;
+	}
+
+	/// <summary>
+	/// Tests an event that has been implemented using the <see cref="Tests.TestEventImplementation"/> implementation strategy.
 	/// </summary>
 	/// <param name="definition">Type definition the event to test belongs to.</param>
 	/// <param name="instance">Instance of the dynamically created type that contains the event.</param>
@@ -434,7 +470,7 @@ public static class Helpers
 	/// <param name="expectedEventRaiserName">Expected name of the added event raiser method.</param>
 	/// <param name="expectedEventRaiserReturnType">The expected return type of the event raiser method, if any.</param>
 	/// <param name="expectedEventRaiserParameterTypes">The expected parameter types of the event raiser method, if any.</param>
-	public static void TestEventImplementation_Standard(
+	public static void TestEventImplementation(
 		TypeDefinition definition,
 		object         instance,
 		string         eventName,
@@ -596,7 +632,7 @@ public static class Helpers
 		// add event handler to the event and raise it
 		// => the handler should be called
 		handlerWasCalled = false;
-		generatedEvent.AddMethod.Invoke(instance, [handler]);
+		generatedEvent.AddMethod!.Invoke(instance, [handler]);
 		object actualHandlerReturnValue = eventRaiserMethod.Invoke(instance, eventRaiserArguments);
 		Assert.True(handlerWasCalled);
 		Assert.Equal(expectedReturnValue, actualHandlerReturnValue);
@@ -604,7 +640,7 @@ public static class Helpers
 		// remove the event handler from the event and raise it
 		// => the handler should not be called anymore
 		handlerWasCalled = false;
-		generatedEvent.RemoveMethod.Invoke(instance, [handler]);
+		generatedEvent.RemoveMethod!.Invoke(instance, [handler]);
 		eventRaiserMethod.Invoke(instance, eventRaiserArguments);
 		Assert.False(handlerWasCalled);
 	}
@@ -749,11 +785,9 @@ public static class Helpers
 		ILGenerator      msilGenerator)
 	{
 		Assert.Same(msilGenerator, methodToImplement.MethodBuilder.GetILGenerator());
-		Assert.Equal(typeof(EventHandler<EventArgs>), eventDefinition.EventHandlerType); // only EventHandler<EventArgs> is supported in tests!
+		Assert.Equal(typeof(EventHandler), eventDefinition.EventHandlerType); // only EventHandler is supported in tests!
 
-		// the event type is System.EventHandler<EventArgs>
-		// => the event raiser will have the signature: void OnEvent()
-		FieldInfo eventArgsEmpty = typeof(EventArgs).GetField(nameof(EventArgs.Empty));
+		FieldInfo eventArgsEmpty = typeof(EventArgs).GetField("Empty");
 		Debug.Assert(eventArgsEmpty != null);
 		LocalBuilder handlerLocalBuilder = msilGenerator.DeclareLocal(backingFieldBuilder.FieldType);
 		Label label = msilGenerator.DefineLabel();
@@ -765,7 +799,8 @@ public static class Helpers
 			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
 			msilGenerator.Emit(OpCodes.Brfalse_S, label);
 			msilGenerator.Emit(OpCodes.Ldloc, handlerLocalBuilder);
-			msilGenerator.Emit(OpCodes.Ldnull); // load sender (null)
+			msilGenerator.Emit(OpCodes.Ldnull);                 // load sender (null)
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
 		}
 		else
 		{
@@ -781,13 +816,11 @@ public static class Helpers
 				msilGenerator.Emit(OpCodes.Ldobj, methodToImplement.TypeDefinition.TypeBuilder);
 				msilGenerator.Emit(OpCodes.Box, methodToImplement.TypeDefinition.TypeBuilder);
 			}
+
+			msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty); // load event arguments
 		}
 
-		// load event arguments
-		msilGenerator.Emit(OpCodes.Ldsfld, eventArgsEmpty);
-
-		// invoke the event
-		MethodInfo invokeMethod = backingFieldBuilder.FieldType.GetMethod(nameof(EventHandler<EventArgs>.Invoke));
+		MethodInfo invokeMethod = backingFieldBuilder.FieldType.GetMethod("Invoke");
 		Debug.Assert(invokeMethod != null, nameof(invokeMethod) + " != null");
 		msilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
 		msilGenerator.MarkLabel(label);
@@ -797,6 +830,27 @@ public static class Helpers
 	#endregion
 
 	#region Helpers concerning Properties
+
+	/// <summary>
+	/// Asserts that the specified property name generated the correct actual property name.
+	/// </summary>
+	/// <param name="name">Name of the property (<c>null</c> to generate a random name).</param>
+	/// <param name="actualName">The actual property name.</param>
+	/// <returns><paramref name="actualName"/> if it complies with expected <paramref name="name"/>.</returns>
+	public static string AssertPropertyName(string name, string actualName)
+	{
+		if (name != null)
+		{
+			// name has been specified explicitly
+			Assert.Equal(name, actualName);
+			return actualName;
+		}
+
+		// name has not been specified explicitly
+		// => random name is expected to be used
+		Assert.Matches("^Property_[0-9a-f]{32}$", actualName);
+		return actualName;
+	}
 
 	/// <summary>
 	/// Tests a property that has been implemented using the <see cref="PropertyImplementation_TestDataStorage"/> implementation strategy.
@@ -814,8 +868,8 @@ public static class Helpers
 		TypeDefinition definition,
 		object         instance,
 		string         propertyName,
-		Visibility     expectedGetAccessorVisibility,
-		Visibility     expectedSetAccessorVisibility,
+		Visibility?    expectedGetAccessorVisibility,
+		Visibility?    expectedSetAccessorVisibility,
 		PropertyKind   expectedPropertyKind,
 		Type           expectedPropertyType,
 		object[]       testObjects,
@@ -882,12 +936,190 @@ public static class Helpers
 		AssertGeneratedMethodCompliesToTheDefinition(propertyDefinition.SetAccessor, setAccessorMethod);
 	}
 
+	/// <summary>
+	/// Emits MSIL code for a 'get' accessor method that returns the value of a test data object from the <see cref="TestDataStorage"/>.
+	/// </summary>
+	/// <param name="property">Property to implement the accessor for.</param>
+	/// <param name="handle">Handle to the test data object.</param>
+	/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'get' accessor method.</param>
+	public static void EmitPropertyGetAccessorWithTestDataStorageCallback(
+		IProperty   property,
+		int         handle,
+		ILGenerator msilGenerator)
+	{
+		MethodInfo testDataStorage_get = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Get));
+		Debug.Assert(testDataStorage_get != null, nameof(testDataStorage_get) + " != null");
+		msilGenerator.Emit(OpCodes.Ldc_I4, handle);
+		msilGenerator.Emit(OpCodes.Call, testDataStorage_get);
+		msilGenerator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+		msilGenerator.Emit(OpCodes.Ret);
+	}
+
+	/// <summary>
+	/// Emits MSIL code for a 'set' accessor method that changes the value of a test data object in the <see cref="TestDataStorage"/>.
+	/// </summary>
+	/// <param name="property">Property to implement the accessor for.</param>
+	/// <param name="handle">Handle to the test data object.</param>
+	/// <param name="msilGenerator">MSIL generator to use when emitting code for the 'set' accessor method.</param>
+	public static void EmitPropertySetAccessorWithTestDataStorageCallback(
+		IProperty   property,
+		int         handle,
+		ILGenerator msilGenerator)
+	{
+		msilGenerator.Emit(OpCodes.Ldc_I4, handle);
+		msilGenerator.Emit(property.Kind == PropertyKind.Static ? OpCodes.Ldarg_0 : OpCodes.Ldarg_1);
+		if (property.PropertyType.IsValueType) msilGenerator.Emit(OpCodes.Box, property.PropertyType);
+		MethodInfo testDataStorage_set = typeof(TestDataStorage).GetMethod(nameof(TestDataStorage.Set));
+		Debug.Assert(testDataStorage_set != null, nameof(testDataStorage_set) + " != null");
+		msilGenerator.Emit(OpCodes.Call, testDataStorage_set);
+		msilGenerator.Emit(OpCodes.Ret);
+	}
+
 	#endregion
 
 	#region Helpers concerning Methods
 
 	/// <summary>
-	/// Tests a method that has been implemented using the <see cref="IncrementMethodImplementation"/> implementation strategy.
+	/// Asserts that the specified method name generated the correct actual method name.
+	/// </summary>
+	/// <param name="name">Name of the method (<c>null</c> to generate a random name).</param>
+	/// <param name="actualName">The actual method name.</param>
+	/// <returns><paramref name="actualName"/> if it complies with expected <paramref name="name"/>.</returns>
+	public static string AssertMethodName(string name, string actualName)
+	{
+		if (name != null)
+		{
+			// name has been specified explicitly
+			Assert.Equal(name, actualName);
+			return actualName;
+		}
+
+		// name has not been specified explicitly
+		// => random name is expected to be used
+		Assert.Matches("^Method_[0-9a-f]{32}$", actualName);
+		return actualName;
+	}
+
+	/// <summary>
+	/// returns test arguments and the expected return value of a method implemented with <see cref="TestMethodImplementation"/>
+	/// or <see cref="TestMethodImplementation.Callback"/>.
+	/// </summary>
+	/// <param name="type">Type of the method parameters and the return type (must be all the same).</param>
+	/// <param name="parameterCount">Number of parameters of the method to test.</param>
+	/// <param name="parameterTypes">Array with <paramref name="parameterCount"/> elements containing <paramref name="type"/>.</param>
+	/// <param name="testArguments">Receives the arguments to pass to the method to test.</param>
+	/// <param name="expectedTestResult">Receives the object the method to test is expected to return.</param>
+	/// <exception cref="NotSupportedException"></exception>
+	public static void CreateMethodTestData(
+		Type         type,
+		int          parameterCount,
+		out Type[]   parameterTypes,
+		out object[] testArguments,
+		out object   expectedTestResult)
+	{
+		// prepare some arguments for testing the method
+		// (all parameter types and the return type must be the same type, otherwise the simple implementation crashes...)
+		parameterTypes = new Type[parameterCount];
+		testArguments = new object[parameterCount];
+		if (type == typeof(int))
+		{
+			expectedTestResult = default(int);
+			for (int i = 0; i < parameterCount; i++)
+			{
+				parameterTypes[i] = type;
+				testArguments[i] = i + 1; // skip default value
+			}
+		}
+		else if (type == typeof(long))
+		{
+			expectedTestResult = default(long);
+			for (int i = 0; i < parameterCount; i++)
+			{
+				parameterTypes[i] = type;
+				testArguments[i] = (long)(i + 1); // skip default value
+			}
+		}
+		else if (type == typeof(string))
+		{
+			expectedTestResult = default(string);
+			for (int i = 0; i < parameterCount; i++)
+			{
+				parameterTypes[i] = type;
+				testArguments[i] = i.ToString();
+			}
+		}
+		else
+		{
+			throw new NotSupportedException($"Test arguments for type {type.FullName} are not available. Add them above.");
+		}
+
+		expectedTestResult = testArguments.Length > 0
+			                     ? testArguments[^1]
+			                     : expectedTestResult;
+	}
+
+	/// <summary>
+	/// Tests adding a method to the specified type definition.
+	/// </summary>
+	/// <param name="definition">Type definition the property to test belongs to.</param>
+	/// <param name="expectedKind">The expected kind of the method added by <paramref name="addMethodAction"/>.</param>
+	/// <param name="expectedName">The expected name of the method added by <paramref name="addMethodAction"/>.</param>
+	/// <param name="expectedReturnType">The expected return type of method added by <paramref name="addMethodAction"/>.</param>
+	/// <param name="expectedParameterTypes">The expected parameter types of the method added by <paramref name="addMethodAction"/>.</param>
+	/// <param name="expectedVisibility">The expected visibility of the method added by <paramref name="addMethodAction"/>.</param>
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	/// <param name="addMethodAction">Callback that actually adds the method to the type definition.</param>
+	public static void TestAddMethod(
+		TypeDefinition         definition,
+		MethodKind             expectedKind,
+		string                 expectedName,
+		Type                   expectedReturnType,
+		Type[]                 expectedParameterTypes,
+		Visibility             expectedVisibility,
+		object[]               testArguments,
+		object                 expectedTestResult,
+		Func<IGeneratedMethod> addMethodAction)
+	{
+		// add the method to the definition
+		IGeneratedMethod addedMethod = addMethodAction();
+		Assert.NotNull(addedMethod);
+		expectedName = AssertMethodName(expectedName, addedMethod.Name);
+		Assert.Equal(expectedKind, addedMethod.Kind);
+		Assert.Equal(expectedReturnType, addedMethod.ReturnType);
+		Assert.Equal(expectedParameterTypes, addedMethod.ParameterTypes);
+		Assert.Equal(expectedVisibility, addedMethod.Visibility);
+		Assert.Equal((MethodAttributes)0, addedMethod.AdditionalAttributes);
+		Assert.Equal(
+			expectedVisibility.ToMethodAttributes() | expectedKind.ToMethodAttributes(),
+			addedMethod.Attributes);
+
+		// create the defined type, check the result against the definition
+		Type type = definition.CreateType();
+		CheckTypeAgainstDefinition(type, definition);
+
+		// abort if the added method (and therefore the declaring type) is abstract
+		if (expectedKind == MethodKind.Abstract)
+			return;
+
+		// create an instance of the type
+		object instance = Activator.CreateInstance(type);
+
+		// test the method implementation
+		TestMethodImplementation(
+			definition,             // type definition with the method to test
+			instance,               // instance of the test class providing the method to test
+			expectedName,           // name of the method to test
+			expectedKind,           // expected kind of the method
+			expectedVisibility,     // expected visibility of the method
+			expectedReturnType,     // expected return type of the method
+			expectedParameterTypes, // expected parameter types of the method
+			testArguments,          // arguments to pass to the method when testing it
+			expectedTestResult);    // result the tested method is expected to return
+	}
+
+	/// <summary>
+	/// Tests a method that has been implemented using the <see cref="TestMethodImplementation"/> implementation strategy.
 	/// </summary>
 	/// <param name="definition">Type definition the property to test belongs to.</param>
 	/// <param name="instance">Instance of the dynamically created type that contains the method.</param>
@@ -896,14 +1128,18 @@ public static class Helpers
 	/// <param name="expectedVisibility">The expected visibility of the generated method.</param>
 	/// <param name="expectedReturnType">The expected return type of the generated method.</param>
 	/// <param name="expectedParameterTypes">The expected parameter types of the generated method.</param>
-	public static void TestMethodImplementation_Increment(
+	/// <param name="testArguments">Arguments to pass to the method when testing it.</param>
+	/// <param name="expectedTestResult">Expected result returned by the method when testing it.</param>
+	public static void TestMethodImplementation(
 		TypeDefinition definition,
 		object         instance,
 		string         methodName,
 		MethodKind     expectedMethodKind,
 		Visibility     expectedVisibility,
 		Type           expectedReturnType,
-		Type[]         expectedParameterTypes)
+		Type[]         expectedParameterTypes,
+		object[]       testArguments,
+		object         expectedTestResult)
 	{
 		// get the type of the generated instance
 		Type generatedType = instance.GetType();
@@ -917,6 +1153,10 @@ public static class Helpers
 				          method.ParameterTypes.SequenceEqual(expectedParameterTypes));
 		Assert.NotNull(methodDefinition);
 
+		// the test assumes that all parameters and the return type are the same
+		// (otherwise the simple implementation crashes...)
+		Assert.All(methodDefinition.ParameterTypes, type => Assert.Equal(expectedReturnType, type));
+
 		// check whether the method has been created as defined
 		MethodInfo generatedMethod = generatedType
 			.GetMethods(ExactDeclaredOnlyBindingFlags)
@@ -929,12 +1169,9 @@ public static class Helpers
 		if (methodDefinition.Kind == MethodKind.Abstract)
 			return;
 
-		// invoke the generated method
-		// (it just increments the specified value by 1)
-		const int inputValue = 1;
-		object result = generatedMethod.Invoke(instance, [inputValue]);
-		Assert.IsType<int>(result);
-		Assert.Equal(inputValue + 1, result);
+		// generate some arguments and invoke the generated method
+		object result = generatedMethod.Invoke(instance, testArguments);
+		Assert.Equal(expectedTestResult, result);
 	}
 
 	/// <summary>
