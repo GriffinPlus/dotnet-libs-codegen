@@ -327,532 +327,252 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		get
 		{
+			// ------------------------------------------------------------------------------------
+			// different field names
+			// ------------------------------------------------------------------------------------
+
 			foreach (string name in FieldNames)
+			{
+				yield return
+				[
+					name,
+					Visibility.Public,
+					typeof(int),
+					0
+				];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different visibilities
+			// ------------------------------------------------------------------------------------
+
 			foreach (Visibility visibility in Visibilities)
 			{
-				yield return [name, visibility, typeof(int), 0];       // value type
-				yield return [name, visibility, typeof(string), null]; // reference type
+				// skip test case covered above
+				if (visibility == Visibility.Public)
+					continue;
+
+				yield return
+				[
+					null,
+					visibility,
+					typeof(int),
+					0
+				];
 			}
+
+			// ------------------------------------------------------------------------------------
+			// different types
+			// ------------------------------------------------------------------------------------
+
+			//// value type (covered above)
+			//yield return
+			//[
+			//	null,
+			//	Visibility.Public,
+			//	typeof(int),
+			//	0
+			//];
+
+			// reference type
+			yield return
+			[
+				null,
+				Visibility.Public,
+				typeof(string),
+				null
+			];
 		}
 	}
 
 	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="bool"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Boolean
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Boolean
-				yield return [name, visibility, false]; // should emit OpCodes.Ldc_I4_0
-				yield return [name, visibility, true];  // should emit OpCodes.Ldc_I4_1
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="char"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Char
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Char
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (char)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (char)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, char.MaxValue];                        // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="sbyte"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_SByte
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.SByte
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (sbyte)-1];                             // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (sbyte)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, sbyte.MinValue];                        // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, sbyte.MaxValue];                        // should emit OpCodes.Ldc_I4_S
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="byte"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Byte
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Byte
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (byte)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (byte)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, byte.MaxValue];                        // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="short"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int16
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Int16
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (short)-1];                             // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (short)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (short)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (short)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, short.MinValue];                        // should emit OpCodes.Ldc_I4
-				yield return [name, visibility, short.MaxValue];                        // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="ushort"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt16
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.UInt16
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (ushort)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (ushort)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, ushort.MaxValue];                        // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="int"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int32
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Int32
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, -1];                             // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (int)sbyte.MinValue];            // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (int)sbyte.MaxValue];            // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, int.MinValue];                   // should emit OpCodes.Ldc_I4
-				yield return [name, visibility, int.MaxValue];                   // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="uint"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt32
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.UInt32
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (uint)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (uint)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, uint.MaxValue];                        // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="long"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Int64
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.Int64
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (long)-1];                             // should emit OpCodes.Ldc_I4_M1 followed by OpCodes.Conv_I8
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (long)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
-				yield return [name, visibility, (long)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (long)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (long)int.MinValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, (long)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, long.MinValue];                        // should emit OpCodes.Ldc_I8
-				yield return [name, visibility, long.MaxValue];                        // should emit OpCodes.Ldc_I8
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="ulong"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_UInt64
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// System.UInt64
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (ulong)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
-				yield return [name, visibility, (ulong)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (ulong)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, ulong.MaxValue];                        // should emit OpCodes.Ldc_I8
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumS8"/>, an enumeration type backed by <see cref="sbyte"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_SByte
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.SByte
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (TestEnumS8)(-1)];                           // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumS8)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumS8)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumS8)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumU8"/>, an enumeration type backed by <see cref="byte"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Byte
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.Byte
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumU8)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumU8)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumU8)byte.MaxValue];                  // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumS16"/>, an enumeration type backed by <see cref="short"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int16
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.Int16
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (TestEnumS16)(-1)];                           // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumS16)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumS16)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumS16)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumS16)short.MinValue];                 // should emit OpCodes.Ldc_I4
-				yield return [name, visibility, (TestEnumS16)short.MaxValue];                 // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumU16"/>, an enumeration type backed by <see cref="ushort"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt16
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.UInt16
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumU16)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumU16)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumU16)ushort.MaxValue];                // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumS32"/>, an enumeration type backed by <see cref="int"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int32
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.Int32
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (TestEnumS32)(-1)];                           // should emit OpCodes.Ldc_I4_M1
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumS32)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumS32)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumS32)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumS32)int.MinValue];                   // should emit OpCodes.Ldc_I4
-				yield return [name, visibility, (TestEnumS32)int.MaxValue];                   // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumU32"/>, an enumeration type backed by <see cref="uint"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt32
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.UInt32
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumU32)i]; // should emit OpCodes.Ldc_I4_{0..8}
-				yield return [name, visibility, (TestEnumU32)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
-				yield return [name, visibility, (TestEnumU32)uint.MaxValue];                  // should emit OpCodes.Ldc_I4
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumS64"/>, an enumeration type backed by <see cref="long"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_Int64
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.Int64
-				// (field initializers have optimizations for small integers)
-				yield return [name, visibility, (TestEnumS64)(-1)];                           // should emit OpCodes.Ldc_I4_M1 followed by OpCodes.Conv_I8
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumS64)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumS64)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumS64)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumS64)int.MinValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumS64)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumS64)long.MinValue];                  // should emit OpCodes.Ldc_I8
-				yield return [name, visibility, (TestEnumS64)long.MaxValue];                  // should emit OpCodes.Ldc_I8
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting
-	/// <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/>,
-	/// <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/>,
-	/// <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> and
-	/// <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/>
-	/// with field type <see cref="TestEnumU64"/>, an enumeration type backed by <see cref="ulong"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Enum_UInt64
-	{
-		get
-		{
-			foreach (string name in FieldNames)
-			foreach (Visibility visibility in Visibilities)
-			{
-				// enumeration with underlying type System.UInt64
-				// (field initializers have optimizations for small integers)
-				for (int i = 0; i <= 8; i++) yield return [name, visibility, (TestEnumU64)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumU64)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumU64)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
-				yield return [name, visibility, (TestEnumU64)ulong.MaxValue];                 // should emit OpCodes.Ldc_I8
-			}
-		}
-	}
-
-	/// <summary>
-	/// Test data for tests targeting...<br/>
+	/// Test data for tests targeting the following methods:<br/>
 	/// - <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/><br/>
 	/// - <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/><br/>
 	/// - <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/><br/>
 	/// - <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/><br/>
-	/// ... with field type <see cref="System.Single"/>. This should emit <see cref="OpCodes.Ldc_R4"/>.
+	/// with different field types.
 	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Single =>
-		from name in FieldNames
-		from visibility in Visibilities
-		select (object[]) [name, visibility, 0.5f];
-
-	/// <summary>
-	/// Test data for tests targeting...<br/>
-	/// - <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/><br/>
-	/// ... with field type <see cref="System.Double"/>. This should emit <see cref="OpCodes.Ldc_R8"/>.
-	/// </summary>
-
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_Double =>
-		from name in FieldNames
-		from visibility in Visibilities
-		select (object[]) [name, visibility, 0.5];
-
-	/// <summary>
-	/// Test data for tests targeting...<br/>
-	/// - <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/><br/>
-	/// ... with field type <see cref="System.String"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_String
+	public static IEnumerable<object[]> AddFieldTestData_InitialValue
 	{
 		get
 		{
+			// ------------------------------------------------------------------------------------
+			// different field names
+			// ------------------------------------------------------------------------------------
+
 			foreach (string name in FieldNames)
+			{
+				// skip test case covered below...
+				if (name == null)
+					continue;
+
+				yield return [name, Visibility.Public, typeof(int), 0];
+			}
+
+			// ------------------------------------------------------------------------------------
+			// different visibilities
+			// ------------------------------------------------------------------------------------
+
 			foreach (Visibility visibility in Visibilities)
 			{
-				// System.String
-				yield return [name, visibility, "just-a-string"];
-				yield return [name, visibility, null];
+				// skip test case covered below
+				if (visibility == Visibility.Public)
+					continue;
+
+				yield return [null, visibility, typeof(int), 0];
 			}
+
+			// ------------------------------------------------------------------------------------
+			// different types and initial values
+			// ------------------------------------------------------------------------------------
+
+			// System.Boolean
+			yield return [null, Visibility.Public, typeof(bool), false]; // should emit OpCodes.Ldc_I4_0
+			yield return [null, Visibility.Public, typeof(bool), true];  // should emit OpCodes.Ldc_I4_1
+
+			// System.Char
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(char), (char)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(char), (char)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(char), char.MaxValue];                        // should emit OpCodes.Ldc_I4
+
+			// System.SByte
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(sbyte), (sbyte)-1];                             // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(sbyte), (sbyte)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(sbyte), sbyte.MinValue];                        // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(sbyte), sbyte.MaxValue];                        // should emit OpCodes.Ldc_I4_S
+
+			// System.Byte
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(byte), (byte)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(byte), (byte)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(byte), byte.MaxValue];                        // should emit OpCodes.Ldc_I4
+
+			// System.Int16
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(short), (short)-1];                             // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(short), (short)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(short), (short)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(short), (short)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(short), short.MinValue];                        // should emit OpCodes.Ldc_I4
+			yield return [null, Visibility.Public, typeof(short), short.MaxValue];                        // should emit OpCodes.Ldc_I4
+
+			// System.UInt16
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(ushort), (ushort)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(ushort), (ushort)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(ushort), ushort.MaxValue];                        // should emit OpCodes.Ldc_I4
+
+			// System.Int32
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(int), -1];                             // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(int), i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(int), (int)sbyte.MinValue];            // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(int), (int)sbyte.MaxValue];            // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(int), int.MinValue];                   // should emit OpCodes.Ldc_I4
+			yield return [null, Visibility.Public, typeof(int), int.MaxValue];                   // should emit OpCodes.Ldc_I4
+
+			// System.UInt32
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(uint), (uint)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(uint), (uint)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(uint), uint.MaxValue];                        // should emit OpCodes.Ldc_I4
+
+			// System.Int64
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(long), (long)-1];                             // should emit OpCodes.Ldc_I4_M1 followed by OpCodes.Conv_I8
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(long), (long)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(long), (long)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(long), (long)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(long), (long)int.MinValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(long), (long)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(long), long.MinValue];                        // should emit OpCodes.Ldc_I8
+			yield return [null, Visibility.Public, typeof(long), long.MaxValue];                        // should emit OpCodes.Ldc_I8
+
+			// System.UInt64
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(ulong), (ulong)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(ulong), (ulong)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(ulong), (ulong)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(ulong), ulong.MaxValue];                        // should emit OpCodes.Ldc_I8
+
+			// enumeration with underlying type System.SByte
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(TestEnumS8), (TestEnumS8)(-1)];                           // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumS8), (TestEnumS8)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumS8), (TestEnumS8)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumS8), (TestEnumS8)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+
+			// enumeration with underlying type System.Byte
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumU8), (TestEnumU8)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumU8), (TestEnumU8)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumU8), (TestEnumU8)byte.MaxValue];                  // should emit OpCodes.Ldc_I4
+
+			// enumeration with underlying type System.Int16
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)(-1)];                           // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)short.MinValue];                 // should emit OpCodes.Ldc_I4
+			yield return [null, Visibility.Public, typeof(TestEnumS16), (TestEnumS16)short.MaxValue];                 // should emit OpCodes.Ldc_I4
+
+			// enumeration with underlying type System.UInt16
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumU16), (TestEnumU16)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumU16), (TestEnumU16)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumU16), (TestEnumU16)ushort.MaxValue];                // should emit OpCodes.Ldc_I4
+
+			// enumeration with underlying type System.Int32
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)(-1)];                           // should emit OpCodes.Ldc_I4_M1
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)int.MinValue];                   // should emit OpCodes.Ldc_I4
+			yield return [null, Visibility.Public, typeof(TestEnumS32), (TestEnumS32)int.MaxValue];                   // should emit OpCodes.Ldc_I4
+
+			// enumeration with underlying type System.UInt32
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumU32), (TestEnumU32)i]; // should emit OpCodes.Ldc_I4_{0..8}
+			yield return [null, Visibility.Public, typeof(TestEnumU32), (TestEnumU32)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S
+			yield return [null, Visibility.Public, typeof(TestEnumU32), (TestEnumU32)uint.MaxValue];                  // should emit OpCodes.Ldc_I4
+
+			// enumeration with underlying type System.Int64
+			// (field initializers have optimizations for small integers)
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)(-1)];                           // should emit OpCodes.Ldc_I4_M1 followed by OpCodes.Conv_I8
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)sbyte.MinValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)int.MinValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)long.MinValue];                  // should emit OpCodes.Ldc_I8
+			yield return [null, Visibility.Public, typeof(TestEnumS64), (TestEnumS64)long.MaxValue];                  // should emit OpCodes.Ldc_I8
+
+			// enumeration with underlying type System.UInt64
+			// (field initializers have optimizations for small integers)
+			for (int i = 0; i <= 8; i++) yield return [null, Visibility.Public, typeof(TestEnumU64), (TestEnumU64)i]; // should emit OpCodes.Ldc_I4_{0..8} followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumU64), (TestEnumU64)sbyte.MaxValue];                 // should emit OpCodes.Ldc_I4_S followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumU64), (TestEnumU64)int.MaxValue];                   // should emit OpCodes.Ldc_I4 followed by OpCodes.Conv_I8
+			yield return [null, Visibility.Public, typeof(TestEnumU64), (TestEnumU64)ulong.MaxValue];                 // should emit OpCodes.Ldc_I8
+
+			// System.Single
+			yield return [null, Visibility.Public, typeof(float), 0.5f]; // should emit OpCodes.Ldc_R4
+
+			// System.Double
+			yield return [null, Visibility.Public, typeof(double), 0.5]; // should emit OpCodes.Ldc_R8
+
+			// System.String
+			yield return [null, Visibility.Public, typeof(string), "just-a-string"];
+			yield return [null, Visibility.Public, typeof(string), null];
+
+			// System.DateTime
+			yield return [null, Visibility.Public, typeof(DateTime), DateTime.Now];
 		}
 	}
-
-	/// <summary>
-	/// Test data for tests targeting...<br/>
-	/// - <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/><br/>
-	/// - <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/><br/>
-	/// ... with field type <see cref="System.DateTime"/>.
-	/// </summary>
-	public static IEnumerable<object[]> AddFieldTestData_InitialValue_DateTime =>
-		from name in FieldNames
-		from visibility in Visibilities
-		select (object[]) [name, visibility, DateTime.Now];
 
 	/// <summary>
 	/// Test data for tests targeting...<br/>
@@ -1058,15 +778,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility]);
+		IGeneratedField addedField = definition.AddField(fieldType, name, visibility);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -1150,15 +862,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility]);
+		IGeneratedField addedField = definition.AddStaticField(fieldType, name, visibility);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -1179,238 +883,20 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#region AddField<T>(string name, Visibility visibility, T initialValue)
 
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddFieldT_WithInitialValue_Boolean(
-		string     name,
-		Visibility visibility,
-		bool       initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddFieldT_WithInitialValue_Char(
-		string     name,
-		Visibility visibility,
-		char       initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddFieldT_WithInitialValue_SByte(
-		string     name,
-		Visibility visibility,
-		sbyte      initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddFieldT_WithInitialValue_Byte(
-		string     name,
-		Visibility visibility,
-		byte       initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddFieldT_WithInitialValue_Int16(
-		string     name,
-		Visibility visibility,
-		short      initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddFieldT_WithInitialValue_UInt16(
-		string     name,
-		Visibility visibility,
-		ushort     initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddFieldT_WithInitialValue_Int32(
-		string     name,
-		Visibility visibility,
-		int        initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddFieldT_WithInitialValue_UInt32(
-		string     name,
-		Visibility visibility,
-		uint       initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddFieldT_WithInitialValue_Int64(
-		string     name,
-		Visibility visibility,
-		long       initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddFieldT_WithInitialValue_UInt64(
-		string     name,
-		Visibility visibility,
-		ulong      initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddFieldT_WithInitialValue_Enum_Byte(
-		string     name,
-		Visibility visibility,
-		TestEnumS8 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddFieldT_WithInitialValue_Enum_SByte(
-		string     name,
-		Visibility visibility,
-		TestEnumU8 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddFieldT_WithInitialValue_Enum_Int16(
-		string      name,
-		Visibility  visibility,
-		TestEnumS16 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddFieldT_WithInitialValue_Enum_UInt16(
-		string      name,
-		Visibility  visibility,
-		TestEnumU16 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddFieldT_WithInitialValue_Enum_Int32(
-		string      name,
-		Visibility  visibility,
-		TestEnumS32 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddFieldT_WithInitialValue_Enum_UInt32(
-		string      name,
-		Visibility  visibility,
-		TestEnumU32 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddFieldT_WithInitialValue_Enum_Int64(
-		string      name,
-		Visibility  visibility,
-		TestEnumS64 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddFieldT_WithInitialValue_Enum_UInt64(
-		string      name,
-		Visibility  visibility,
-		TestEnumU64 initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddFieldT_WithInitialValue_Single(
-		string     name,
-		Visibility visibility,
-		float      initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddFieldT_WithInitialValue_Double(
-		string     name,
-		Visibility visibility,
-		double     initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddFieldT_WithInitialValue_String(
-		string     name,
-		Visibility visibility,
-		string     initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddFieldT_WithInitialValue_DateTime(
-		string     name,
-		Visibility visibility,
-		DateTime   initialValue)
-	{
-		AddFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> method
-	/// (common part, type specific tests methods run the tests).
+	/// Tests the <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> method.
 	/// </summary>
-	/// <typeparam name="TFieldType">Type of the field to add.</typeparam>
 	/// <param name="name">Name of the field to add.</param>
+	/// <param name="fieldType">Type of the field to add.</param>
 	/// <param name="visibility">Visibility of the field to add.</param>
 	/// <param name="initialValue">The initial value of the field to set.</param>
-	private void AddFieldT_WithInitialValue<TFieldType>(
+	[Theory]
+	[MemberData(nameof(AddFieldTestData_InitialValue))]
+	public void AddFieldT_WithInitialValue(
 		string     name,
 		Visibility visibility,
-		TFieldType initialValue)
+		Type       fieldType,
+		object     initialValue)
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
@@ -1418,8 +904,8 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 			.Where(method => method.Name == nameof(TypeDefinition.AddField))
 			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
-			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), typeof(TFieldType)]));
+			.Select(method => method.MakeGenericMethod(fieldType))
+			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), fieldType]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -1439,251 +925,24 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#region AddField(Type type, string name, Visibility visibility, object initialValue)
 
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddField_WithInitialValue_Boolean(
-		string     name,
-		Visibility visibility,
-		bool       initialValue)
-	{
-		AddField_WithInitialValue(typeof(bool), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddField_WithInitialValue_Char(
-		string     name,
-		Visibility visibility,
-		char       initialValue)
-	{
-		AddField_WithInitialValue(typeof(char), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddField_WithInitialValue_SByte(
-		string     name,
-		Visibility visibility,
-		sbyte      initialValue)
-	{
-		AddField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddField_WithInitialValue_Byte(
-		string     name,
-		Visibility visibility,
-		byte       initialValue)
-	{
-		AddField_WithInitialValue(typeof(byte), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddField_WithInitialValue_Int16(
-		string     name,
-		Visibility visibility,
-		short      initialValue)
-	{
-		AddField_WithInitialValue(typeof(short), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddField_WithInitialValue_UInt16(
-		string     name,
-		Visibility visibility,
-		ushort     initialValue)
-	{
-		AddField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddField_WithInitialValue_Int32(
-		string     name,
-		Visibility visibility,
-		int        initialValue)
-	{
-		AddField_WithInitialValue(typeof(int), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddField_WithInitialValue_UInt32(
-		string     name,
-		Visibility visibility,
-		uint       initialValue)
-	{
-		AddField_WithInitialValue(typeof(uint), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddField_WithInitialValue_Int64(
-		string     name,
-		Visibility visibility,
-		long       initialValue)
-	{
-		AddField_WithInitialValue(typeof(long), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddField_WithInitialValue_UInt64(
-		string     name,
-		Visibility visibility,
-		ulong      initialValue)
-	{
-		AddField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddField_WithInitialValue_Enum_Byte(
-		string     name,
-		Visibility visibility,
-		TestEnumS8 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddField_WithInitialValue_Enum_SByte(
-		string     name,
-		Visibility visibility,
-		TestEnumU8 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddField_WithInitialValue_Enum_Int16(
-		string      name,
-		Visibility  visibility,
-		TestEnumS16 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddField_WithInitialValue_Enum_UInt16(
-		string      name,
-		Visibility  visibility,
-		TestEnumU16 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddField_WithInitialValue_Enum_Int32(
-		string      name,
-		Visibility  visibility,
-		TestEnumS32 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddField_WithInitialValue_Enum_UInt32(
-		string      name,
-		Visibility  visibility,
-		TestEnumU32 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddField_WithInitialValue_Enum_Int64(
-		string      name,
-		Visibility  visibility,
-		TestEnumS64 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddField_WithInitialValue_Enum_UInt64(
-		string      name,
-		Visibility  visibility,
-		TestEnumU64 initialValue)
-	{
-		AddField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddField_WithInitialValue_Single(
-		string     name,
-		Visibility visibility,
-		float      initialValue)
-	{
-		AddField_WithInitialValue(typeof(float), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddField_WithInitialValue_Double(
-		string     name,
-		Visibility visibility,
-		double     initialValue)
-	{
-		AddField_WithInitialValue(typeof(double), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddField_WithInitialValue_String(
-		string     name,
-		Visibility visibility,
-		string     initialValue)
-	{
-		AddField_WithInitialValue(typeof(string), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddField_WithInitialValue_DateTime(
-		string     name,
-		Visibility visibility,
-		DateTime   initialValue)
-	{
-		AddField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
-	}
-
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddField(Type,string,Visibility,object)"/> method
-	/// (common part, type specific tests methods run the tests).
+	/// Tests the <see cref="TypeDefinition.AddField{T}(string,Visibility,T)"/> method.
 	/// </summary>
-	/// <param name="fieldType">Type of the field to add.</param>
 	/// <param name="name">Name of the field to add.</param>
+	/// <param name="fieldType">Type of the field to add.</param>
 	/// <param name="visibility">Visibility of the field to add.</param>
 	/// <param name="initialValue">The initial value of the field to set.</param>
-	private void AddField_WithInitialValue(
-		Type       fieldType,
+	[Theory]
+	[MemberData(nameof(AddFieldTestData_InitialValue))]
+	public void AddField_WithInitialValue(
 		string     name,
 		Visibility visibility,
+		Type       fieldType,
 		object     initialValue)
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(object)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initialValue]);
+		IGeneratedField addedField = definition.AddField(fieldType, name, visibility, initialValue);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -1702,238 +961,20 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#region AddStaticField<T>(string name, Visibility visibility, T initialValue)
 
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddStaticFieldT_WithInitialValue_Boolean(
-		string     name,
-		Visibility visibility,
-		bool       initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddStaticFieldT_WithInitialValue_Char(
-		string     name,
-		Visibility visibility,
-		char       initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddStaticFieldT_WithInitialValue_SByte(
-		string     name,
-		Visibility visibility,
-		sbyte      initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddStaticFieldT_WithInitialValue_Byte(
-		string     name,
-		Visibility visibility,
-		byte       initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddStaticFieldT_WithInitialValue_Int16(
-		string     name,
-		Visibility visibility,
-		short      initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddStaticFieldT_WithInitialValue_UInt16(
-		string     name,
-		Visibility visibility,
-		ushort     initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddStaticFieldT_WithInitialValue_Int32(
-		string     name,
-		Visibility visibility,
-		int        initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddStaticFieldT_WithInitialValue_UInt32(
-		string     name,
-		Visibility visibility,
-		uint       initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddStaticFieldT_WithInitialValue_Int64(
-		string     name,
-		Visibility visibility,
-		long       initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddStaticFieldT_WithInitialValue_UInt64(
-		string     name,
-		Visibility visibility,
-		ulong      initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddStaticFieldT_WithInitialValue_Enum_SByte(
-		string     name,
-		Visibility visibility,
-		TestEnumS8 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Byte(
-		string     name,
-		Visibility visibility,
-		TestEnumU8 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int16(
-		string      name,
-		Visibility  visibility,
-		TestEnumS16 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt16(
-		string      name,
-		Visibility  visibility,
-		TestEnumU16 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int32(
-		string      name,
-		Visibility  visibility,
-		TestEnumS32 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt32(
-		string      name,
-		Visibility  visibility,
-		TestEnumU32 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddStaticFieldT_WithInitialValue_Enum_Int64(
-		string      name,
-		Visibility  visibility,
-		TestEnumS64 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddStaticFieldT_WithInitialValue_Enum_UInt64(
-		string      name,
-		Visibility  visibility,
-		TestEnumU64 initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddStaticFieldT_WithInitialValue_Single(
-		string     name,
-		Visibility visibility,
-		float      initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddStaticFieldT_WithInitialValue_Double(
-		string     name,
-		Visibility visibility,
-		double     initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddStaticFieldT_WithInitialValue_String(
-		string     name,
-		Visibility visibility,
-		string     initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddStaticFieldT_WithInitialValue_DateTime(
-		string     name,
-		Visibility visibility,
-		DateTime   initialValue)
-	{
-		AddStaticFieldT_WithInitialValue(name, visibility, initialValue);
-	}
-
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> method
-	/// (common part, type specific tests methods run the tests).
+	/// Tests the <see cref="TypeDefinition.AddStaticField{T}(string,Visibility,T)"/> method.
 	/// </summary>
-	/// <typeparam name="TFieldType">Type of the field to add.</typeparam>
 	/// <param name="name">Name of the field to add.</param>
+	/// <param name="fieldType">Type of the field to add.</param>
 	/// <param name="visibility">Visibility of the field to add.</param>
 	/// <param name="initialValue">The initial value of the field to set.</param>
-	private void AddStaticFieldT_WithInitialValue<TFieldType>(
+	[Theory]
+	[MemberData(nameof(AddFieldTestData_InitialValue))]
+	public void AddStaticFieldT_WithInitialValue(
 		string     name,
 		Visibility visibility,
-		TFieldType initialValue)
+		Type       fieldType,
+		object     initialValue)
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
@@ -1941,8 +982,8 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
 			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
 			.Where(method => method.GetGenericArguments().Length == 1)
-			.Select(method => method.MakeGenericMethod(typeof(TFieldType)))
-			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), typeof(TFieldType)]));
+			.Select(method => method.MakeGenericMethod(fieldType))
+			.Single(method => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(string), typeof(Visibility), fieldType]));
 		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [name, visibility, initialValue]);
 		Assert.NotNull(addedField);
 
@@ -1964,251 +1005,24 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 
 	#region AddStaticField(Type type, string name, Visibility visibility, object initialValue)
 
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Boolean))]
-	public void AddStaticField_WithInitialValue_Boolean(
-		string     name,
-		Visibility visibility,
-		bool       initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(bool), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Char))]
-	public void AddStaticField_WithInitialValue_Char(
-		string     name,
-		Visibility visibility,
-		char       initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(char), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_SByte))]
-	public void AddStaticField_WithInitialValue_SByte(
-		string     name,
-		Visibility visibility,
-		sbyte      initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(sbyte), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Byte))]
-	public void AddStaticField_WithInitialValue_Byte(
-		string     name,
-		Visibility visibility,
-		byte       initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(byte), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int16))]
-	public void AddStaticField_WithInitialValue_Int16(
-		string     name,
-		Visibility visibility,
-		short      initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(short), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt16))]
-	public void AddStaticField_WithInitialValue_UInt16(
-		string     name,
-		Visibility visibility,
-		ushort     initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(ushort), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int32))]
-	public void AddStaticField_WithInitialValue_Int32(
-		string     name,
-		Visibility visibility,
-		int        initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(int), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt32))]
-	public void AddStaticField_WithInitialValue_UInt32(
-		string     name,
-		Visibility visibility,
-		uint       initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(uint), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Int64))]
-	public void AddStaticField_WithInitialValue_Int64(
-		string     name,
-		Visibility visibility,
-		long       initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(long), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_UInt64))]
-	public void AddStaticField_WithInitialValue_UInt64(
-		string     name,
-		Visibility visibility,
-		ulong      initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(ulong), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_SByte))]
-	public void AddStaticField_WithInitialValue_Enum_Byte(
-		string     name,
-		Visibility visibility,
-		TestEnumS8 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumS8), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Byte))]
-	public void AddStaticField_WithInitialValue_Enum_SByte(
-		string     name,
-		Visibility visibility,
-		TestEnumU8 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumU8), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int16))]
-	public void AddStaticField_WithInitialValue_Enum_Int16(
-		string      name,
-		Visibility  visibility,
-		TestEnumS16 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumS16), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt16))]
-	public void AddStaticField_WithInitialValue_Enum_UInt16(
-		string      name,
-		Visibility  visibility,
-		TestEnumU16 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumU16), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int32))]
-	public void AddStaticField_WithInitialValue_Enum_Int32(
-		string      name,
-		Visibility  visibility,
-		TestEnumS32 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumS32), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt32))]
-	public void AddStaticField_WithInitialValue_Enum_UInt32(
-		string      name,
-		Visibility  visibility,
-		TestEnumU32 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumU32), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_Int64))]
-	public void AddStaticField_WithInitialValue_Enum_Int64(
-		string      name,
-		Visibility  visibility,
-		TestEnumS64 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumS64), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Enum_UInt64))]
-	public void AddStaticField_WithInitialValue_Enum_UInt64(
-		string      name,
-		Visibility  visibility,
-		TestEnumU64 initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(TestEnumU64), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Single))]
-	public void AddStaticField_WithInitialValue_Single(
-		string     name,
-		Visibility visibility,
-		float      initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(float), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_Double))]
-	public void AddStaticField_WithInitialValue_Double(
-		string     name,
-		Visibility visibility,
-		double     initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(double), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_String))]
-	public void AddStaticField_WithInitialValue_String(
-		string     name,
-		Visibility visibility,
-		string     initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(string), name, visibility, initialValue);
-	}
-
-	[Theory]
-	[MemberData(nameof(AddFieldTestData_InitialValue_DateTime))]
-	public void AddStaticField_WithInitialValue_DateTime(
-		string     name,
-		Visibility visibility,
-		DateTime   initialValue)
-	{
-		AddStaticField_WithInitialValue(typeof(DateTime), name, visibility, initialValue);
-	}
-
 	/// <summary>
-	/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/> method
-	/// (common part, type specific tests methods run the tests).
+	/// Tests the <see cref="TypeDefinition.AddStaticField(Type,string,Visibility,object)"/> method.
 	/// </summary>
 	/// <param name="fieldType">Type of the field to add.</param>
 	/// <param name="name">Name of the field to add.</param>
 	/// <param name="visibility">Visibility of the field to add.</param>
 	/// <param name="initialValue">The initial value of the field to set.</param>
-	private void AddStaticField_WithInitialValue(
-		Type       fieldType,
+	[Theory]
+	[MemberData(nameof(AddFieldTestData_InitialValue))]
+	public void AddStaticField_WithInitialValue(
 		string     name,
 		Visibility visibility,
+		Type       fieldType,
 		object     initialValue)
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(object)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initialValue]);
+		IGeneratedField addedField = definition.AddStaticField(fieldType, name, visibility, initialValue);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -2294,15 +1108,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initializer]);
+		IGeneratedField addedField = definition.AddField(fieldType, name, visibility, (FieldInitializer)initializer);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -2390,15 +1196,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(FieldInitializer)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, initializer]);
+		IGeneratedField addedField = definition.AddStaticField(fieldType, name, visibility, (FieldInitializer)initializer);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -2490,15 +1288,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, provideInitialValueCallback]);
+		IGeneratedField addedField = definition.AddField(fieldType, name, visibility, (ProvideValueCallback)provideInitialValueCallback);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
@@ -2591,15 +1381,7 @@ public abstract class TypeDefinitionTests_Common<TDefinition> where TDefinition 
 	{
 		// create a new type definition and add the field
 		TDefinition definition = CreateTypeDefinition();
-		MethodInfo addFieldMethod = typeof(TypeDefinition)
-			.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-			.Where(method => method.Name == nameof(TypeDefinition.AddStaticField))
-			.Single(
-				method => !method.IsGenericMethod && method
-					          .GetParameters()
-					          .Select(parameter => parameter.ParameterType)
-					          .SequenceEqual([typeof(Type), typeof(string), typeof(Visibility), typeof(ProvideValueCallback)]));
-		var addedField = (IGeneratedField)addFieldMethod.Invoke(definition, [fieldType, name, visibility, provideInitialValueCallback]);
+		IGeneratedField addedField = definition.AddStaticField(fieldType, name, visibility, (ProvideValueCallback)provideInitialValueCallback);
 		Assert.NotNull(addedField);
 
 		// create the defined type, check the result against the definition and create an instance of that type
